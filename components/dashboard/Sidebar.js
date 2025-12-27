@@ -4,15 +4,19 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { signOut } from "next-auth/react";
-import { 
-  LayoutDashboard, 
-  ShoppingBag, 
-  Scissors, 
-  Truck, 
-  Settings, 
-  LogOut, 
+import {
+  LayoutDashboard,
+  ShoppingBag,
+  Scissors,
+  Truck,
+  Settings,
+  LogOut,
   User,
-  Package
+  Package,
+  Store,
+  BarChart3,
+  PlusCircle,
+  Home
 } from "lucide-react";
 
 export default function Sidebar({ role }) {
@@ -22,16 +26,19 @@ export default function Sidebar({ role }) {
     USER: [
       { href: "/dashboard/user", label: "Overview", icon: LayoutDashboard },
       { href: "/dashboard/user/orders", label: "My Orders", icon: ShoppingBag },
-      // { href: "/dashboard/user/profile", label: "Profile", icon: User },
+      { href: "/dashboard/user/settings", label: "Settings", icon: Settings },
     ],
     TAILOR: [
       { href: "/dashboard/tailor", label: "Assignments", icon: Scissors },
       // { href: "/dashboard/tailor/history", label: "History", icon: LayoutDashboard },
     ],
     SHOPKEEPER: [
-      { href: "/dashboard/shopkeeper", label: "Overview", icon: LayoutDashboard },
-      // { href: "/dashboard/shopkeeper/products", label: "Products", icon: Package },
-      // { href: "/dashboard/shopkeeper/orders", label: "Orders", icon: ShoppingBag },
+      { href: "/dashboard/shopkeeper", label: "My Shop", icon: LayoutDashboard },
+      { href: "/dashboard/shopkeeper?tab=products", label: "Products", icon: Package },
+      { href: "/dashboard/shopkeeper/products/new", label: "Add Product", icon: PlusCircle },
+      { href: "/dashboard/shopkeeper?tab=orders", label: "Orders", icon: ShoppingBag },
+      { href: "/dashboard/shopkeeper?tab=analytics", label: "Analytics", icon: BarChart3 },
+      { href: "/dashboard/shopkeeper/settings", label: "Settings", icon: Settings },
     ],
     DELIVERY: [
       { href: "/dashboard/delivery", label: "Deliveries", icon: Truck },
@@ -49,11 +56,11 @@ export default function Sidebar({ role }) {
     <div className="flex h-full w-64 flex-col border-r bg-white shadow-sm">
       <div className="p-6 border-b">
         <Link href="/" className="flex items-center gap-2">
-           <div className="h-8 w-8 rounded-full bg-gray-900 text-white flex items-center justify-center font-bold">S</div>
-           <div>
-             <h2 className="text-xl font-bold tracking-tight">StyleAI</h2>
-             <p className="text-xs font-medium text-gray-500">{role} Workspace</p>
-           </div>
+          <div className="h-8 w-8 rounded-full bg-gray-900 text-white flex items-center justify-center font-bold">S</div>
+          <div>
+            <h2 className="text-xl font-bold tracking-tight">StyleAI</h2>
+            <p className="text-xs font-medium text-gray-500">{role} Workspace</p>
+          </div>
         </Link>
       </div>
       <nav className="flex-1 space-y-1 px-3 py-4">
@@ -75,8 +82,8 @@ export default function Sidebar({ role }) {
         })}
       </nav>
       <div className="p-4 border-t bg-gray-50">
-        <Button 
-          variant="ghost" 
+        <Button
+          variant="ghost"
           className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50"
           onClick={() => signOut({ callbackUrl: '/' })}
         >

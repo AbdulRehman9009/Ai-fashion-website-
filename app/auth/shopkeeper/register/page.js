@@ -1,5 +1,10 @@
+"use client";
 import AuthForm from "@/components/auth/AuthForm";
 
 export default function ShopkeeperRegisterPage() {
-  return <AuthForm role="SHOPKEEPER" type="register" />;
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-orange-50/30 p-4">
+      <AuthForm role="SHOPKEEPER" type="register" />
+    </div>
+  );
 }

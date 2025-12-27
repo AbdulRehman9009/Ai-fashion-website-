@@ -59,6 +59,13 @@ const OrderSchema = new mongoose.Schema(
     },
     delivery: { type: mongoose.Schema.Types.ObjectId, ref: "Delivery" },
     assignedTailor: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    tailorAcceptanceStatus: {
+      type: String,
+      enum: ["Pending", "Accepted", "Rejected"],
+      default: "Pending"
+    },
+    tailorNotes: String,
+    estimatedCompletionDate: Date,
     timeline: [
       {
         at: { type: Date, default: Date.now },

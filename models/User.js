@@ -9,6 +9,14 @@ const UserSchema = new mongoose.Schema(
     role: { type: String, enum: Roles, default: "USER", index: true },
     status: { type: String, enum: ["ACTIVE", "SUSPENDED"], default: "ACTIVE" },
     lastLogin: { type: Date },
+
+    // Auth & Reset
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
+
+    // Caching typical profile fields to reduce lookups
+    name: { type: String },
+    image: { type: String },
   },
   { timestamps: true }
 );

@@ -4,6 +4,9 @@ const ShopSchema = new mongoose.Schema(
   {
     owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     name: { type: String, required: true, trim: true },
+    description: { type: String },
+    logo: { type: String }, // URL from Cloudinary
+    banner: { type: String }, // URL from Cloudinary
     location: {
       address: String,
       city: String,

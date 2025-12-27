@@ -25,11 +25,21 @@ export async function POST(req) {
     return NextResponse.json({ error: "Email in use" }, { status: 409 });
   }
   const passwordHash = await bcrypt.hash(password, 12);
-  
+
   // Transaction-like sequence (optimistic)
-  const user = await User.create({ email: email.toLowerCase().trim(), passwordHash, role });
+  const user = await User.create({ email: email.toLowerCase().trim(), passwordHash, role, name });
   await Profile.create({ user: user._id, name: name || "" });
-  
-  return NextResponse.json({ id: String(user._id), email: user.email, role: user.role }, { status: 201 });
+
+  // Auto-create Shop for SHOPKEEPER role
+  if (role === "SHOPKEEPER") {
+    const Shop = (await import("@/models/Shop")).default;
+    await Shop.create({
+      owner: user._id,
+      name: `${name}'s Fashion Store`,
+      location: { city: "Pending Setup" }
+    });
+  }
+
+  return NextResponse.json({ id: String(user._id), email: user.email, role: user.role, name: user.name }, { status: 201 });
 }
 
