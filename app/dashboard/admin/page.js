@@ -1,170 +1,200 @@
 "use client";
 import { useState, useEffect } from "react";
-import OrdersList from "@/components/OrdersList";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Shield, TrendingUp, Users, DollarSign, Activity } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Users, ShoppingBag, DollarSign, AlertCircle, Shield } from "lucide-react";
+import { toast } from "react-toastify";
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState({ revenue: 0, orders: 0, users: 0, active: true });
-  const [chartData, setChartData] = useState([]);
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulating fetching aggregation stats
-    const fetchStats = async () => {
-      try {
-        const res = await fetch("/api/orders?role=ADMIN");
-        const data = await res.json();
-        if (Array.isArray(data)) {
-          const totalRev = data.reduce((acc, o) => acc + (o.pricing?.grandTotal || 0), 0);
-          setStats({
-            revenue: totalRev,
-            orders: data.length,
-            users: new Set(data.map(o => o.user._id)).size,
-            active: true
-          });
-
-          // Generate mock chart data based on orders
-          // In real app, aggregate by date from backend
-          const last7Days = Array.from({ length: 7 }, (_, i) => {
-            const d = new Date();
-            d.setDate(d.getDate() - i);
-            return d.toLocaleDateString('en-US', { weekday: 'short' });
-          }).reverse();
-
-          const mockData = last7Days.map(day => ({
-            name: day,
-            revenue: Math.floor(Math.random() * 500) + 100, // Mocking distribution
-            orders: Math.floor(Math.random() * 10) + 1
-          }));
-          setChartData(mockData);
-        }
-      } catch (e) { console.error(e); }
-    };
     fetchStats();
   }, []);
 
+  const fetchStats = async () => {
+    try {
+      const res = await fetch("/api/admin/stats");
+      if (res.ok) {
+        const data = await res.json();
+        setStats(data);
+      } else {
+        toast.error("Failed to load stats");
+      }
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+      toast.error("Could not load dashboard stats");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="flex justify-center p-12">Loading...</div>;
+  }
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in duration-500">
+      {/* Header */}
       <div className="flex items-center gap-4">
         <div className="bg-red-100 p-3 rounded-full">
-          <Shield className="h-6 w-6 text-red-800" />
+          <Shield className="h-6 w-6 text-red-900" />
         </div>
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900">System Admin</h2>
-          <p className="text-gray-500">Platform overview and analytics.</p>
+          <h2 className="text-3xl font-bold tracking-tight">Admin Dashboard</h2>
+          <p className="text-gray-500">Complete system oversight and management</p>
         </div>
       </div>
 
-      {/* Stats Grid */}
+      {/* Stats Cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+        <Card className="bg-gradient-to-br from-blue-50 to-white">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-blue-700">Total Users</CardTitle>
+            <Users className="h-4 w-4 text-blue-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${stats.revenue.toLocaleString()}</div>
-            <p className="text-xs text-muted-foreground">+20.1% from last month</p>
+            <div className="text-3xl font-bold">{stats?.users?.total || 0}</div>
+            <p className="text-xs text-blue-600 mt-1">
+              {stats?.users?.byRole?.USER || 0} customers, {stats?.users?.byRole?.SHOPKEEPER || 0} shops
+            </p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Orders</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+
+        <Card className="bg-gradient-to-br from-green-50 to-white">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-green-700">Total Orders</CardTitle>
+            <ShoppingBag className="h-4 w-4 text-green-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.orders}</div>
+            <div className="text-3xl font-bold">{stats?.orders?.total || 0}</div>
+            <p className="text-xs text-green-600 mt-1">
+              {stats?.orders?.completed || 0} completed
+            </p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Active Users</CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+
+        <Card className="bg-gradient-to-br from-purple-50 to-white">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-purple-700">Total Revenue</CardTitle>
+            <DollarSign className="h-4 w-4 text-purple-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.users}</div>
+            <div className="text-3xl font-bold">${stats?.revenue?.total || 0}</div>
+            <p className="text-xs text-purple-600 mt-1">
+              ${stats?.revenue?.thisMonth || 0} this month
+            </p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">System Health</CardTitle>
-            <Activity className="h-4 w-4 text-green-500" />
+
+        <Card className="bg-gradient-to-br from-orange-50 to-white">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-sm font-medium text-orange-700">Pending Actions</CardTitle>
+            <AlertCircle className="h-4 w-4 text-orange-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">Operational</div>
+            <div className="text-3xl font-bold">{stats?.pendingActions?.total || 0}</div>
+            <p className="text-xs text-orange-600 mt-1">
+              Requires attention
+            </p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Charts Section */}
-      <div className="grid gap-6 md:grid-cols-2">
+      {/* Quick Stats Grid */}
+      <div className="grid gap-6 md:grid-cols-3">
         <Card>
           <CardHeader>
-            <CardTitle>Revenue Trend</CardTitle>
+            <CardTitle className="text-base">Users by Role</CardTitle>
           </CardHeader>
-          <CardContent className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="revenue" stroke="#ef4444" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
+          <CardContent className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Customers:</span>
+              <span className="font-semibold">{stats?.users?.byRole?.USER || 0}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Shopkeepers:</span>
+              <span className="font-semibold">{stats?.users?.byRole?.SHOPKEEPER || 0}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Tailors:</span>
+              <span className="font-semibold">{stats?.users?.byRole?.TAILOR || 0}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Delivery:</span>
+              <span className="font-semibold">{stats?.users?.byRole?.DELIVERY || 0}</span>
+            </div>
           </CardContent>
         </Card>
+
         <Card>
           <CardHeader>
-            <CardTitle>Orders Activity</CardTitle>
+            <CardTitle className="text-base">Order Status</CardTitle>
           </CardHeader>
-          <CardContent className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="orders" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+          <CardContent className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Pending:</span>
+              <span className="font-semibold text-orange-600">{stats?.orders?.pending || 0}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Completed:</span>
+              <span className="font-semibold text-green-600">{stats?.orders?.completed || 0}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Total:</span>
+              <span className="font-semibold">{stats?.orders?.total || 0}</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Pending Actions</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Payments:</span>
+              <span className="font-semibold text-red-600">{stats?.pendingActions?.pendingPayments || 0}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Deliveries:</span>
+              <span className="font-semibold text-blue-600">{stats?.pendingActions?.pendingDeliveries || 0}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span className="text-gray-600">Tailor Requests:</span>
+              <span className="font-semibold text-purple-600">{stats?.pendingActions?.tailorRequests || 0}</span>
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-7">
-        <div className="col-span-4">
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle>Recent Orders</CardTitle>
-              <CardDescription>Latest transactions across the platform.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <OrdersList role="ADMIN" />
-            </CardContent>
-          </Card>
-        </div>
-        <div className="col-span-3">
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle>System Activity</CardTitle>
-              <CardDescription>Real-time system logs.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="flex gap-4 text-sm border-b pb-2 last:border-0">
-                  <div className="text-gray-400 font-mono text-xs">10:4{i} AM</div>
-                  <div>
-                    <p className="font-medium">New order placed</p>
-                    <p className="text-xs text-gray-500">Order #{202400 + i} processed successfully.</p>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      {/* Quick Links */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Quick Actions</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid gap-4 md:grid-cols-4">
+            <a href="/dashboard/admin/users" className="p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors text-center">
+              <Users className="h-6 w-6 mx-auto mb-2 text-blue-600" />
+              <p className="font-semibold text-blue-900">Manage Users</p>
+            </a>
+            <a href="/dashboard/admin/shops" className="p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors text-center">
+              <ShoppingBag className="h-6 w-6 mx-auto mb-2 text-orange-600" />
+              <p className="font-semibold text-orange-900">Manage Shops</p>
+            </a>
+            <a href="/dashboard/admin/tailors" className="p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors text-center">
+              <Shield className="h-6 w-6 mx-auto mb-2 text-purple-600" />
+              <p className="font-semibold text-purple-900">Manage Tailors</p>
+            </a>
+            <a href="/dashboard/admin/orders" className="p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors text-center">
+              <DollarSign className="h-6 w-6 mx-auto mb-2 text-green-600" />
+              <p className="font-semibold text-green-900">View Orders</p>
+            </a>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

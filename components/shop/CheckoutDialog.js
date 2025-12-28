@@ -59,7 +59,13 @@ export default function CheckoutDialog({ open, onOpenChange, product, onSuccess 
 
       if (!res.ok) throw new Error(data.error || "Failed to place order");
 
-      toast.success("Payment Successful! Order placed.");
+      if (data.checkoutUrl) {
+        toast.success("Order created! Redirecting to payment...");
+        window.location.href = data.checkoutUrl;
+        return;
+      }
+
+      toast.success("Order placed successfully!");
       onSuccess();
       onOpenChange(false);
 

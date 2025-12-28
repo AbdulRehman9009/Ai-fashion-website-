@@ -16,6 +16,15 @@ const ProductSchema = new mongoose.Schema(
       fabric: String,
       pattern: String,
     },
+    // Paddle Integration
+    paddleProductId: String,
+    paddlePriceId: String,
+    paddleSyncStatus: {
+      type: String,
+      enum: ["pending", "synced", "failed"],
+      default: "pending",
+    },
+    paddleSyncError: String,
   },
   { timestamps: true }
 );

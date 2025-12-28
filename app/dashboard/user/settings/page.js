@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Loader2, Save } from "lucide-react";
 import { toast } from "react-toastify";
 import ImageUpload from "@/components/ui/image-upload";
+import PasswordChangeForm from "@/components/settings/PasswordChangeForm";
 
 export default function UserSettings() {
     const [loading, setLoading] = useState(true);
@@ -63,7 +64,9 @@ export default function UserSettings() {
         <div className="max-w-2xl mx-auto space-y-6">
             <h2 className="text-2xl font-bold">Profile Settings</h2>
 
+            {/* Profile Information */}
             <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow border">
+                <h3 className="text-lg font-semibold border-b pb-2">Profile Information</h3>
 
                 <div className="space-y-2">
                     <Label htmlFor="name">Your Name</Label>
@@ -93,6 +96,9 @@ export default function UserSettings() {
                     </Button>
                 </div>
             </form>
+
+            {/* Password Change */}
+            <PasswordChangeForm />
         </div>
     );
 }

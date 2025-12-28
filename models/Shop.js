@@ -13,6 +13,25 @@ const ShopSchema = new mongoose.Schema(
       state: String,
       coordinates: { type: [Number], index: "2dsphere" }, // [longitude, latitude]
     },
+    businessDetails: {
+      ownerName: String,
+      phone: String,
+      taxId: String,
+      businessType: String,
+    },
+    categoryPermissions: [String], // categories this shop can sell
+    commissionAgreement: {
+      percentage: { type: Number, default: 10 },
+      agreedAt: Date,
+      agreedToTerms: Boolean,
+    },
+    profileCompletion: {
+      isComplete: { type: Boolean, default: false },
+      percentage: { type: Number, default: 0 },
+      missingFields: [String],
+    },
+    isActive: { type: Boolean, default: true, index: true },
+    isVisibleToCustomers: { type: Boolean, default: true, index: true },
     ratingAvg: { type: Number, default: 0 },
     ratingCount: { type: Number, default: 0 },
   },

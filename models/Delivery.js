@@ -24,6 +24,16 @@ const DeliverySchema = new mongoose.Schema(
       default: "Assigned",
       index: true,
     },
+    deliveryNotes: { type: String },
+    confirmedAt: { type: Date },
+    fee: { type: Number, default: 10 },
+    urgentBonus: { type: Number, default: 0 },
+    paymentStatus: {
+      type: String,
+      enum: ["Pending", "Paid"],
+      default: "Pending",
+      index: true,
+    },
     events: [
       {
         at: { type: Date, default: Date.now },

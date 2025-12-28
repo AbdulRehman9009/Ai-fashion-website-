@@ -35,6 +35,16 @@ export async function middleware(req) {
       // Wrong role. Redirect to their own dashboard.
       return NextResponse.redirect(new URL(`/dashboard/${userRole.toLowerCase()}`, req.url));
     }
+
+    // 3. Profile Completion Check (Skip for profile and settings pages)
+    const isProfilePage = pathname.includes("/profile") || pathname.includes("/settings");
+    if (!isProfilePage) {
+      // Check if profile is complete (using value cached in token)
+      if (token.isProfileComplete === false) {
+        const profileUrl = new URL(`/dashboard/${userRole.toLowerCase()}/profile?required=true`, req.url);
+        return NextResponse.redirect(profileUrl);
+      }
+    }
   }
 
   return NextResponse.next();

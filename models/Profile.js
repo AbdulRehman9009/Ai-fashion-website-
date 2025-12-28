@@ -5,6 +5,9 @@ const ProfileSchema = new mongoose.Schema(
     user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true, unique: true },
     name: { type: String, trim: true },
     phone: { type: String, trim: true },
+    emailVerified: { type: Boolean, default: false },
+    emailVerificationToken: String,
+    emailVerificationExpire: Date,
     addresses: [
       {
         street: String,
@@ -30,6 +33,10 @@ const ProfileSchema = new mongoose.Schema(
       fit: { type: String, enum: ["SLIM", "REGULAR", "LOOSE"], default: "REGULAR" },
       budgetRange: { min: Number, max: Number },
     },
+    termsAccepted: { type: Boolean, default: false },
+    termsAcceptedAt: Date,
+    refundPolicyAccepted: { type: Boolean, default: false },
+    refundPolicyAcceptedAt: Date,
   },
   { timestamps: true }
 );

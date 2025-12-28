@@ -83,6 +83,22 @@ const OrderSchema = new mongoose.Schema(
       zip: String,
       country: String,
     },
+    // Paddle Payment Integration
+    paddleCheckoutId: String,
+    paddlePaymentId: String,
+    paddleOrderId: String,
+    paymentDistribution: {
+      shopkeeperAmount: { type: Number, default: 0 },
+      tailorAmount: { type: Number, default: 0 },
+      deliveryAmount: { type: Number, default: 0 },
+      platformFee: { type: Number, default: 0 },
+      processingFee: { type: Number, default: 0 },
+    },
+    paymentReleaseStatus: {
+      shopkeeper: { type: String, enum: ["pending", "available", "paid", "failed"], default: "pending" },
+      tailor: { type: String, enum: ["pending", "available", "paid", "failed"], default: "pending" },
+      delivery: { type: String, enum: ["pending", "available", "paid", "failed"], default: "pending" },
+    },
   },
   { timestamps: true }
 );

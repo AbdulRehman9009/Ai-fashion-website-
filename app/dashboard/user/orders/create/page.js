@@ -54,25 +54,43 @@ export default function CreateOrderPage() {
         }
 
         try {
-            for (const shopId of shopIds) {
-                const shopItems = cart.filter(p => p.shop === shopId);
-                const payload = {
-                    items: shopItems.map(p => ({ productId: p._id, quantity: 1 })),
-                    shopId: shopId,
-                    tailoringRequests: [], // Customization step could be added here
-                    urgent: false,
-                    shippingAddress: { street: "Default Address" } // Should be from a form
-                };
+            // Start with the first shop (simplified flow for Paddle migration)
+            const shopId = shopIds[0];
+            const shopItems = cart.filter(p => p.shop === shopId);
 
-                const res = await fetch("/api/orders", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(payload)
-                });
-
-                if (!res.ok) throw new Error("Failed to place order for a shop");
+            if (shopIds.length > 1) {
+                toast.warning(`Processing items for ${shopItems[0].shopName || "first shop"} only. Please create separate orders for others.`);
             }
-            toast.success("All orders placed successfully!");
+
+            const payload = {
+                items: shopItems.map(p => ({ productId: p._id, quantity: 1 })),
+                shopId: shopId,
+                tailoringRequests: [],
+                urgent: false,
+                shippingAddress: { street: "Default Address" }
+            };
+
+            const res = await fetch("/api/orders", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) throw new Error(data.error || "Failed to place order");
+
+            if (data.checkoutUrl) {
+                toast.success("Order created! Redirecting to payment...");
+                // Remove processed items from cart
+                const newCart = cart.filter(p => p.shop !== shopId);
+                setCart(newCart);
+                // Store cart in local storage if needed, but for now just redirect
+                window.location.href = data.checkoutUrl;
+                return;
+            }
+
+            toast.success("Order placed successfully!");
             setCart([]);
             router.push("/dashboard/user/orders");
         } catch (e) {
