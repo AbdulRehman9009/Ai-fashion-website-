@@ -3,10 +3,10 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import axios from "axios";
-import CustomerProfileForm from "@/components/profile/CustomerProfileForm";
-import TailorProfileForm from "@/components/profile/TailorProfileForm";
-import ShopkeeperProfileForm from "@/components/profile/ShopkeeperProfileForm";
-import DeliveryProfileForm from "@/components/profile/DeliveryProfileForm";
+import UserProfileForm from "@/components/profile-forms/UserProfileForm";
+import TailorProfileForm from "@/components/profile-forms/TailorProfileForm";
+import ShopkeeperProfileForm from "@/components/profile-forms/ShopkeeperProfileForm";
+import DeliveryProfileForm from "@/components/profile-forms/DeliveryProfileForm";
 import ProgressIndicator from "@/components/ui/ProgressIndicator";
 import { Loader2, CheckCircle2 } from "lucide-react";
 
@@ -106,7 +106,7 @@ export default function CompleteProfilePage() {
             <div className="container mx-auto px-4 py-12">
                 <div className="mx-auto max-w-3xl">
                     <div className="rounded-xl border bg-white p-8 shadow-lg">
-                        {session.user.role === "USER" && <CustomerProfileForm onComplete={handleComplete} />}
+                        {session.user.role === "USER" && <UserProfileForm onComplete={handleComplete} />}
                         {session.user.role === "TAILOR" && <TailorProfileForm onComplete={handleComplete} />}
                         {session.user.role === "SHOPKEEPER" && <ShopkeeperProfileForm onComplete={handleComplete} />}
                         {session.user.role === "DELIVERY" && <DeliveryProfileForm onComplete={handleComplete} />}

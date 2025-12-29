@@ -31,6 +31,7 @@
     "next-auth": "^4.24.13",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-google-recaptcha": "^3.1.0",
     "react-hook-form": "^7.69.0",
     "react-toastify": "^11.0.5",
     "recharts": "^3.6.0",

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { connectDB } from "@/lib/db";
 import Order from "@/models/Order";
+import User from "@/models/User";
 import Product from "@/models/Product";
 import Shop from "@/models/Shop";
 import { computePricing } from "@/lib/pricing";
@@ -44,6 +45,16 @@ export async function POST(req) {
   if (token.role !== "USER") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const body = await req.json();
+
+  // Check Profile Completion
+  const user = await User.findById(token.sub).select("profileCompletion").lean();
+  if (!user || !user.profileCompletion?.isComplete) {
+    return NextResponse.json({
+      error: "Profile incomplete. Please complete your profile to place an order.",
+      redirect: "/dashboard/complete-profile"
+    }, { status: 403 });
+  }
+
   const { items = [], shopId, tailoringRequests = [], urgent = false, deliveryZone = "standard", shippingAddress = {} } = body;
 
   if (!shopId || !Array.isArray(items) || items.length === 0) {

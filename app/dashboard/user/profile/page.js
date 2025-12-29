@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import CustomerProfileForm from "@/components/profile-forms/CustomerProfileForm";
+import UserProfileForm from "@/components/profile-forms/UserProfileForm";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, CheckCircle } from "lucide-react";
 
@@ -49,7 +49,7 @@ export default function CustomerProfilePage() {
                 </Alert>
             )}
 
-            <CustomerProfileForm />
+            <UserProfileForm />
         </div>
     );
 }

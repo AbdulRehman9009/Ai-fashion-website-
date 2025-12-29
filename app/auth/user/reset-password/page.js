@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,14 @@ import Link from "next/link";
 import { Loader2, KeyRound, CheckCircle } from "lucide-react";
 
 export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="flex justify-center mt-10"><Loader2 className="h-8 w-8 animate-spin text-blue-600" /></div>}>
+      <UserResetPasswordContent />
+    </Suspense>
+  );
+}
+
+function UserResetPasswordContent() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

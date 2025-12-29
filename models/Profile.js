@@ -19,6 +19,11 @@ const ProfileSchema = new mongoose.Schema(
       },
     ],
     measurements: {
+      height: Number, // cm
+      weight: Number, // kg
+      shirtSize: { type: String, enum: ["XS", "S", "M", "L", "XL", "XXL"] },
+      pantSize: Number, // waist (in)
+      shoeSize: Number, // US size
       chest: Number,
       waist: Number,
       hips: Number,
@@ -32,6 +37,7 @@ const ProfileSchema = new mongoose.Schema(
       brands: [String],
       fit: { type: String, enum: ["SLIM", "REGULAR", "LOOSE"], default: "REGULAR" },
       budgetRange: { min: Number, max: Number },
+      newsletter: { type: Boolean, default: true },
     },
     termsAccepted: { type: Boolean, default: false },
     termsAcceptedAt: Date,

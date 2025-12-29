@@ -12,6 +12,8 @@ const geistMono = Geist_Mono({
 });
 
 import { Providers } from "@/components/Providers";
+import ProfileWarningBanner from "@/components/ui/ProfileWarningBanner";
+import Footer from "@/components/layout/Footer";
 
 export const metadata = {
   title: "Create Next App",
@@ -25,7 +27,9 @@ export default function RootLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
+          <ProfileWarningBanner />
           {children}
+          <Footer />
         </Providers>
       </body>
     </html>

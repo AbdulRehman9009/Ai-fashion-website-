@@ -124,184 +124,204 @@ export default function ShopkeeperProfileForm({ onComplete }) {
     };
 
     return (
-        <Card className="max-w-2xl mx-auto">
-            <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                    <Store className="h-5 w-5" />
-                    Complete Shop Profile
-                </CardTitle>
-                <CardDescription>
-                    Provide your business details and bank account for payouts.
-                </CardDescription>
-            </CardHeader>
-            <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    {/* Business Info */}
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-semibold">Business Information</h3>
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <div className="space-y-2">
-                                <Label htmlFor="businessName">Shop Name *</Label>
-                                <Input
-                                    id="businessName"
-                                    name="businessName"
-                                    value={formData.businessName}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="ownerName">Owner Name *</Label>
-                                <Input
-                                    id="ownerName"
-                                    name="ownerName"
-                                    value={formData.ownerName}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <div className="space-y-2">
-                                <Label htmlFor="phone">Business Phone *</Label>
-                                <Input
-                                    id="phone"
-                                    name="phone"
-                                    value={formData.phone}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="taxId">Tax ID (Optional)</Label>
-                                <Input
-                                    id="taxId"
-                                    name="taxId"
-                                    value={formData.taxId}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                        </div>
+        <div className="max-w-4xl mx-auto space-y-6">
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-bold tracking-tight">Shop Profile Setup</h1>
+                    <p className="text-muted-foreground">Set up your digital shop front and payout details.</p>
+                </div>
+                <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground bg-secondary/50 px-3 py-1 rounded-full">
+                    <Store className="h-4 w-4" />
+                    <span>Business Owner</span>
+                </div>
+            </div>
+
+            <form onSubmit={handleSubmit}>
+                <div className="grid gap-6 md:grid-cols-2">
+                    {/* Left Column: Business Info */}
+                    <div className="space-y-6">
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-lg">Business Details</CardTitle>
+                                <CardDescription>Basic information about your shop.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="businessName">Shop Name *</Label>
+                                    <Input
+                                        id="businessName"
+                                        name="businessName"
+                                        value={formData.businessName}
+                                        onChange={handleChange}
+                                        placeholder="My Fashion Boutique"
+                                        required
+                                    />
+                                </div>
+                                <div className="grid gap-4 md:grid-cols-2">
+                                    <div className="space-y-2">
+                                        <Label htmlFor="ownerName">Owner Name *</Label>
+                                        <Input
+                                            id="ownerName"
+                                            name="ownerName"
+                                            value={formData.ownerName}
+                                            onChange={handleChange}
+                                            placeholder="John Doe"
+                                            required
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="phone">Business Phone *</Label>
+                                        <Input
+                                            id="phone"
+                                            name="phone"
+                                            type="tel"
+                                            value={formData.phone}
+                                            onChange={handleChange}
+                                            placeholder="+1234567890"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="taxId">Tax ID / Registration (Optional)</Label>
+                                    <Input
+                                        id="taxId"
+                                        name="taxId"
+                                        value={formData.taxId}
+                                        onChange={handleChange}
+                                        placeholder="Tax-123456"
+                                    />
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader>
+                                <CardTitle className="text-lg">Location</CardTitle>
+                                <CardDescription>Physical address of your shop.</CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="address">Address *</Label>
+                                    <Input
+                                        id="address"
+                                        name="address"
+                                        value={formData.address}
+                                        onChange={handleChange}
+                                        placeholder="123 Fashion Ave"
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="city">City *</Label>
+                                    <Input
+                                        id="city"
+                                        name="city"
+                                        value={formData.city}
+                                        onChange={handleChange}
+                                        placeholder="New York"
+                                        required
+                                    />
+                                </div>
+                            </CardContent>
+                        </Card>
                     </div>
 
-                    {/* Location */}
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-semibold flex items-center gap-2">
-                            <MapPin className="h-4 w-4" />
-                            Business Location
-                        </h3>
-                        <div className="space-y-2">
-                            <Label htmlFor="address">Address *</Label>
-                            <Input
-                                id="address"
-                                name="address"
-                                value={formData.address}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-                        <div className="space-y-2">
-                            <Label htmlFor="city">City *</Label>
-                            <Input
-                                id="city"
-                                name="city"
-                                value={formData.city}
-                                onChange={handleChange}
-                                required
-                            />
+                    {/* Right Column: Bank & Terms */}
+                    <div className="space-y-6">
+                        <Card className="border-blue-100 bg-blue-50/30">
+                            <CardHeader>
+                                <CardTitle className="text-lg flex items-center gap-2 text-blue-900">
+                                    <CreditCard className="h-5 w-5" />
+                                    Payout Information
+                                </CardTitle>
+                                <CardDescription className="text-blue-700/80">
+                                    Bank details for recieving sales revenue.
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="space-y-2">
+                                    <Label htmlFor="bankName">Bank Name *</Label>
+                                    <Input
+                                        id="bankName"
+                                        name="bankName"
+                                        value={formData.bankName}
+                                        onChange={handleChange}
+                                        className="bg-white"
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="accountHolderName">Account Holder Name *</Label>
+                                    <Input
+                                        id="accountHolderName"
+                                        name="accountHolderName"
+                                        value={formData.accountHolderName}
+                                        onChange={handleChange}
+                                        className="bg-white"
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="accountNumber">Account Number *</Label>
+                                    <Input
+                                        id="accountNumber"
+                                        name="accountNumber"
+                                        value={formData.accountNumber}
+                                        onChange={handleChange}
+                                        className="bg-white"
+                                        required
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="iban">IBAN (Optional)</Label>
+                                    <Input
+                                        id="iban"
+                                        name="iban"
+                                        value={formData.iban}
+                                        onChange={handleChange}
+                                        className="bg-white"
+                                    />
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        <div className="space-y-4 pt-4">
+                            <div className="flex items-start gap-3 p-4 rounded-lg border border-muted bg-muted/20">
+                                <input
+                                    type="checkbox"
+                                    id="agreedToTerms"
+                                    name="agreedToTerms"
+                                    checked={formData.agreedToTerms}
+                                    onChange={handleChange}
+                                    className="mt-1 h-4 w-4 rounded border-gray-300 text-primary focus:ring-primary"
+                                />
+                                <Label htmlFor="agreedToTerms" className="text-sm leading-tight cursor-pointer">
+                                    I accept the <span className="text-primary underline">Commission Agreement</span> and <span className="text-primary underline">Shop Terms of Service</span>.
+                                </Label>
+                            </div>
+
+                            <Button
+                                type="submit"
+                                className="w-full h-11 text-base shadow-lg hover:shadow-xl transition-all"
+                                disabled={loading || !formData.agreedToTerms}
+                            >
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                        Saving Profile...
+                                    </>
+                                ) : (
+                                    <>
+                                        <Check className="mr-2 h-4 w-4" />
+                                        Save & Open Shop
+                                    </>
+                                )}
+                            </Button>
                         </div>
                     </div>
-
-                    {/* Bank Details */}
-                    <div className="space-y-4">
-                        <h3 className="text-lg font-semibold flex items-center gap-2">
-                            <CreditCard className="h-4 w-4" />
-                            Bank Account for Payouts
-                        </h3>
-                        <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                            <p className="text-sm text-blue-800">
-                                Provide your bank account details to receive your earnings via bank transfer.
-                            </p>
-                        </div>
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <div className="space-y-2">
-                                <Label htmlFor="accountHolderName">Account Holder Name *</Label>
-                                <Input
-                                    id="accountHolderName"
-                                    name="accountHolderName"
-                                    value={formData.accountHolderName}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="accountNumber">Account Number *</Label>
-                                <Input
-                                    id="accountNumber"
-                                    name="accountNumber"
-                                    value={formData.accountNumber}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                        </div>
-                        <div className="grid gap-4 md:grid-cols-2">
-                            <div className="space-y-2">
-                                <Label htmlFor="bankName">Bank Name *</Label>
-                                <Input
-                                    id="bankName"
-                                    name="bankName"
-                                    value={formData.bankName}
-                                    onChange={handleChange}
-                                    required
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label htmlFor="iban">IBAN (Optional)</Label>
-                                <Input
-                                    id="iban"
-                                    name="iban"
-                                    value={formData.iban}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Terms */}
-                    <div className="flex items-start gap-2">
-                        <input
-                            type="checkbox"
-                            id="agreedToTerms"
-                            name="agreedToTerms"
-                            checked={formData.agreedToTerms}
-                            onChange={handleChange}
-                            className="mt-1"
-                        />
-                        <Label htmlFor="agreedToTerms" className="cursor-pointer text-sm">
-                            I agree to the Commission Agreement and Shop Terms *
-                        </Label>
-                    </div>
-
-                    <Button
-                        type="submit"
-                        className="w-full"
-                        disabled={loading || !formData.agreedToTerms}
-                    >
-                        {loading ? (
-                            <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Saving...
-                            </>
-                        ) : (
-                            <>
-                                <Check className="mr-2 h-4 w-4" />
-                                Complete Shop Profile
-                            </>
-                        )}
-                    </Button>
-                </form>
-            </CardContent>
-        </Card>
+                </div>
+            </form>
+        </div>
     );
 }

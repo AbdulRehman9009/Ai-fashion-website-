@@ -14,6 +14,10 @@ const UserSchema = new mongoose.Schema(
     resetPasswordToken: String,
     resetPasswordExpire: Date,
 
+    // AI Usage Limits
+    aiUsageCount: { type: Number, default: 0 },
+    lastAiUsageDate: { type: Date },
+
     // Caching typical profile fields to reduce lookups
     name: { type: String },
     image: { type: String },
