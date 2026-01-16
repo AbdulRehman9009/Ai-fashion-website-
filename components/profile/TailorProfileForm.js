@@ -206,7 +206,7 @@ export default function TailorProfileForm({ onComplete }) {
             <div className="flex gap-3">
                 <Button
                     type="submit"
-                    className="flex-1 bg-gradient-to-r from-purple-500 to-purple-600"
+                    className="flex-1 bg-linear-to-r from-purple-500 to-purple-600"
                     disabled={loading || stripeLoading}
                 >
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

@@ -11,7 +11,7 @@ import ProgressIndicator from "@/components/ui/ProgressIndicator";
 import { Loader2, CheckCircle2 } from "lucide-react";
 
 export default function CompleteProfilePage() {
-    const { data: session, status } = useSession();
+    const { data: session, status, update } = useSession();
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [profileStatus, setProfileStatus] = useState(null);
@@ -27,10 +27,11 @@ export default function CompleteProfilePage() {
             const response = await axios.get("/api/profile/completion");
             setProfileStatus(response.data);
 
-            // If profile is complete, redirect to dashboard
+            // If profile is complete, update session and redirect
             if (response.data.isComplete) {
+                await update({ isProfileComplete: true });
                 const role = session.user.role.toLowerCase();
-                router.push(`/dashboard/${role}`);
+                window.location.href = `/dashboard/${role}`;
             }
         } catch (error) {
             console.error("Error checking profile:", error);
@@ -39,9 +40,10 @@ export default function CompleteProfilePage() {
         }
     };
 
-    const handleComplete = () => {
+    const handleComplete = async () => {
+        await update({ isProfileComplete: true });
         const role = session.user.role.toLowerCase();
-        router.push(`/dashboard/${role}`);
+        window.location.href = `/dashboard/${role}`;
     };
 
     if (status === "loading" || loading) {

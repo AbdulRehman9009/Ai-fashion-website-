@@ -90,13 +90,14 @@ export default function Sidebar({ role }) {
   return (
     <div className="flex h-full w-64 flex-col border-r bg-white shadow-lg transition-all duration-300 ease-in-out">
       {/* Brand Header */}
-      <div className={`p-6 border-b bg-gradient-to-r ${colorGradient}`}>
+      <div className={`p-6 border-b bg-linear-to-r ${colorGradient}`}>
         <Link href="/" className="flex items-center gap-3 group">
           <div className="h-10 w-10 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center font-bold text-lg shadow-lg group-hover:scale-110 transition-transform duration-200">
-            S
+            {/* Stylized S */}
+            <span className="text-indigo-200">S</span>
           </div>
           <div>
-            <h2 className="text-xl font-bold tracking-tight text-white">StyleAI</h2>
+            <h2 className="text-xl font-bold tracking-tight text-white lowercase">stylegenie</h2>
             <p className="text-xs font-medium text-white/80">{role} Portal</p>
           </div>
         </Link>
@@ -116,11 +117,11 @@ export default function Sidebar({ role }) {
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ease-in-out",
                 "hover:bg-gray-100 hover:translate-x-1 hover:shadow-sm",
                 isActive
-                  ? `bg-gradient-to-r ${colorGradient} text-white shadow-md`
+                  ? `bg-linear-to-r ${colorGradient} text-white shadow-md`
                   : "text-gray-600 hover:text-gray-900"
               )}
             >
-              <Icon className="h-4 w-4 flex-shrink-0" />
+              <Icon className="h-4 w-4 shrink-0" />
               <span className="truncate">{link.label}</span>
             </Link>
           );

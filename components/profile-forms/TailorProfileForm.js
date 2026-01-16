@@ -54,8 +54,8 @@ export default function TailorProfileForm({ onComplete }) {
             const res = await fetch("/api/profile");
             if (res.ok) {
                 const data = await res.json();
-                const profile = data.user.tailorProfile || {};
-                const bankDetails = data.user.payoutMethod?.bankDetails || {};
+                const profile = data.user?.tailorProfile || {};
+                const bankDetails = data.user?.payoutMethod?.bankDetails || {};
 
                 setFormData({
                     name: data.user?.name || "",

@@ -19,7 +19,7 @@ export default function Footer() {
 
                     {/* Brand */}
                     <div className="space-y-4">
-                        <h3 className="text-2xl font-bold text-white">AI Fashion</h3>
+                        <h3 className="text-2xl font-bold text-white">stylegenie</h3>
                         <p className="text-sm leading-relaxed text-gray-400">
                             Revolutionizing tailored fashion with AI. Perfect fit, every time, delivered to your doorstep.
                         </p>
@@ -57,7 +57,7 @@ export default function Footer() {
                         <h4 className="text-lg font-semibold text-white">Contact</h4>
                         <ul className="space-y-2 text-sm">
                             <li className="flex items-center gap-2">
-                                <Mail className="h-4 w-4" /> support@aifashion.com
+                                <Mail className="h-4 w-4" /> support@stylegenie.com
                             </li>
                             <li>123 Fashion Ave, Design District</li>
                             <li>New York, NY 10001</li>
@@ -66,7 +66,7 @@ export default function Footer() {
                 </div>
 
                 <div className="border-t border-gray-800 mt-12 pt-8 text-center text-sm text-gray-500">
-                    © {new Date().getFullYear()} AI Fashion. All rights reserved.
+                    © {new Date().getFullYear()} stylegenie. All rights reserved.
                 </div>
             </div>
         </footer>

@@ -39,11 +39,11 @@ export default function ShopkeeperProfileForm({ onComplete }) {
             if (res.ok) {
                 const data = await res.json();
                 const shop = data.shop || {};
-                const bankDetails = data.user.payoutMethod?.bankDetails || {};
+                const bankDetails = data.user?.payoutMethod?.bankDetails || {};
 
                 setFormData({
                     businessName: shop.name || "",
-                    ownerName: shop.businessDetails?.ownerName || data.user.name || "",
+                    ownerName: shop.businessDetails?.ownerName || data.user?.name || "",
                     phone: shop.businessDetails?.phone || "",
                     taxId: shop.businessDetails?.taxId || "",
                     address: shop.location?.address || "",

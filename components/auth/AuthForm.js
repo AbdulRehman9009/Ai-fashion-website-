@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { toast } from "react-toastify";
 import Link from "next/link";
 import { Loader2, Shirt, Scissors, Truck, Store, User, Shield, Eye, EyeOff, Check, X } from "lucide-react";
-import ReCAPTCHA from "react-google-recaptcha";
+// import ReCAPTCHA from "react-google-recaptcha"; // Temporarily disabled for testing
 // import zxcvbn from "zxcvbn"; // Dynamic import better for client
 
 export default function AuthForm({ role, type }) { // type: "login" | "register"
@@ -20,7 +20,7 @@ export default function AuthForm({ role, type }) { // type: "login" | "register"
   const [loading, setLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [passwordFeedback, setPasswordFeedback] = useState("");
-  const [captchaToken, setCaptchaToken] = useState(null);
+  // const [captchaToken, setCaptchaToken] = useState(null); // Temporarily disabled for testing
 
   const router = useRouter();
 
@@ -59,9 +59,10 @@ export default function AuthForm({ role, type }) { // type: "login" | "register"
     setLoading(true);
 
     try {
-      if (!captchaToken) {
-        throw new Error("Please complete the Captcha verification.");
-      }
+      // Temporarily disabled reCAPTCHA for testing
+      // if (!captchaToken) {
+      //   throw new Error("Please complete the Captcha verification.");
+      // }
 
       if (type === "register") {
         if (passwordStrength < 2) throw new Error("Password is too weak.");
@@ -224,12 +225,13 @@ export default function AuthForm({ role, type }) { // type: "login" | "register"
 
           </div>
 
-          <div className="flex justify-center">
+          {/* Temporarily disabled reCAPTCHA for testing */}
+          {/* <div className="flex justify-center">
             <ReCAPTCHA
-              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"} // Fallback for dev only if needed, ideally from env
+              sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"}
               onChange={setCaptchaToken}
             />
-          </div>
+          </div> */}
 
           <Button type="submit" className={`w-full ${config.color} hover:opacity-90 h-11 text-base shadow-lg transition-all`} disabled={loading}>
             {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : (type === "login" ? "Sign In" : "Create Account")}

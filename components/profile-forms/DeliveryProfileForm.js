@@ -40,11 +40,11 @@ export default function DeliveryProfileForm({ onComplete }) {
             const res = await fetch("/api/profile");
             if (res.ok) {
                 const data = await res.json();
-                const profile = data.user.deliveryProfile || {};
-                const bankDetails = data.user.payoutMethod?.bankDetails || {};
+                const profile = data.user?.deliveryProfile || {};
+                const bankDetails = data.user?.payoutMethod?.bankDetails || {};
 
                 setFormData({
-                    fullName: profile.fullName || data.user.name || "",
+                    fullName: profile.fullName || data.user?.name || "",
                     phone: profile.phone || "",
                     cnicId: profile.cnicId || "",
                     vehicleType: profile.vehicleType || "bike",

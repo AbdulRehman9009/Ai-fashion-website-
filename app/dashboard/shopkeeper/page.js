@@ -18,16 +18,29 @@ export default function ShopkeeperDashboard() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchStats();
+    let mounted = true;
+    const ac = new AbortController();
+
+    const run = async () => {
+      if (!mounted) return;
+      await fetchStats(ac.signal);
+    };
+
+    run();
+
+    return () => {
+      mounted = false;
+      ac.abort();
+    };
   }, []);
 
-  const fetchStats = async () => {
+  const fetchStats = async (signal) => {
     try {
-      const res = await fetch("/api/dashboard/shopkeeper/stats");
+      const res = await fetch("/api/dashboard/shopkeeper/stats", { signal });
       const data = await res.json();
       if (res.ok) setStats(data);
     } catch (e) {
-      console.error(e);
+      if (e.name !== 'AbortError') console.error(e);
     } finally {
       setLoading(false);
     }

@@ -36,12 +36,13 @@ export async function middleware(req) {
       return NextResponse.redirect(new URL(`/dashboard/${userRole.toLowerCase()}`, req.url));
     }
 
-    // 3. Profile Completion Check (Skip for profile and settings pages)
-    const isProfilePage = pathname.includes("/profile") || pathname.includes("/settings");
+    // 3. Profile Completion Check (Skip for profile, settings and complete-profile pages)
+    const isProfilePage = pathname.includes("/profile") || pathname.includes("/settings") || pathname.includes("/complete-profile");
     if (!isProfilePage) {
       // Check if profile is complete (using value cached in token)
       if (token.isProfileComplete === false) {
-        const profileUrl = new URL(`/dashboard/${userRole.toLowerCase()}/profile?required=true`, req.url);
+        // Redirect to the central complete-profile flow which exists at /dashboard/complete-profile
+        const profileUrl = new URL(`/dashboard/complete-profile?required=true`, req.url);
         return NextResponse.redirect(profileUrl);
       }
     }

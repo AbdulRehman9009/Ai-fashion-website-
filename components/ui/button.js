@@ -3,16 +3,16 @@ import { cva } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-gray-950 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-400 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       variant: {
-        default: "bg-gray-900 text-gray-50 hover:bg-gray-900/90 shadow",
-        destructive: "bg-red-500 text-gray-50 hover:bg-red-500/90 shadow-sm",
-        outline: "border border-gray-200 bg-white hover:bg-gray-100 hover:text-gray-900 shadow-sm",
-        secondary: "bg-gray-100 text-gray-900 hover:bg-gray-100/80 shadow-sm",
-        ghost: "hover:bg-gray-100 hover:text-gray-900",
-        link: "text-gray-900 underline-offset-4 hover:underline",
+        default: "bg-gradient-to-r from-indigo-600 to-pink-500 text-white hover:opacity-95 shadow-md",
+        destructive: "bg-red-600 text-white hover:bg-red-700 shadow-sm",
+        outline: "border border-gray-200 bg-white hover:bg-gray-50 text-gray-900 shadow-sm",
+        secondary: "bg-white text-indigo-600 border border-indigo-100 hover:bg-indigo-50 shadow-sm",
+        ghost: "bg-transparent hover:bg-gray-50 hover:text-gray-900",
+        link: "text-indigo-600 underline-offset-4 hover:underline",
       },
       size: {
         default: "h-9 px-4 py-2",

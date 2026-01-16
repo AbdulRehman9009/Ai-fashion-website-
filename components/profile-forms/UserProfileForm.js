@@ -43,12 +43,12 @@ export default function UserProfileForm({ onComplete }) {
             const res = await fetch("/api/profile/customer");
             if (res.ok) {
                 const data = await res.json();
-                const profile = data.user.customerProfile || {}; // Assuming customerProfile field exists or we create it
+                const profile = data.user?.customerProfile || data.customerProfile || {}; // Safe navigation to prevent undefined error
                 // If API returns flat structure, adjust accordingly. 
                 // Based on `app/api/profile/customer/route.js` (viewed earlier), it updates user root fields and maybe profile.
 
                 setFormData({
-                    name: data.user.name || "",
+                    name: data.name || data.user?.name || "",
                     phone: profile.phone || "",
                     address: profile.address || "",
                     city: profile.city || "",
