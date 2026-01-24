@@ -61,11 +61,14 @@ export async function POST(req) {
         // Recalculate profile completion using new Paddle-compatible logic
         const status = await checkProfileCompletion(session.user.id, "SHOPKEEPER");
 
-        // Update Shop profile completion
+        // Update Shop profile completion AND activate shop if complete
         await Shop.findByIdAndUpdate(shop._id, {
             "profileCompletion.isComplete": status.isComplete,
             "profileCompletion.percentage": status.percentage,
             "profileCompletion.missingFields": status.missingFields,
+            // IMPORTANT: Activate shop when profile is complete so products are visible
+            isActive: status.isComplete,
+            isVisibleToCustomers: status.isComplete,
         });
 
         // Update User profile completion

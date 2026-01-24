@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
+import axios from "axios";
 
 export default function OrderListShop() {
     const [orders, setOrders] = useState([]);
@@ -24,9 +25,8 @@ export default function OrderListShop() {
 
     async function fetchOrders() {
         try {
-            const res = await fetch("/api/orders?role=SHOPKEEPER");
-            const data = await res.json();
-            if (res.ok) setOrders(data);
+            const res = await axios.get("/api/orders?role=SHOPKEEPER");
+            setOrders(res.data);
         } catch (error) {
             console.error("Failed to fetch orders", error);
         } finally {
@@ -34,16 +34,11 @@ export default function OrderListShop() {
         }
     }
 
-    // Assuming we have an API to get list of tailors
     async function fetchTailors() {
-        // Mocking tailor list purely for UI, assume GET /api/users?role=TAILOR exists or similar
-        // For now, hardcode or fetch real if possible. Implementation plan noted needing a way.
-        // Let's assume a dedicated endpoint or filtered user list.
-        // Using a mock for now to proceed, will verify if users exist.
+        // Mocking tailor list
         try {
-            // const res = await fetch("/api/users?role=TAILOR");
-            // const data = await res.json();
-            // if(res.ok) setTailors(data);
+            // const res = await axios.get("/api/users?role=TAILOR");
+            // setTailors(res.data);
             setTailors([
                 { _id: "mock1", name: "Tailor John" },
                 { _id: "mock2", name: "Tailor Mary" }
@@ -57,19 +52,11 @@ export default function OrderListShop() {
         if (!confirm(`Are you sure you want to mark this order as ${status}?`)) return;
         setActionLoading(true);
         try {
-            const res = await fetch(`/api/orders/${orderId}/status`, {
-                method: "PATCH",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ status })
-            });
-            if (res.ok) {
-                toast.success(`Order ${status}`);
-                fetchOrders();
-            } else {
-                throw new Error("Failed to update");
-            }
+            await axios.patch(`/api/orders/${orderId}/status`, { status });
+            toast.success(`Order ${status}`);
+            fetchOrders();
         } catch (e) {
-            toast.error(e.message);
+            toast.error(e.response?.data?.error || "Failed to update");
         } finally {
             setActionLoading(false);
         }
@@ -79,20 +66,12 @@ export default function OrderListShop() {
         if (!selectedTailor) return toast.error("Select a tailor");
         setActionLoading(true);
         try {
-            const res = await fetch(`/api/orders/${selectedOrder._id}/tailor`, {
-                method: "PATCH", // Special route for assigning
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ tailorId: selectedTailor })
-            });
-            if (res.ok) {
-                toast.success("Tailor assigned");
-                setSelectedOrder(null);
-                fetchOrders();
-            } else {
-                throw new Error("Failed to assign");
-            }
+            await axios.patch(`/api/orders/${selectedOrder._id}/tailor`, { tailorId: selectedTailor });
+            toast.success("Tailor assigned");
+            setSelectedOrder(null);
+            fetchOrders();
         } catch (e) {
-            toast.error(e.message);
+            toast.error(e.response?.data?.error || "Failed to assign");
         } finally {
             setActionLoading(false);
         }

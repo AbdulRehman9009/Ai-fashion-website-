@@ -40,6 +40,12 @@ const statusConfig = {
 
     // Generic
     urgent: { label: "Urgent", color: "bg-red-100 text-red-700 border-red-300" },
+
+    // Additional Fulfillment Statuses
+    placed: { label: "Placed", color: "bg-blue-100 text-blue-700 border-blue-300" },
+    ready_for_delivery: { label: "Ready for Delivery", color: "bg-cyan-100 text-cyan-700 border-cyan-300" },
+    out_for_delivery: { label: "Out for Delivery", color: "bg-blue-100 text-blue-700 border-blue-300" },
+    stitched: { label: "Stitched", color: "bg-green-100 text-green-700 border-green-300" },
 };
 
 export default function StatusBadge({ status, size = "md", className }) {

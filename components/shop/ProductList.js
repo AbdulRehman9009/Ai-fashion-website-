@@ -7,6 +7,7 @@ import { Edit, Trash2, Plus, Loader2 } from "lucide-react";
 import { toast } from "react-toastify";
 import ProductForm from "./ProductForm";
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import axios from "axios";
 
 export default function ProductList() {
     const [products, setProducts] = useState([]);
@@ -20,11 +21,13 @@ export default function ProductList() {
 
     async function fetchProducts() {
         try {
-            const res = await fetch("/api/products?role=SHOPKEEPER"); // Fetch my products
-            const data = await res.json();
-            if (res.ok) setProducts(data);
+            const res = await axios.get("/api/products?role=SHOPKEEPER");
+            // API returns paginated response: { data: [...], pagination: {...} }
+            const productData = res.data?.data || [];
+            setProducts(productData);
         } catch (error) {
             console.error("Failed to fetch products", error);
+            setProducts([]); // Set empty array on error
         } finally {
             setLoading(false);
         }
@@ -33,16 +36,11 @@ export default function ProductList() {
     async function deleteProduct(id) {
         if (!confirm("Are you sure you want to delete this product?")) return;
         try {
-            const res = await fetch(`/api/products?id=${id}`, { method: "DELETE" }); // Using query param for delete usually, or path
-            if (res.ok) {
-                toast.success("Product deleted");
-                fetchProducts();
-            } else {
-                const d = await res.json();
-                throw new Error(d.error);
-            }
+            await axios.delete(`/api/products?id=${id}`);
+            toast.success("Product deleted");
+            fetchProducts();
         } catch (e) {
-            toast.error(e.message || "Failed to delete");
+            toast.error(e.response?.data?.error || "Failed to delete");
         }
     }
 

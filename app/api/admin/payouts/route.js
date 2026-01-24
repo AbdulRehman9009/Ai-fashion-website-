@@ -4,9 +4,11 @@ import { authOptions } from "@/lib/auth";
 import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import Earning from "@/models/Earning";
+import Payout from "@/models/Payout";
+import Order from "@/models/Order";
 import { processPayoutBatch } from "@/lib/paddle/paddlePayout";
 
-// GET: Fetch all users with available earnings for payout
+// GET: Fetch pending payouts for admin dashboard
 export async function GET(req) {
     try {
         const session = await getServerSession(authOptions);
@@ -16,38 +18,55 @@ export async function GET(req) {
 
         await connectDB();
 
-        // Aggregate earnings by user where status is 'available'
-        const payoutCandidates = await Earning.aggregate([
-            { $match: { status: "available" } },
+        const { searchParams } = new URL(req.url);
+        const status = searchParams.get("status") || "pending";
+
+        // Fetch from Payout model (new system)
+        const payouts = await Payout.find({ status })
+            .populate("userId", "name email")
+            .populate("orderId", "pricing status createdAt")
+            .sort({ createdAt: -1 })
+            .limit(50)
+            .lean();
+
+        // Get summary stats from Payout model
+        const summary = await Payout.aggregate([
+            { $match: { status: "pending" } },
             {
                 $group: {
-                    _id: "$user",
+                    _id: "$providerRole",
                     totalAmount: { $sum: "$amount" },
-                    earningsCount: { $sum: 1 },
-                    lastEarningDate: { $max: "$createdAt" }
+                    count: { $sum: 1 }
                 }
             }
         ]);
 
-        // Populate user details including bank info
-        const populatedCandidates = await User.populate(payoutCandidates, {
-            path: "_id",
-            select: "name email role payoutMethod"
+        // Get total revenue from orders
+        const revenueResult = await Order.aggregate([
+            { $match: { paymentStatus: "PAID" } },
+            { $group: { _id: null, total: { $sum: "$pricing.grandTotal" } } }
+        ]);
+
+        return NextResponse.json({
+            payouts: payouts.map(p => ({
+                ...p,
+                amount: p.amount / 100, // Convert cents to dollars
+            })),
+            pagination: {
+                total: payouts.length
+            },
+            summary: {
+                byRole: summary.reduce((acc, item) => {
+                    acc[item._id] = {
+                        amount: item.totalAmount / 100,
+                        count: item.count
+                    };
+                    return acc;
+                }, {}),
+                totalPending: summary.reduce((acc, item) => acc + item.totalAmount, 0) / 100
+            },
+            totalRevenue: revenueResult[0]?.total || 0
         });
-
-        // Format for frontend
-        const formatted = populatedCandidates.map(item => ({
-            userId: item._id._id,
-            name: item._id.name,
-            email: item._id.email,
-            role: item._id.role,
-            amount: item.totalAmount,
-            count: item.earningsCount,
-            lastEarning: item.lastEarningDate,
-            payoutMethod: item._id.payoutMethod || { type: "unknown" }
-        }));
-
-        return NextResponse.json({ candidates: formatted });
     } catch (error) {
         console.error("Error fetching payout candidates:", error);
         return NextResponse.json({ error: "Server error" }, { status: 500 });
@@ -79,3 +98,42 @@ export async function POST(req) {
         return NextResponse.json({ error: "Server error" }, { status: 500 });
     }
 }
+
+// PATCH: Mark payouts as paid by admin
+export async function PATCH(req) {
+    try {
+        const session = await getServerSession(authOptions);
+        if (!session || session.user.role !== "ADMIN") {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+        }
+
+        const body = await req.json();
+        const { payoutIds, notes } = body;
+
+        if (!payoutIds || !Array.isArray(payoutIds) || payoutIds.length === 0) {
+            return NextResponse.json({ error: "Payout IDs required" }, { status: 400 });
+        }
+
+        await connectDB();
+
+        const result = await Payout.updateMany(
+            { _id: { $in: payoutIds }, status: "pending" },
+            {
+                status: "paid_by_admin",
+                paidAt: new Date(),
+                paidBy: session.user.id,
+                notes: notes || ""
+            }
+        );
+
+        return NextResponse.json({
+            success: true,
+            updated: result.modifiedCount
+        });
+
+    } catch (error) {
+        console.error("Error marking payouts as paid:", error);
+        return NextResponse.json({ error: "Failed to update payouts" }, { status: 500 });
+    }
+}
+

@@ -65,23 +65,57 @@ export default function AuthForm({ role, type }) { // type: "login" | "register"
       // }
 
       if (type === "register") {
-        if (passwordStrength < 2) throw new Error("Password is too weak.");
+        // Strict password validation to match backend Zod schema
+        const passwordRules = [
+          { regex: /.{8,}/, message: "Password must be at least 8 characters" },
+          { regex: /[A-Z]/, message: "Password must contain at least one uppercase letter" },
+          { regex: /[a-z]/, message: "Password must contain at least one lowercase letter" },
+          { regex: /[0-9]/, message: "Password must contain at least one number" },
+          { regex: /[^A-Za-z0-9]/, message: "Password must contain at least one special character" }
+        ];
+
+        for (const rule of passwordRules) {
+          if (!rule.regex.test(password)) {
+            throw new Error(rule.message);
+          }
+        }
 
         const res = await fetch("/api/auth/signup", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password, role, name }),
+          body: JSON.stringify({
+            email,
+            password,
+            role,
+            name: name?.length >= 2 ? name : undefined // Ensure name meets min length or is undefined
+          }),
         });
 
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || "Registration failed");
+
+        if (!res.ok) {
+          // Log full error details for debugging
+          console.error("Signup Error Details:", data);
+
+          if (data.errors && Array.isArray(data.errors) && data.errors.length > 0) {
+            // Show field-specific error messages
+            const messages = data.errors.map(e => `${e.field}: ${e.message}`).join("; ");
+            throw new Error(messages);
+          }
+
+          throw new Error(data.message || data.error || "Registration failed");
+        }
+
+        toast.success("Account created successfully!");
 
         // Auto login after register
         const loginRes = await signIn("credentials", { email, password, redirect: false });
-        if (!loginRes?.ok) throw new Error("Auto-login failed");
-
-        toast.success("Account created successfully!");
-        router.push(`/dashboard/${role.toLowerCase()}`);
+        if (!loginRes?.ok) {
+          // If auto-login fails, just redirect to login
+          router.push(`/auth/${role.toLowerCase()}/login`);
+        } else {
+          router.push(`/dashboard/${role.toLowerCase()}`);
+        }
       } else {
         const res = await signIn("credentials", { email, password, redirect: false });
         if (res?.error) throw new Error("Invalid credentials");

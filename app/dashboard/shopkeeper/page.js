@@ -11,6 +11,7 @@ import { motion } from "framer-motion";
 import ProductList from "@/components/shop/ProductList";
 import OrderListShop from "@/components/shop/OrderListShop";
 import ShopAnalytics from "@/components/shop/ShopAnalytics";
+import axios from "axios";
 
 export default function ShopkeeperDashboard() {
   const { data: session } = useSession();
@@ -36,11 +37,12 @@ export default function ShopkeeperDashboard() {
 
   const fetchStats = async (signal) => {
     try {
-      const res = await fetch("/api/dashboard/shopkeeper/stats", { signal });
-      const data = await res.json();
-      if (res.ok) setStats(data);
+      const res = await axios.get("/api/dashboard/shopkeeper/stats", { signal });
+      setStats(res.data);
     } catch (e) {
-      if (e.name !== 'AbortError') console.error(e);
+      if (axios.isCancel(e)) return;
+      console.error(e);
+      // Optional: toast.error("Failed to load stats"); 
     } finally {
       setLoading(false);
     }
@@ -71,7 +73,7 @@ export default function ShopkeeperDashboard() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-4">
         <Card className="border-l-4 border-l-blue-500 shadow-sm hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-gray-500">Total Products</CardTitle>

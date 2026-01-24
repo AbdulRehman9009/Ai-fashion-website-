@@ -10,6 +10,7 @@ import { Loader2, Save, X, ImageIcon } from "lucide-react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import ImageUpload from "@/components/ui/image-upload";
+import axios from "axios";
 
 export default function ProductForm({ product, onSuccess }) {
     const router = useRouter();
@@ -42,28 +43,21 @@ export default function ProductForm({ product, onSuccess }) {
         setLoading(true);
 
         try {
-            const method = product ? "PUT" : "POST";
+            const method = product ? "put" : "post";
             const body = {
                 ...formData,
                 _id: product?._id,
                 images: [formData.imageUrl]
             };
 
-            const res = await fetch("/api/products", {
-                method,
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(body),
-            });
-
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || "Failed to save product");
+            const res = await axios[method]("/api/products", body);
 
             toast.success(product ? "Product updated!" : "Product created!");
             if (onSuccess) onSuccess();
             else router.push("/dashboard/shopkeeper");
 
         } catch (err) {
-            toast.error(err.message);
+            toast.error(err.response?.data?.error || err.message || "Failed to save product");
         } finally {
             setLoading(false);
         }

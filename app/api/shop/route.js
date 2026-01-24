@@ -37,6 +37,9 @@ export async function PUT(req) {
                 description: body.description,
                 logo: body.logo,
                 banner: body.banner,
+                // Allow visibility toggle
+                ...(typeof body.isActive === 'boolean' && { isActive: body.isActive }),
+                ...(typeof body.isVisibleToCustomers === 'boolean' && { isVisibleToCustomers: body.isVisibleToCustomers }),
             },
             $setOnInsert: {
                 ratingAvg: 0,

@@ -126,6 +126,25 @@ export default function UserManagementPage() {
         }
     };
 
+    const handleRoleChange = async (userId, newRole) => {
+        try {
+            const res = await fetch(`/api/admin/users/${userId}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ role: newRole })
+            });
+
+            if (res.ok) {
+                toast.success(`Role updated to ${roleConfig[newRole]?.label || newRole}`);
+                fetchUsers();
+            } else {
+                throw new Error("Role update failed");
+            }
+        } catch (error) {
+            toast.error(error.message);
+        }
+    };
+
     const handleCreateUser = async (e) => {
         e.preventDefault();
 
@@ -170,64 +189,80 @@ export default function UserManagementPage() {
 
         return (
             <Card className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                    <div className="flex items-start justify-between">
-                        <div className="flex items-center gap-4 flex-1">
-                            <div className={`h-12 w-12 rounded-full ${config?.color || "bg-gray-100"} flex items-center justify-center`}>
+                <CardContent className="p-4 sm:p-6">
+                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+                        <div className="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+                            <div className={`h-10 w-10 sm:h-12 sm:w-12 rounded-full ${config?.color || "bg-gray-100"} flex items-center justify-center flex-shrink-0`}>
                                 {user.image ? (
                                     <img src={user.image} className="h-full w-full object-cover rounded-full" alt={user.name} />
                                 ) : (
-                                    <RoleIcon className="h-6 w-6" />
+                                    <RoleIcon className="h-5 w-5 sm:h-6 sm:w-6" />
                                 )}
                             </div>
 
-                            <div className="flex-1">
-                                <div className="flex items-center gap-2">
-                                    <h3 className="font-semibold text-lg">{user.name || "No Name"}</h3>
-                                    <Badge className={config?.color}>
-                                        {config?.label}
-                                    </Badge>
+                            <div className="flex-1 min-w-0">
+                                <div className="flex flex-wrap items-center gap-2">
+                                    <h3 className="font-semibold text-base sm:text-lg truncate">{user.name || "No Name"}</h3>
                                     {user.status === "SUSPENDED" && (
                                         <Badge variant="destructive">Suspended</Badge>
                                     )}
                                 </div>
-                                <p className="text-sm text-gray-500">{user.email}</p>
+                                <p className="text-sm text-gray-500 truncate">{user.email}</p>
                                 <p className="text-xs text-gray-400 mt-1">
                                     Joined {new Date(user.createdAt).toLocaleDateString()}
                                 </p>
+                                {/* Inline Role Change */}
+                                <div className="mt-2">
+                                    <Select
+                                        value={user.role}
+                                        onValueChange={(value) => handleRoleChange(user._id, value)}
+                                    >
+                                        <SelectTrigger className="w-[140px] h-8 text-xs">
+                                            <SelectValue />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="USER">Customer</SelectItem>
+                                            <SelectItem value="TAILOR">Tailor</SelectItem>
+                                            <SelectItem value="SHOPKEEPER">Shopkeeper</SelectItem>
+                                            <SelectItem value="DELIVERY">Delivery</SelectItem>
+                                            <SelectItem value="ADMIN">Admin</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                </div>
                             </div>
                         </div>
 
-                        <div className="flex gap-2">
+                        <div className="flex flex-wrap gap-2 justify-end">
                             {user.status === "ACTIVE" ? (
                                 <Button
                                     size="sm"
                                     variant="outline"
-                                    className="text-red-600 hover:text-red-700"
+                                    className="text-red-600 hover:text-red-700 text-xs sm:text-sm"
                                     onClick={() => handleAction("deactivate", user)}
                                 >
-                                    <UserX className="h-4 w-4 mr-1" />
-                                    Deactivate
+                                    <UserX className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                                    <span className="hidden sm:inline">Deactivate</span>
                                 </Button>
                             ) : (
                                 <Button
                                     size="sm"
                                     variant="outline"
-                                    className="text-green-600 hover:text-green-700"
+                                    className="text-green-600 hover:text-green-700 text-xs sm:text-sm"
                                     onClick={() => handleAction("activate", user)}
                                 >
-                                    <UserCheck className="h-4 w-4 mr-1" />
-                                    Activate
+                                    <UserCheck className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                                    <span className="hidden sm:inline">Activate</span>
                                 </Button>
                             )}
 
                             <Button
                                 size="sm"
                                 variant="outline"
+                                className="text-xs sm:text-sm"
                                 onClick={() => handleAction("reset", user)}
                             >
-                                <Key className="h-4 w-4 mr-1" />
-                                Reset Password
+                                <Key className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                                <span className="hidden sm:inline">Reset</span>
                             </Button>
 
                             <Button
@@ -236,7 +271,7 @@ export default function UserManagementPage() {
                                 className="text-red-600 hover:text-red-700"
                                 onClick={() => handleAction("delete", user)}
                             >
-                                <Trash2 className="h-4 w-4" />
+                                <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                             </Button>
                         </div>
                     </div>

@@ -2,11 +2,13 @@
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Truck, TrendingUp, Calendar, CreditCard } from "lucide-react";
+import { Truck, TrendingUp, Calendar, CreditCard, CheckCircle, Package } from "lucide-react";
 import { toast } from "react-toastify";
-import DeliveryOrderCard from "@/components/delivery/DeliveryOrderCard";
+import OrderCard from "@/components/ui/OrderCard";
+import { Button } from "@/components/ui/button";
 import DeliveryStats from "@/components/delivery/DeliveryStats";
 import DeliveryAnalytics from "@/components/delivery/DeliveryAnalytics";
+import axios from "axios";
 
 export default function DeliveryDashboard() {
   const [deliveries, setDeliveries] = useState([]);
@@ -16,20 +18,16 @@ export default function DeliveryDashboard() {
 
   const fetchDeliveries = async () => {
     try {
-      const res = await fetch("/api/deliveries");
-      if (res.ok) {
-        const data = await res.json();
-        setDeliveries(data);
+      const res = await axios.get("/api/deliveries"); // Uses existing endpoint
+      const data = res.data;
+      setDeliveries(data);
 
-        // Calculate stats
-        const assigned = data.filter(d => d.status === "Assigned").length;
-        const completed = data.filter(d => d.status === "Delivered").length;
-        const pending = data.filter(d => !["Delivered", "Assigned"].includes(d.status)).length;
+      // Calculate stats
+      const assigned = data.filter(d => ["OutForPickup", "OutForDelivery"].includes(d.status)).length;
+      const completed = data.filter(d => d.status === "Delivered").length;
+      const pending = data.filter(d => d.status === "DeliveryPending").length;
 
-        setStats({ assigned, completed, pending });
-      } else {
-        toast.error("Failed to load deliveries");
-      }
+      setStats({ assigned, completed, pending });
     } catch (error) {
       console.error("Failed to fetch deliveries", error);
       toast.error("Could not load deliveries");
@@ -40,11 +38,8 @@ export default function DeliveryDashboard() {
 
   const fetchEarnings = async () => {
     try {
-      const res = await fetch("/api/deliveries/earnings");
-      if (res.ok) {
-        const data = await res.json();
-        setEarnings(data);
-      }
+      const res = await axios.get("/api/deliveries/earnings");
+      setEarnings(res.data);
     } catch (error) {
       console.error("Failed to fetch earnings", error);
     }
@@ -55,19 +50,34 @@ export default function DeliveryDashboard() {
     fetchEarnings();
   }, []);
 
-  const activeDeliveries = deliveries.filter(d => d.status !== "Delivered");
-  const completedDeliveries = deliveries.filter(d => d.status === "Delivered");
+  const handleAction = async (orderId, action) => {
+    try {
+      // action maps to: "pickup", "confirm" -> "confirm_delivery"
+      const apiAction = action === "confirm" ? "confirm_delivery" : action;
+
+      await axios.patch(`/api/orders/${orderId}/fulfillment`, { action: apiAction });
+      toast.success(action === "pickup" ? "Order Picked Up" : "Delivery Confirmed");
+      fetchDeliveries();
+      fetchEarnings();
+    } catch (e) {
+      console.error(e);
+      toast.error(e.response?.data?.error || "Action failed");
+    }
+  };
+
+  const activeDeliveries = deliveries.filter(d => ["DeliveryPending", "OutForPickup", "OutForDelivery"].includes(d.status));
+  const completedDeliveries = deliveries.filter(d => ["Delivered", "Completed"].includes(d.status));
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       {/* Header */}
-      <div className="flex items-center gap-4">
-        <div className="bg-green-100 p-3 rounded-full">
-          <Truck className="h-6 w-6 text-green-600" />
+      <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
+        <div className="bg-green-100 p-2 sm:p-3 rounded-full w-fit">
+          <Truck className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
         </div>
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Delivery Hub</h2>
-          <p className="text-gray-500">Manage your deliveries and track earnings</p>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Delivery Hub</h2>
+          <p className="text-sm sm:text-base text-gray-500">Manage your deliveries and track earnings</p>
         </div>
       </div>
 
@@ -106,13 +116,23 @@ export default function DeliveryDashboard() {
           ) : (
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
               {activeDeliveries.map((delivery) => (
-                <DeliveryOrderCard
+                <OrderCard
                   key={delivery._id}
-                  delivery={delivery}
-                  onUpdate={() => {
-                    fetchDeliveries();
-                    fetchEarnings();
-                  }}
+                  order={delivery}
+                  actions={
+                    <>
+                      {delivery.status === "DeliveryPending" && (
+                        <Button className="w-full bg-blue-600 hover:bg-blue-700" onClick={() => handleAction(delivery._id, "pickup")}>
+                          <Package className="mr-2 h-4 w-4" /> Pickup Order
+                        </Button>
+                      )}
+                      {(delivery.status === "OutForPickup" || delivery.status === "OutForDelivery") && (
+                        <Button className="w-full bg-green-600 hover:bg-green-700" onClick={() => handleAction(delivery._id, "confirm")}>
+                          <CheckCircle className="mr-2 h-4 w-4" /> Confirm Delivery
+                        </Button>
+                      )}
+                    </>
+                  }
                 />
               ))}
             </div>
@@ -129,38 +149,9 @@ export default function DeliveryDashboard() {
               {completedDeliveries.length === 0 ? (
                 <p className="text-center py-8 text-gray-500">No completed deliveries yet</p>
               ) : (
-                <div className="divide-y">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {completedDeliveries.map((delivery) => (
-                    <div key={delivery._id} className="py-4 flex justify-between items-center">
-                      <div className="flex items-center gap-4">
-                        <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center">
-                          {delivery.outfitImage ? (
-                            <img
-                              src={delivery.outfitImage}
-                              className="h-full w-full object-cover rounded-full"
-                              alt="Outfit"
-                            />
-                          ) : (
-                            <Truck className="h-6 w-6 text-green-600" />
-                          )}
-                        </div>
-                        <div>
-                          <p className="font-medium">{delivery.customer?.name || "Customer"}</p>
-                          <p className="text-sm text-gray-500">
-                            Order #{String(delivery.orderId).slice(-6)} •
-                            {delivery.confirmedAt
-                              ? new Date(delivery.confirmedAt).toLocaleDateString()
-                              : new Date(delivery.updatedAt).toLocaleDateString()}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-green-600">
-                          +${(delivery.fee || 10) + (delivery.urgentBonus || 0)}
-                        </p>
-                        <p className="text-xs text-gray-500">{delivery.paymentStatus}</p>
-                      </div>
-                    </div>
+                    <OrderCard key={delivery._id} order={delivery} />
                   ))}
                 </div>
               )}

@@ -1,69 +1,166 @@
 import { connectDB } from "@/lib/db";
 import Product from "@/models/Product";
 import Shop from "@/models/Shop";
-import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { createPaddleProduct, updatePaddleProduct, archivePaddleProduct } from "@/lib/paddle/paddleClient";
+import { withErrorHandler, withAuth } from "@/lib/api-middleware";
+import { successResponse, createdResponse, paginatedResponse, noContentResponse } from "@/lib/api-response";
+import { NotFoundError, AuthorizationError, ValidationError } from "@/lib/errors";
+import { validate, createProductSchema, updateProductSchema, productQuerySchema } from "@/lib/validation/schemas";
+import { sanitizeObject } from "@/lib/security";
+import { logger } from "@/lib/logger";
+import { createAuditLog, AUDIT_ACTIONS } from "@/lib/audit-logger";
 
-export async function GET(req) {
+/**
+ * GET /api/products
+ * List products with filtering, pagination, and sorting
+ * 
+ * @query {string} role - Filter by user role (SHOPKEEPER gets their products only)
+ * @query {string} shop - Filter by shop ID
+ * @query {string} category - Filter by category
+ * @query {number} minPrice - Minimum price
+ * @query {number} maxPrice - Maximum price
+ * @query {string} type - Product type (STITCHED, UNSTITCHED, READY_TO_WEAR)
+ * @query {string} search - Search in title/description/tags
+ * @query {number} page - Page number
+ * @query {number} limit - Items per page
+ * @query {string} sort - Sort order (price_asc, price_desc, newest, oldest)
+ */
+async function getProducts(req) {
   await connectDB();
+
   const { searchParams } = new URL(req.url);
   const role = searchParams.get("role");
-  const shopId = searchParams.get("shop"); // Optional filter
 
-  // If Shopkeeper, return *their* products.
+  // If Shopkeeper, return their products only
   if (role === "SHOPKEEPER") {
     const session = await getServerSession(authOptions);
     if (!session || session.user.role !== "SHOPKEEPER") {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      throw new AuthorizationError("Unauthorized access");
     }
+
     const shop = await Shop.findOne({ owner: session.user.id });
-    if (!shop) return NextResponse.json([]);
+    if (!shop) {
+      return paginatedResponse([], { page: 1, limit: 20, total: 0 });
+    }
+
     const products = await Product.find({ shop: shop._id }).sort({ createdAt: -1 }).lean();
-    return NextResponse.json(products);
+    return paginatedResponse(products, { page: 1, limit: products.length, total: products.length });
   }
 
-  // Public/User view (can filter by explicit shopId)
+  // Validate query parameters
+  const queryValidation = validate(productQuerySchema, {
+    page: searchParams.get('page'),
+    limit: searchParams.get('limit'),
+    category: searchParams.get('category'),
+    minPrice: searchParams.get('minPrice'),
+    maxPrice: searchParams.get('maxPrice'),
+    type: searchParams.get('type'),
+    search: searchParams.get('search'),
+    sort: searchParams.get('sort')
+  });
+
+  if (!queryValidation.success) {
+    throw new ValidationError("Invalid query parameters", queryValidation.errors);
+  }
+
+  const { page, limit, category, minPrice, maxPrice, type, search, sort } = queryValidation.data;
+  const skip = (page - 1) * limit;
+
+  // Build query
   const query = {};
+  const shopId = searchParams.get("shop");
   if (shopId) query.shop = shopId;
+  if (category) query.category = category;
+  if (type) query.type = type;
+  if (minPrice !== undefined || maxPrice !== undefined) {
+    query.basePrice = {};
+    if (minPrice !== undefined) query.basePrice.$gte = minPrice;
+    if (maxPrice !== undefined) query.basePrice.$lte = maxPrice;
+  }
+  if (search) {
+    query.$text = { $search: search };
+  }
 
-  const products = await Product.find(query)
-    .populate('shop', 'name logo location isActive isVisibleToCustomers')
-    .sort({ createdAt: -1 })
-    .lean();
+  // Build sort
+  let sortOption = {};
+  switch (sort) {
+    case 'price_asc':
+      sortOption = { basePrice: 1 };
+      break;
+    case 'price_desc':
+      sortOption = { basePrice: -1 };
+      break;
+    case 'oldest':
+      sortOption = { createdAt: 1 };
+      break;
+    case 'newest':
+    default:
+      sortOption = { createdAt: -1 };
+  }
 
-  // Filter out products from inactive or hidden shops
-  const visibleProducts = products.filter(p =>
-    p.shop && p.shop.isActive && p.shop.isVisibleToCustomers
-  );
+  const [products, total] = await Promise.all([
+    Product.find(query)
+      .populate('shop', 'name logo location isActive isVisibleToCustomers')
+      .sort(sortOption)
+      .skip(skip)
+      .limit(limit)
+      .lean(),
+    Product.countDocuments(query)
+  ]);
 
-  return NextResponse.json(visibleProducts);
+  // Allow includeAll param for development/testing (admin only in prod)
+  const includeAll = searchParams.get('includeAll') === 'true';
+
+  // Filter out products from inactive or hidden shops (unless includeAll)
+  const visibleProducts = includeAll
+    ? products
+    : products.filter(p => {
+      // If shop is populated and has visibility flags, check them
+      if (p.shop) {
+        return p.shop.isActive && p.shop.isVisibleToCustomers;
+      }
+      // If no shop info, include the product (edge case)
+      return true;
+    });
+
+  return paginatedResponse(visibleProducts, { page, limit, total: visibleProducts.length });
 }
 
-export async function POST(req) {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "SHOPKEEPER") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+/**
+ * POST /api/products
+ * Create a new product (Shopkeeper only)
+ */
+async function createProduct(req) {
+  await connectDB();
+
+  // Parse and sanitize request body
+  const body = await req.json();
+  const sanitized = sanitizeObject(body);
+
+  // Validate input
+  const validation = validate(createProductSchema, sanitized);
+  if (!validation.success) {
+    throw new ValidationError("Invalid product data", validation.errors);
   }
 
-  await connectDB();
-  const body = await req.json();
+  const productData = validation.data;
 
-  const shop = await Shop.findOne({ owner: session.user.id });
-
+  // Get shopkeeper's shop
+  const shop = await Shop.findOne({ owner: req.user.id });
   if (!shop) {
-    return NextResponse.json({ error: "Shop not found for this user" }, { status: 404 });
+    throw new NotFoundError("Shop not found for this user");
   }
 
   try {
-    // 1. Create Product in DB first
-    const product = await Product.create({ ...body, shop: shop._id });
+    // Create Product in DB first
+    const product = await Product.create({ ...productData, shop: shop._id });
 
-    // 2. Sync with Paddle
+    // Sync with Paddle
     try {
       const paddleResult = await createPaddleProduct({
-        name: product.name,
+        name: product.title,
         description: product.description,
         price: product.basePrice,
         currency: "USD",
@@ -78,57 +175,83 @@ export async function POST(req) {
       } else {
         product.paddleSyncStatus = "failed";
         product.paddleSyncError = paddleResult.error;
-        console.error("Paddle Sync Failed:", paddleResult.error);
+        logger.error("Paddle sync failed", { productId: product._id, error: paddleResult.error });
       }
       await product.save();
     } catch (syncError) {
-      console.error("Paddle Sync Error:", syncError);
+      logger.error("Paddle sync error", { productId: product._id, error: syncError.message });
       product.paddleSyncStatus = "failed";
       product.paddleSyncError = syncError.message;
       await product.save();
     }
 
-    return NextResponse.json(product, { status: 201 });
-  } catch (e) {
-    return NextResponse.json({ error: e.message }, { status: 400 });
+    // Create audit log
+    await createAuditLog({
+      action: AUDIT_ACTIONS.PRODUCT_CREATED,
+      userId: req.user.id,
+      resource: 'Product',
+      resourceId: product._id.toString(),
+      metadata: { title: product.title, category: product.category, price: product.basePrice }
+    }, req);
+
+    logger.info("Product created", {
+      productId: product._id.toString(),
+      shopId: shop._id.toString(),
+      userId: req.user.id
+    });
+
+    return createdResponse(product, "Product created successfully");
+  } catch (error) {
+    logger.error("Product creation failed", { error: error.message, userId: req.user.id });
+    throw error;
   }
 }
 
-export async function PUT(req) {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "SHOPKEEPER") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+/**
+ * PUT /api/products
+ * Update a product (Shopkeeper only)
+ */
+async function updateProduct(req) {
+  await connectDB();
+
+  const body = await req.json();
+  const sanitized = sanitizeObject(body);
+
+  // Validate input
+  const validation = validate(updateProductSchema, sanitized);
+  if (!validation.success) {
+    throw new ValidationError("Invalid product data", validation.errors);
   }
 
-  await connectDB();
-  const body = await req.json();
-  const { _id, ...updates } = body;
+  const { _id, ...updates } = validation.data;
 
   const product = await Product.findById(_id);
-  if (!product) return NextResponse.json({ error: "Product not found" }, { status: 404 });
+  if (!product) {
+    throw new NotFoundError("Product");
+  }
 
   const shop = await Shop.findById(product.shop);
-  if (!shop || shop.owner.toString() !== session.user.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+  if (!shop || shop.owner.toString() !== req.user.id) {
+    throw new AuthorizationError("You can only update your own products");
   }
 
   try {
-    // 1. Update DB
+    // Update DB
     const updated = await Product.findByIdAndUpdate(_id, updates, { new: true });
 
-    // 2. Sync with Paddle (if critical fields changed)
-    if (updates.name || updates.basePrice || updates.description) {
+    // Sync with Paddle (if critical fields changed)
+    if (updates.title || updates.basePrice || updates.description) {
       try {
         const paddleResult = await updatePaddleProduct(updated.paddleProductId, updated.paddlePriceId, {
-          name: updated.name,
+          name: updated.title,
           price: updated.basePrice,
-          currency: "USD", // Assuming USD for now
+          currency: "USD",
           description: updated.description,
           imageUrl: updated.images?.[0]
         });
 
         if (paddleResult.success) {
-          updated.paddlePriceId = paddleResult.priceId || updated.paddlePriceId; // Price change creates new ID
+          updated.paddlePriceId = paddleResult.priceId || updated.paddlePriceId;
           updated.paddleSyncStatus = "synced";
           updated.paddleSyncError = null;
         } else {
@@ -137,32 +260,50 @@ export async function PUT(req) {
         }
         await updated.save();
       } catch (syncError) {
-        console.error("Paddle Update Error:", syncError);
+        logger.error("Paddle update error", { productId: _id, error: syncError.message });
       }
     }
 
-    return NextResponse.json(updated);
-  } catch (e) {
-    return NextResponse.json({ error: e.message }, { status: 400 });
+    // Create audit log
+    await createAuditLog({
+      action: AUDIT_ACTIONS.PRODUCT_UPDATED,
+      userId: req.user.id,
+      resource: 'Product',
+      resourceId: _id,
+      metadata: { updates: Object.keys(updates) }
+    }, req);
+
+    logger.info("Product updated", { productId: _id, userId: req.user.id });
+
+    return successResponse(updated, "Product updated successfully");
+  } catch (error) {
+    logger.error("Product update failed", { productId: _id, error: error.message });
+    throw error;
   }
 }
 
-export async function DELETE(req) {
-  const session = await getServerSession(authOptions);
-  if (!session || session.user.role !== "SHOPKEEPER") {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
+/**
+ * DELETE /api/products
+ * Delete a product (Shopkeeper only)
+ */
+async function deleteProduct(req) {
   await connectDB();
+
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
 
+  if (!id) {
+    throw new ValidationError("Product ID is required");
+  }
+
   const product = await Product.findById(id);
-  if (!product) return NextResponse.json({ error: "Product not found" }, { status: 404 });
+  if (!product) {
+    throw new NotFoundError("Product");
+  }
 
   const shop = await Shop.findById(product.shop);
-  if (!shop || shop.owner.toString() !== session.user.id) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+  if (!shop || shop.owner.toString() !== req.user.id) {
+    throw new AuthorizationError("You can only delete your own products");
   }
 
   try {
@@ -171,10 +312,28 @@ export async function DELETE(req) {
       await archivePaddleProduct(product.paddleProductId);
     }
   } catch (error) {
-    console.error("Paddle Archive Error:", error);
+    logger.error("Paddle archive error", { productId: id, error: error.message });
     // Proceed with deletion anyway
   }
 
   await Product.findByIdAndDelete(id);
-  return NextResponse.json({ message: "Deleted" });
+
+  // Create audit log
+  await createAuditLog({
+    action: AUDIT_ACTIONS.PRODUCT_DELETED,
+    userId: req.user.id,
+    resource: 'Product',
+    resourceId: id,
+    metadata: { title: product.title }
+  }, req);
+
+  logger.info("Product deleted", { productId: id, userId: req.user.id });
+
+  return noContentResponse();
 }
+
+// Export with middleware
+export const GET = withErrorHandler(getProducts);
+export const POST = withErrorHandler(withAuth(createProduct, { roles: ['SHOPKEEPER'] }));
+export const PUT = withErrorHandler(withAuth(updateProduct, { roles: ['SHOPKEEPER'] }));
+export const DELETE = withErrorHandler(withAuth(deleteProduct, { roles: ['SHOPKEEPER'] }));

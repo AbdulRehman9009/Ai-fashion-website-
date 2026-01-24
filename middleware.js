@@ -27,11 +27,16 @@ export async function middleware(req) {
 
     // Role Enforcement
     const userRole = token.role;
-    const pathRole = pathname.split("/")[2]?.toUpperCase(); // USER, TAILOR, etc.
+    // Extract the segment after /dashboard/
+    const pathSegment = pathname.split("/")[2];
+    const pathRole = pathSegment?.toUpperCase();
 
-    // Allow Admin to access everything (optional, but let's be strict for now: Admin only admin)
-    // Actually, stick to strict separation as requested.
-    if (pathRole && userRole !== "ADMIN" && userRole !== pathRole) {
+    // List of shared dashboard routes that shouldn't trigger role enforcement
+    // These pages are accessible by any authenticated user regardless of role
+    const sharedRoutes = ["COMPLETE-PROFILE", "SETTINGS", "PROFILE"];
+
+    // Only enforce role mismatch if it's NOT a shared route
+    if (pathRole && !sharedRoutes.includes(pathRole) && userRole !== "ADMIN" && userRole !== pathRole) {
       // Wrong role. Redirect to their own dashboard.
       return NextResponse.redirect(new URL(`/dashboard/${userRole.toLowerCase()}`, req.url));
     }
@@ -48,7 +53,17 @@ export async function middleware(req) {
     }
   }
 
-  return NextResponse.next();
+  // Add security headers to all responses
+  const response = NextResponse.next();
+
+  // Security headers
+  response.headers.set('X-Content-Type-Options', 'nosniff');
+  response.headers.set('X-Frame-Options', 'SAMEORIGIN');
+  response.headers.set('X-XSS-Protection', '1; mode=block');
+  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+
+  return response;
 }
 
 export const config = {

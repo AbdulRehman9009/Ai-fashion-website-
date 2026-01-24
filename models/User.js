@@ -5,7 +5,7 @@ export const Roles = ["USER", "TAILOR", "DELIVERY", "SHOPKEEPER", "ADMIN"];
 const UserSchema = new mongoose.Schema(
   {
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-    passwordHash: { type: String, required: true },
+    passwordHash: { type: String },  // Optional for OAuth users
     role: { type: String, enum: Roles, default: "USER", index: true },
     status: { type: String, enum: ["ACTIVE", "SUSPENDED"], default: "ACTIVE" },
     lastLogin: { type: Date },
@@ -13,6 +13,17 @@ const UserSchema = new mongoose.Schema(
     // Auth & Reset
     resetPasswordToken: String,
     resetPasswordExpire: Date,
+
+    // Email Verification
+    emailVerified: { type: Boolean, default: false },
+    emailVerificationToken: String,
+    emailVerificationExpire: Date,
+
+    // Account Security
+    loginAttempts: { type: Number, default: 0 },
+    lockUntil: Date,
+    twoFactorEnabled: { type: Boolean, default: false },
+    twoFactorSecret: String,
 
     // AI Usage Limits
     aiUsageCount: { type: Number, default: 0 },
@@ -93,5 +104,41 @@ const UserSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+// Virtual for checking if account is locked
+UserSchema.virtual('isLocked').get(function () {
+  return !!(this.lockUntil && this.lockUntil > Date.now());
+});
+
+// Instance methods
+UserSchema.methods.incLoginAttempts = function () {
+  // If we have a previous lock that has expired, restart at 1
+  if (this.lockUntil && this.lockUntil < Date.now()) {
+    return this.updateOne({
+      $set: { loginAttempts: 1 },
+      $unset: { lockUntil: 1 }
+    });
+  }
+
+  // Otherwise increment
+  const updates = { $inc: { loginAttempts: 1 } };
+
+  // Lock account after 5 failed attempts for 15 minutes
+  const MAX_LOGIN_ATTEMPTS = 5;
+  const LOCK_TIME = 15 * 60 * 1000; // 15 minutes
+
+  if (this.loginAttempts + 1 >= MAX_LOGIN_ATTEMPTS && !this.isLocked) {
+    updates.$set = { lockUntil: Date.now() + LOCK_TIME };
+  }
+
+  return this.updateOne(updates);
+};
+
+UserSchema.methods.resetLoginAttempts = function () {
+  return this.updateOne({
+    $set: { loginAttempts: 0 },
+    $unset: { lockUntil: 1 }
+  });
+};
 
 export default mongoose.models.User || mongoose.model("User", UserSchema);

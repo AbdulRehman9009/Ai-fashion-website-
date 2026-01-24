@@ -2,36 +2,44 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, ShoppingBag, DollarSign, AlertCircle, Shield } from "lucide-react";
+import { Users, ShoppingBag, DollarSign, AlertCircle, Shield, Scissors, TrendingUp } from "lucide-react";
 import { toast } from "react-toastify";
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import axios from "axios";
+
+const COLORS = ["#3b82f6", "#22c55e", "#f59e0b", "#ef4444", "#8b5cf6", "#14b8a6", "#f97316", "#6366f1"];
 
 export default function AdminDashboard() {
   const [stats, setStats] = useState(null);
+  const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchStats();
+    fetchData();
   }, []);
 
-  const fetchStats = async () => {
+  const fetchData = async () => {
     try {
-      const res = await fetch("/api/admin/stats");
-      if (res.ok) {
-        const data = await res.json();
-        setStats(data);
-      } else {
-        toast.error("Failed to load stats");
-      }
+      const [statsRes, analyticsRes] = await Promise.all([
+        axios.get("/api/admin/stats"),
+        axios.get("/api/admin/analytics")
+      ]);
+      setStats(statsRes.data);
+      setAnalytics(analyticsRes.data);
     } catch (error) {
-      console.error("Error fetching stats:", error);
-      toast.error("Could not load dashboard stats");
+      console.error("Error fetching data:", error);
+      toast.error("Could not load dashboard data");
     } finally {
       setLoading(false);
     }
   };
 
   if (loading) {
-    return <div className="flex justify-center p-12">Loading...</div>;
+    return (
+      <div className="flex justify-center items-center p-12 min-h-[400px]">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-red-600"></div>
+      </div>
+    );
   }
 
   return (
@@ -102,8 +110,74 @@ export default function AdminDashboard() {
         </Card>
       </div>
 
+      {/* Analytics Charts */}
+      <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
+        {/* Revenue by Day Chart */}
+        <Card className="col-span-1">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <TrendingUp className="h-5 w-5 text-green-600" />
+              Revenue by Day (Last 30 Days)
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={analytics?.revenueByDay || []}>
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fontSize: 10 }}
+                    tickFormatter={(val) => val.slice(5)}
+                  />
+                  <YAxis tick={{ fontSize: 10 }} />
+                  <Tooltip
+                    formatter={(value) => [`$${value}`, 'Revenue']}
+                    labelFormatter={(label) => `Date: ${label}`}
+                  />
+                  <Bar dataKey="revenue" fill="#22c55e" radius={[4, 4, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Order Status Distribution */}
+        <Card className="col-span-1">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ShoppingBag className="h-5 w-5 text-blue-600" />
+              Order Status Distribution
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="h-[300px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={analytics?.statusDistribution || []}
+                    dataKey="count"
+                    nameKey="status"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={100}
+                    label={({ status, percent }) => `${status}: ${(percent * 100).toFixed(0)}%`}
+                    labelLine={false}
+                  >
+                    {(analytics?.statusDistribution || []).map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Quick Stats Grid */}
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
         <Card>
           <CardHeader>
             <CardTitle className="text-base">Users by Role</CardTitle>
@@ -175,7 +249,7 @@ export default function AdminDashboard() {
           <CardTitle>Quick Actions</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-3 sm:gap-4 grid-cols-2 md:grid-cols-4">
             <a href="/dashboard/admin/users" className="p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors text-center">
               <Users className="h-6 w-6 mx-auto mb-2 text-blue-600" />
               <p className="font-semibold text-blue-900">Manage Users</p>

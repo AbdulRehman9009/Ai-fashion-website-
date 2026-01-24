@@ -76,17 +76,39 @@ async function handleTransactionCompleted(event) {
             return;
         }
 
+        // IDEMPOTENCY CHECK: Skip if already paid
+        if (order.paymentStatus === "PAID" && order.paddlePaymentId === data.id) {
+            console.log(`Order ${orderId} already processed, skipping duplicate event`);
+            return;
+        }
+
         // Update order with Paddle payment details
         order.paddlePaymentId = data.id;
         order.paddleOrderId = data.order_id || data.id;
         order.paymentStatus = "PAID";
+        order.status = "PaymentConfirmed";
+        order.timeline.push({
+            at: new Date(),
+            byRole: "SYSTEM",
+            event: "Payment received via Paddle",
+            notes: `Transaction ID: ${data.id}`
+        });
         await order.save();
 
-        // Create earnings for all parties
+        // Create earnings for all parties (legacy system)
         await createEarningsForOrder(order);
 
         // Mark earnings as available (since Paddle pays platform first)
         await markEarningsAsAvailable(orderId);
+
+        // Generate payout records (new ledger system)
+        try {
+            const { generatePayoutsForOrder } = await import("@/lib/services/payoutService");
+            await generatePayoutsForOrder(orderId);
+        } catch (payoutError) {
+            console.error("Error generating payouts:", payoutError);
+            // Don't fail the webhook - payouts can be created manually
+        }
 
         console.log(`Payment completed for order ${orderId}`);
     } catch (error) {
