@@ -8,7 +8,9 @@ export async function PATCH(req, { params }) {
   await connectDB();
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const order = await Order.findById(params.id);
+
+  const { id } = await params;
+  const order = await Order.findById(id);
   if (!order) return NextResponse.json({ error: "Not found" }, { status: 404 });
   const body = await req.json();
   const target = body.status;

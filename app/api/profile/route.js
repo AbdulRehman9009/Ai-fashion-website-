@@ -34,6 +34,11 @@ export async function GET(req) {
             additionalData.profile = profile;
         }
 
+        // ADMIN users get admin-specific data
+        if (user.role === "ADMIN") {
+            additionalData.adminProfile = user.adminProfile || {};
+        }
+
         return NextResponse.json({
             user,
             ...additionalData,

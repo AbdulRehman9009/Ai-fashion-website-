@@ -1,13 +1,16 @@
-import { connectDB } from "../lib/db.js";
-import User from "../models/User.js";
-import Shop from "../models/Shop.js";
-import Product from "../models/Product.js";
-import Order from "../models/Order.js";
-import Delivery from "../models/Delivery.js";
-import AuditLog from "../models/AuditLog.js";
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 
+// Load environment variables
 dotenv.config({ path: ".env.local" });
+
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI) {
+    console.error("ERROR: MONGODB_URI not found in .env.local");
+    process.exit(1);
+}
 
 /**
  * Script to clean all dummy/test data from database
@@ -17,51 +20,64 @@ dotenv.config({ path: ".env.local" });
 
 async function cleanDatabase() {
     try {
-        await connectDB();
-        console.log("✅ Connected to database");
-        console.log("\n⚠️  WARNING: This will delete ALL data except ADMIN users!");
-        console.log("Starting cleanup in 3 seconds...\n");
+        console.log("🌱 Connecting to MongoDB...");
+        await mongoose.connect(MONGODB_URI);
+        console.log("✅ Connected to MongoDB\n");
+        console.log("⚠️  WARNING: This will delete ALL data except ADMIN users!");
+        console.log("Starting cleanup...\n");
 
-        await new Promise(resolve => setTimeout(resolve, 3000));
+        // Get database collections directly
+        const db = mongoose.connection.db;
 
         // Delete all orders
-        const ordersDeleted = await Order.deleteMany({});
-        console.log(`🗑️  Deleted ${ordersDeleted.deletedCount} orders`);
+        try {
+            const ordersResult = await db.collection("orders").deleteMany({});
+            console.log(`🗑️  Deleted ${ordersResult.deletedCount} orders`);
+        } catch (e) { console.log("ℹ️  No orders collection"); }
 
         // Delete all deliveries
-        const deliveriesDeleted = await Delivery.deleteMany({});
-        console.log(`🗑️  Deleted ${deliveriesDeleted.deletedCount} deliveries`);
+        try {
+            const deliveriesResult = await db.collection("deliveries").deleteMany({});
+            console.log(`🗑️  Deleted ${deliveriesResult.deletedCount} deliveries`);
+        } catch (e) { console.log("ℹ️  No deliveries collection"); }
 
         // Delete all products
-        const productsDeleted = await Product.deleteMany({});
-        console.log(`🗑️  Deleted ${productsDeleted.deletedCount} products`);
+        try {
+            const productsResult = await db.collection("products").deleteMany({});
+            console.log(`🗑️  Deleted ${productsResult.deletedCount} products`);
+        } catch (e) { console.log("ℹ️  No products collection"); }
 
         // Delete all shops
-        const shopsDeleted = await Shop.deleteMany({});
-        console.log(`🗑️  Deleted ${shopsDeleted.deletedCount} shops`);
+        try {
+            const shopsResult = await db.collection("shops").deleteMany({});
+            console.log(`🗑️  Deleted ${shopsResult.deletedCount} shops`);
+        } catch (e) { console.log("ℹ️  No shops collection"); }
+
+        // Delete all carts
+        try {
+            const cartsResult = await db.collection("carts").deleteMany({});
+            console.log(`🗑️  Deleted ${cartsResult.deletedCount} carts`);
+        } catch (e) { console.log("ℹ️  No carts collection"); }
 
         // Delete all non-admin users
-        const usersDeleted = await User.deleteMany({ role: { $ne: "ADMIN" } });
-        console.log(`🗑️  Deleted ${usersDeleted.deletedCount} non-admin users`);
-
-        // Optional: Clear audit logs (uncomment if needed)
-        // const auditDeleted = await AuditLog.deleteMany({});
-        // console.log(`🗑️  Deleted ${auditDeleted.deletedCount} audit logs`);
+        try {
+            const usersResult = await db.collection("users").deleteMany({ role: { $ne: "ADMIN" } });
+            console.log(`🗑️  Deleted ${usersResult.deletedCount} non-admin users`);
+        } catch (e) { console.log("ℹ️  No users collection"); }
 
         // Count remaining admin users
-        const adminCount = await User.countDocuments({ role: "ADMIN" });
+        const adminCount = await db.collection("users").countDocuments({ role: "ADMIN" });
+
         console.log(`\n✅ Cleanup complete!`);
         console.log(`📊 Remaining ADMIN users: ${adminCount}`);
+        console.log("\n✨ Database is now clean!");
 
-        if (adminCount === 0) {
-            console.log("\n⚠️  WARNING: No admin users found! Run 'node scripts/createAdmin.js' to create one.");
-        }
-
-        console.log("\n✨ Database is now clean and ready for production data!");
-        process.exit(0);
     } catch (error) {
         console.error("❌ Error cleaning database:", error.message);
-        process.exit(1);
+    } finally {
+        await mongoose.disconnect();
+        console.log("\n👋 Disconnected from MongoDB");
+        process.exit(0);
     }
 }
 

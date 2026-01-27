@@ -2,11 +2,13 @@
   "name": "my-app",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed": "node scripts/seed-shops.js"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
@@ -16,6 +18,7 @@
     "@radix-ui/react-select": "^2.2.6",
     "@radix-ui/react-switch": "^1.2.6",
     "@react-icons/all-files": "^4.1.0",
+    "@sendgrid/mail": "^8.1.6",
     "axios": "^1.13.2",
     "bcryptjs": "^3.0.3",
     "class-variance-authority": "^0.7.1",
@@ -35,6 +38,7 @@
     "react-hook-form": "^7.69.0",
     "react-toastify": "^11.0.5",
     "recharts": "^3.6.0",
+    "resend": "^6.8.0",
     "tailwind-merge": "^3.4.0",
     "zod": "^4.2.1",
     "zxcvbn": "^4.4.2"

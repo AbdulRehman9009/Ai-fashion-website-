@@ -6,6 +6,9 @@ import { motion, AnimatePresence } from "framer-motion";
 import OrdersList from "@/components/OrdersList";
 import ShopSection from "@/components/shop/ShopSection";
 import CheckoutDialog from "@/components/shop/CheckoutDialog";
+import WishlistTab from "@/components/shop/WishlistTab";
+import axios from "axios";
+import Link from "next/link";
 import {
   ShoppingBag,
   CheckCircle,
@@ -18,13 +21,126 @@ import {
   Camera,
   X,
   Wand2,
-  Home
+  Home,
+  Store,
+  MapPin,
+  Star,
+  ArrowRight,
+  Heart
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "react-toastify";
+
+// ShopsTab Component - Displays available shops
+function ShopsTab() {
+  const [shops, setShops] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchShops();
+  }, []);
+
+  const fetchShops = async () => {
+    try {
+      const res = await axios.get("/api/shops");
+      setShops(res.data?.data || []);
+    } catch (error) {
+      console.error("Failed to fetch shops:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center py-20">
+        <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <Card className="border-0 shadow-lg">
+        <CardHeader className="bg-gradient-to-r from-orange-50 to-pink-50 border-b">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="bg-orange-100 p-2 rounded-lg">
+                <Store className="h-5 w-5 text-orange-600" />
+              </div>
+              <div>
+                <CardTitle className="text-xl">Discover Shops</CardTitle>
+                <CardDescription>Browse shops and explore their products</CardDescription>
+              </div>
+            </div>
+            <Link href="/shops">
+              <Button variant="outline" size="sm" className="gap-2">
+                View All <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+        </CardHeader>
+        <CardContent className="p-4 sm:p-6">
+          {shops.length === 0 ? (
+            <div className="text-center py-12">
+              <Store className="h-16 w-16 mx-auto text-gray-300 mb-4" />
+              <h3 className="text-lg font-medium text-gray-600">No shops available</h3>
+              <p className="text-sm text-gray-500 mt-1">Check back later for new shops</p>
+            </div>
+          ) : (
+            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+              {shops.map((shop) => (
+                <Link key={shop._id} href={`/shops/${shop._id}`}>
+                  <Card className="overflow-hidden hover:shadow-lg transition-all h-full group cursor-pointer border-2 hover:border-orange-200">
+                    <div className="h-24 bg-gradient-to-r from-orange-400 to-pink-400 relative">
+                      {shop.banner && (
+                        <img src={shop.banner} alt={shop.name} className="w-full h-full object-cover" />
+                      )}
+                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
+                    </div>
+                    <CardContent className="p-4 relative">
+                      <div className="-mt-10 mb-2">
+                        {shop.logo ? (
+                          <img src={shop.logo} alt={shop.name} className="w-16 h-16 rounded-xl object-cover border-4 border-white shadow-lg" />
+                        ) : (
+                          <div className="w-16 h-16 rounded-xl bg-gray-100 flex items-center justify-center border-4 border-white shadow-lg">
+                            <Store className="h-8 w-8 text-gray-400" />
+                          </div>
+                        )}
+                      </div>
+                      <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1 group-hover:text-orange-600 transition-colors">
+                        {shop.name}
+                      </h3>
+                      {shop.location?.city && (
+                        <div className="flex items-center gap-1 text-xs text-gray-500 mb-2">
+                          <MapPin className="h-3 w-3" />
+                          <span>{shop.location.city}</span>
+                        </div>
+                      )}
+                      {shop.ratingCount > 0 && (
+                        <div className="flex items-center gap-1">
+                          <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                          <span className="text-sm font-medium text-gray-900">{shop.ratingAvg?.toFixed(1)}</span>
+                          <span className="text-xs text-gray-500">({shop.ratingCount})</span>
+                        </div>
+                      )}
+                      <div className="mt-3 text-xs text-orange-600 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
+                        View Products <ArrowRight className="h-3 w-3" />
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
 
 const EVENT_TYPES = [
   { id: "Casual", emoji: "👕" },
@@ -210,8 +326,10 @@ export default function UserDashboard() {
 
   const tabs = [
     { id: "stylist", label: "AI Stylist", icon: Sparkles },
+    { id: "shops", label: "Shops", icon: Store },
+    { id: "wishlist", label: "Wishlist", icon: Heart },
     { id: "orders", label: "Orders", icon: List },
-    { id: "shop", label: "Shop", icon: ShoppingCart }
+    { id: "shop", label: "Products", icon: ShoppingCart }
   ];
 
   return (
@@ -274,8 +392,8 @@ export default function UserDashboard() {
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`flex items-center justify-center gap-2 flex-1 min-w-0 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${activeTab === tab.id
-                ? "bg-white shadow text-gray-900"
-                : "text-gray-500 hover:text-gray-700"
+              ? "bg-white shadow text-gray-900"
+              : "text-gray-500 hover:text-gray-700"
               }`}
           >
             <tab.icon className="h-4 w-4 flex-shrink-0" />
@@ -364,8 +482,8 @@ export default function UserDashboard() {
                         <label
                           key={event.id}
                           className={`cursor-pointer rounded-lg p-2 sm:p-3 text-center border-2 transition-all ${watchEventType === event.id
-                              ? "border-purple-500 bg-purple-50"
-                              : "border-gray-200 hover:border-gray-300"
+                            ? "border-purple-500 bg-purple-50"
+                            : "border-gray-200 hover:border-gray-300"
                             }`}
                         >
                           <input
@@ -519,6 +637,30 @@ export default function UserDashboard() {
                 </div>
               </motion.div>
             )}
+          </motion.div>
+        )}
+
+        {/* Shops Tab */}
+        {activeTab === "shops" && (
+          <motion.div
+            key="shops"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+          >
+            <ShopsTab />
+          </motion.div>
+        )}
+
+        {/* Wishlist Tab */}
+        {activeTab === "wishlist" && (
+          <motion.div
+            key="wishlist"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+          >
+            <WishlistTab />
           </motion.div>
         )}
 

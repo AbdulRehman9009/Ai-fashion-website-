@@ -7,7 +7,9 @@ export async function GET(req, { params }) {
   await connectDB();
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const order = await Order.findById(params.id).populate("shop").populate("user").populate("items.product").lean();
+
+  const { id } = await params;
+  const order = await Order.findById(id).populate("shop").populate("user").populate("items.product").lean();
   if (!order) return NextResponse.json({ error: "Not found" }, { status: 404 });
   if (token.role === "ADMIN") return NextResponse.json(order);
   if (token.role === "USER" && String(order.user._id) !== token.sub) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -18,7 +20,9 @@ export async function PATCH(req, { params }) {
   await connectDB();
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const order = await Order.findById(params.id);
+
+  const { id } = await params;
+  const order = await Order.findById(id);
   if (!order) return NextResponse.json({ error: "Not found" }, { status: 404 });
   if (token.role !== "ADMIN" && token.role !== "USER") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   if (token.role === "USER" && String(order.user) !== token.sub) return NextResponse.json({ error: "Forbidden" }, { status: 403 });

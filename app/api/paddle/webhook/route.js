@@ -4,6 +4,7 @@ import { connectDB } from "@/lib/db";
 import Order from "@/models/Order";
 import { verifyPaddleSignature, parsePaddleEvent, extractOrderId } from "@/lib/paddle/paddleWebhook";
 import { markEarningsAsAvailable, createEarningsForOrder } from "@/lib/paddle/paddlePayout";
+import { logger } from "@/lib/logger";
 
 export async function POST(req) {
     try {
@@ -44,12 +45,12 @@ export async function POST(req) {
                 break;
 
             default:
-                console.log(`Unhandled event type: ${event.eventType}`);
+                logger.info(`Unhandled Paddle event type: ${event.eventType}`);
         }
 
         return NextResponse.json({ received: true });
     } catch (error) {
-        console.error("Error processing Paddle webhook:", error);
+        logger.error("Error processing Paddle webhook", { error: error.message });
         return NextResponse.json(
             { error: "Webhook processing failed" },
             { status: 500 }
@@ -65,20 +66,19 @@ async function handleTransactionCompleted(event) {
     const orderId = extractOrderId(data.custom_data);
 
     if (!orderId) {
-        console.error("No order ID found in transaction");
+        logger.error("No order ID found in Paddle transaction");
         return;
     }
 
     try {
         const order = await Order.findById(orderId).populate("shop assignedTailor assignedDelivery");
         if (!order) {
-            console.error(`Order not found: ${orderId}`);
+            logger.error(`Order not found for Paddle payment: ${orderId}`);
             return;
         }
 
-        // IDEMPOTENCY CHECK: Skip if already paid
         if (order.paymentStatus === "PAID" && order.paddlePaymentId === data.id) {
-            console.log(`Order ${orderId} already processed, skipping duplicate event`);
+            logger.info(`Order ${orderId} already processed, skipping duplicate`);
             return;
         }
 
@@ -106,13 +106,13 @@ async function handleTransactionCompleted(event) {
             const { generatePayoutsForOrder } = await import("@/lib/services/payoutService");
             await generatePayoutsForOrder(orderId);
         } catch (payoutError) {
-            console.error("Error generating payouts:", payoutError);
+            logger.error("Error generating payouts", { orderId, error: payoutError.message });
             // Don't fail the webhook - payouts can be created manually
         }
 
-        console.log(`Payment completed for order ${orderId}`);
+        logger.info(`Payment completed for order ${orderId}`);
     } catch (error) {
-        console.error("Error handling transaction completed:", error);
+        logger.error("Error handling transaction completed", { error: error.message });
     }
 }
 
@@ -133,9 +133,9 @@ async function handlePaymentFailed(event) {
             paddlePaymentId: data.id,
         });
 
-        console.log(`Payment failed for order ${orderId}`);
+        logger.info(`Payment failed for order ${orderId}`);
     } catch (error) {
-        console.error("Error handling payment failure:", error);
+        logger.error("Error handling payment failure", { orderId, error: error.message });
     }
 }
 
@@ -163,8 +163,8 @@ async function handleRefund(event) {
             { status: "failed", failureReason: "Order refunded" }
         );
 
-        console.log(`Refund processed for order ${orderId}`);
+        logger.info(`Refund processed for order ${orderId}`);
     } catch (error) {
-        console.error("Error handling refund:", error);
+        logger.error("Error handling refund", { orderId, error: error.message });
     }
 }

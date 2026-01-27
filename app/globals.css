@@ -1,38 +1,53 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #09090b;
+  --background: #fafbfc;
+  --foreground: #0f172a;
 
-  /* Brand Colors */
-  --primary: #4f46e5;
+  /* Brand Colors - Premium Purple/Indigo Theme */
+  --primary: #6366f1;
   --primary-foreground: #ffffff;
-  --secondary: #f3f4f6;
-  --accent: #ec4899;
+  --primary-hover: #4f46e5;
+  --secondary: #f1f5f9;
+  --accent: #8b5cf6;
+  --accent-hover: #7c3aed;
+
+  /* Gradient Colors */
+  --gradient-start: #6366f1;
+  --gradient-end: #8b5cf6;
+  --gradient-primary: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
 
   /* Status Colors */
   --success: #10b981;
+  --success-light: #d1fae5;
   --warning: #f59e0b;
+  --warning-light: #fef3c7;
   --error: #ef4444;
+  --error-light: #fee2e2;
   --info: #3b82f6;
+  --info-light: #dbeafe;
 
   /* Muted Colors */
-  --muted: #f9fafb;
-  --muted-foreground: #6b7280;
+  --muted: #f8fafc;
+  --muted-foreground: #64748b;
 
   /* Border & Card */
-  --border: #e5e7eb;
+  --border: #e2e8f0;
   --card: #ffffff;
-  --card-foreground: #09090b;
+  --card-foreground: #0f172a;
+  --card-hover: #f8fafc;
 
-  /* Shadows */
+  /* Shadows - Enhanced depth */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.08);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.08);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.10), 0 8px 10px -6px rgb(0 0 0 / 0.08);
+  --shadow-glow: 0 0 20px rgba(99, 102, 241, 0.15);
 
   /* Radius */
-  --radius: 0.5rem;
+  --radius: 0.75rem;
+  --radius-sm: 0.5rem;
+  --radius-lg: 1rem;
 }
 
 @theme inline {
@@ -44,20 +59,37 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #09090b;
-    --foreground: #fafafa;
+    --background: #0f172a;
+    --foreground: #f8fafc;
     --primary: #818cf8;
-    --secondary: #1f2937;
-    --muted: #1f2937;
-    --muted-foreground: #9ca3af;
-    --border: #374151;
-    --card: #111827;
-    --card-foreground: #fafafa;
+    --primary-hover: #6366f1;
+    --secondary: #1e293b;
+    --accent: #a78bfa;
+    --muted: #1e293b;
+    --muted-foreground: #94a3b8;
+    --border: #334155;
+    --card: #1e293b;
+    --card-foreground: #f8fafc;
+    --card-hover: #334155;
+    --gradient-start: #818cf8;
+    --gradient-end: #a78bfa;
   }
 }
 
 * {
   border-color: var(--border);
+}
+
+/* Smooth scrolling for better UX */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Prevent body scroll when modal/sidebar is open */
+body.no-scroll {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
 }
 
 body {
@@ -69,6 +101,9 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  /* Improve performance with GPU acceleration */
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 /* Ensure main content grows to fill available space */
@@ -282,6 +317,33 @@ main,
 
   .scrollbar-custom::-webkit-scrollbar-thumb:hover {
     background-color: #9ca3af;
+  }
+
+  /* Touch-friendly minimum target size (44x44px for mobile) */
+  .touch-target {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Hardware acceleration for smooth animations */
+  .gpu-accelerate {
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+  }
+
+  /* Reduce motion for users who prefer it */
+  @media (prefers-reduced-motion: reduce) {
+
+    .animate-fade-in,
+    .animate-slide-up,
+    .animate-slide-down,
+    .animate-scale-in,
+    .animate-float {
+      animation: none !important;
+      transition: none !important;
+    }
   }
 }
 

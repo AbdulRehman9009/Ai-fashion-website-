@@ -50,10 +50,9 @@ function UserResetPasswordContent() {
 
       toast.success(data.message);
 
-      // For Demo: if debugToken is returned, auto-redirect or show it
       if (data.debugToken) {
-        toast.info("DEMO MODE: Token received. check console or auto-filling.");
-        console.log("DEMO TOKEN:", data.debugToken);
+        toast.info("DEMO MODE: Token received");
+        // Simulate clicking the link
         // Simulate clicking the link
         setTimeout(() => {
           router.push(`/auth/user/reset-password?token=${data.debugToken}`);

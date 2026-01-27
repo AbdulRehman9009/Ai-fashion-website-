@@ -35,17 +35,10 @@ async function signupHandler(req) {
     password: body.password // Preserve original password
   };
 
-  console.log("Signup Request:", {
-    email: sanitized.email,
-    role: sanitized.role,
-    hasPassword: !!sanitized.password,
-    name: sanitized.name
-  });
-
   // Validate input
   const validation = validate(signupSchema, sanitized);
   if (!validation.success) {
-    console.error("Signup Validation Failed:", JSON.stringify(validation.errors, null, 2));
+    logger.warn("Signup validation failed", { errors: validation.errors });
     return validationErrorResponse(validation.errors);
   }
 

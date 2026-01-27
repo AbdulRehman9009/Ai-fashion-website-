@@ -13,7 +13,16 @@ export async function middleware(req) {
     }
   }
 
-  // 2. Dashboard Protection
+  // 2. Shops Route Protection (Require authentication)
+  if (pathname.startsWith("/shops")) {
+    if (!token) {
+      const loginUrl = new URL("/auth/user/login", req.url);
+      loginUrl.searchParams.set("callbackUrl", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  // 3. Dashboard Protection
   if (pathname.startsWith("/dashboard")) {
     // If not logged in, redirect to the specific role's login page
     if (!token) {
@@ -67,6 +76,6 @@ export async function middleware(req) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/auth/:path*"],
+  matcher: ["/dashboard/:path*", "/auth/:path*", "/shops/:path*"],
 };
 

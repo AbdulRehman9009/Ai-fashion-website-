@@ -12,7 +12,7 @@ export async function POST(req, { params }) {
         }
 
         await connectDB();
-        const orderId = params.id;
+        const { id: orderId } = await params;
 
         // Release payments (mark earnings as available)
         const result = await markEarningsAsAvailable(orderId);

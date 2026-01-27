@@ -14,7 +14,8 @@ export async function GET(req, { params }) {
     }
 
     try {
-        const user = await User.findById(params.id)
+        const { id } = await params;
+        const user = await User.findById(id)
             .select("-passwordHash -resetPasswordToken -resetPasswordExpire")
             .lean();
 
@@ -42,7 +43,8 @@ export async function PATCH(req, { params }) {
         const body = await req.json();
         const { status, role, resetPassword } = body;
 
-        const user = await User.findById(params.id);
+        const { id } = await params;
+        const user = await User.findById(id);
         if (!user) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
@@ -101,7 +103,7 @@ export async function PATCH(req, { params }) {
 
         // Apply updates
         const updatedUser = await User.findByIdAndUpdate(
-            params.id,
+            id,
             updates,
             { new: true }
         ).select("-passwordHash -resetPasswordToken -resetPasswordExpire");
@@ -126,7 +128,8 @@ export async function DELETE(req, { params }) {
     }
 
     try {
-        const user = await User.findById(params.id);
+        const { id } = await params;
+        const user = await User.findById(id);
         if (!user) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
         }
@@ -136,7 +139,7 @@ export async function DELETE(req, { params }) {
             return NextResponse.json({ error: "Cannot delete yourself" }, { status: 400 });
         }
 
-        await User.findByIdAndDelete(params.id);
+        await User.findByIdAndDelete(id);
 
         // Log action
         await AuditLog.create({

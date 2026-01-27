@@ -295,8 +295,8 @@ export default function CustomerProductsPage() {
                 ) : (
                     <>
                         <div className={`grid gap-4 ${viewMode === "grid"
-                                ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-                                : "grid-cols-1"
+                            ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+                            : "grid-cols-1"
                             }`}>
                             {products.map((product) => (
                                 <ProductCard key={product._id} product={product} viewMode={viewMode} />
@@ -348,11 +348,22 @@ function ProductCard({ product, viewMode }) {
                     </div>
                     <CardContent className="flex-1 p-4">
                         <div className="flex justify-between items-start">
-                            <div>
+                            <div className="flex-1">
                                 <h3 className="font-semibold text-gray-900 line-clamp-1">{product.title}</h3>
                                 <p className="text-sm text-gray-500">{product.category}</p>
-                                {product.shop?.name && (
-                                    <p className="text-xs text-gray-400 mt-1">by {product.shop.name}</p>
+                                {product.shop && (
+                                    <Link href={`/shops/${product.shop._id}`} className="inline-flex items-center gap-2 mt-2 group">
+                                        {product.shop.logo && (
+                                            <img
+                                                src={product.shop.logo}
+                                                alt={product.shop.name}
+                                                className="w-6 h-6 rounded-full object-cover border border-gray-200"
+                                            />
+                                        )}
+                                        <span className="text-sm font-medium text-orange-600 group-hover:text-orange-700 group-hover:underline">
+                                            {product.shop.name}
+                                        </span>
+                                    </Link>
                                 )}
                             </div>
                             <button
@@ -421,8 +432,19 @@ function ProductCard({ product, viewMode }) {
             <CardContent className="p-3">
                 <h3 className="font-medium text-gray-900 line-clamp-1 text-sm">{product.title}</h3>
                 <p className="text-xs text-gray-500 mt-0.5">{product.category}</p>
-                {product.shop?.name && (
-                    <p className="text-xs text-gray-400 truncate">{product.shop.name}</p>
+                {product.shop && (
+                    <Link href={`/shops/${product.shop._id}`} className="inline-flex items-center gap-1.5 mt-1.5 group">
+                        {product.shop.logo && (
+                            <img
+                                src={product.shop.logo}
+                                alt={product.shop.name}
+                                className="w-4 h-4 rounded-full object-cover border border-gray-200"
+                            />
+                        )}
+                        <span className="text-xs font-medium text-orange-600 group-hover:text-orange-700 truncate">
+                            {product.shop.name}
+                        </span>
+                    </Link>
                 )}
                 <div className="flex items-center justify-between mt-2">
                     <span className="text-lg font-bold text-orange-600">

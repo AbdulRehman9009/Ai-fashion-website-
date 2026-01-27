@@ -24,14 +24,10 @@ export async function POST(req) {
             user.resetPasswordExpire = Date.now() + 3600000; // 1 hour
             await user.save();
 
-            // In a real app, send email here using SendGrid/Resend
-            // For now, we'll log it for the "Simulated" aspect or return it in dev mode if requested, 
-            // but adhering to "Simulated" usually implies purely UI flow or logging.
-            // I'll return it in the response for this demo so the user can actually test it without email infra.
-            console.log(`Reset Token for ${email}: ${resetToken}`);
+            // In production, send email here using SendGrid/Resend
 
             return NextResponse.json({
-                message: "Reset link sent (Check console for token in dev)",
+                message: "Reset link sent",
                 // PROD-UNSAFE: returning token for demo purposes only
                 debugToken: resetToken
             });

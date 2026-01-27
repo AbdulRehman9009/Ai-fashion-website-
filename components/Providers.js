@@ -2,13 +2,16 @@
 
 import { SessionProvider } from "next-auth/react";
 import { ToastContainer } from "react-toastify";
+import { CartProvider } from "@/contexts/CartContext";
 import "react-toastify/dist/ReactToastify.css";
 
 export function Providers({ children }) {
     return (
         <SessionProvider>
-            {children}
-            <ToastContainer position="top-right" autoClose={3000} />
+            <CartProvider>
+                {children}
+                <ToastContainer position="bottom-right" />
+            </CartProvider>
         </SessionProvider>
     );
 }

@@ -13,7 +13,8 @@ export async function PATCH(req, { params }) {
   const body = await req.json();
   const { status, notes } = body;
 
-  const delivery = await Delivery.findById(params.id);
+  const { id } = await params;
+  const delivery = await Delivery.findById(id);
   if (!delivery) return NextResponse.json({ error: "Not found" }, { status: 404 });
 
   // Verify delivery belongs to this delivery person
@@ -70,7 +71,7 @@ export async function PATCH(req, { params }) {
   }
 
   // Return enriched delivery data
-  const updatedDelivery = await Delivery.findById(params.id)
+  const updatedDelivery = await Delivery.findById(id)
     .populate({
       path: "order",
       populate: [
