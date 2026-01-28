@@ -57,53 +57,61 @@ export default function AdminDashboard() {
 
       {/* Stats Cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="bg-gradient-to-br from-blue-50 to-white">
+        <Card className="bg-white border border-blue-100 shadow-sm hover:shadow-md transition-all">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-blue-700">Total Users</CardTitle>
-            <Users className="h-4 w-4 text-blue-500" />
+            <CardTitle className="text-sm font-medium text-gray-500">Total Users</CardTitle>
+            <div className="p-2 bg-blue-50 rounded-lg">
+              <Users className="h-4 w-4 text-blue-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{stats?.users?.total || 0}</div>
-            <p className="text-xs text-blue-600 mt-1">
+            <div className="text-2xl font-bold text-gray-900">{stats?.users?.total || 0}</div>
+            <p className="text-xs text-blue-600 mt-1 font-medium">
               {stats?.users?.byRole?.USER || 0} customers, {stats?.users?.byRole?.SHOPKEEPER || 0} shops
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-green-50 to-white">
+        <Card className="bg-white border border-green-100 shadow-sm hover:shadow-md transition-all">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-green-700">Total Orders</CardTitle>
-            <ShoppingBag className="h-4 w-4 text-green-500" />
+            <CardTitle className="text-sm font-medium text-gray-500">Total Orders</CardTitle>
+            <div className="p-2 bg-green-50 rounded-lg">
+              <ShoppingBag className="h-4 w-4 text-green-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{stats?.orders?.total || 0}</div>
-            <p className="text-xs text-green-600 mt-1">
+            <div className="text-2xl font-bold text-gray-900">{stats?.orders?.total || 0}</div>
+            <p className="text-xs text-green-600 mt-1 font-medium">
               {stats?.orders?.completed || 0} completed
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-purple-50 to-white">
+        <Card className="bg-white border border-purple-100 shadow-sm hover:shadow-md transition-all">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-purple-700">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-purple-500" />
+            <CardTitle className="text-sm font-medium text-gray-500">Total Revenue</CardTitle>
+            <div className="p-2 bg-purple-50 rounded-lg">
+              <DollarSign className="h-4 w-4 text-purple-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">${stats?.revenue?.total || 0}</div>
-            <p className="text-xs text-purple-600 mt-1">
+            <div className="text-2xl font-bold text-gray-900">${stats?.revenue?.total || 0}</div>
+            <p className="text-xs text-purple-600 mt-1 font-medium">
               ${stats?.revenue?.thisMonth || 0} this month
             </p>
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-orange-50 to-white">
+        <Card className="bg-white border border-orange-100 shadow-sm hover:shadow-md transition-all">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-orange-700">Pending Actions</CardTitle>
-            <AlertCircle className="h-4 w-4 text-orange-500" />
+            <CardTitle className="text-sm font-medium text-gray-500">Pending Actions</CardTitle>
+            <div className="p-2 bg-orange-50 rounded-lg">
+              <AlertCircle className="h-4 w-4 text-orange-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold">{stats?.pendingActions?.total || 0}</div>
-            <p className="text-xs text-orange-600 mt-1">
+            <div className="text-2xl font-bold text-gray-900">{stats?.pendingActions?.total || 0}</div>
+            <p className="text-xs text-orange-600 mt-1 font-medium">
               Requires attention
             </p>
           </CardContent>

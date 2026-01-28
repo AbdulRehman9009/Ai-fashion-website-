@@ -108,31 +108,37 @@ export default function TailorDashboard() {
 
       {/* Stats Cards */}
       <div className="grid gap-3 sm:gap-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-        <Card>
+        <Card className="border border-purple-100 shadow-sm hover:shadow-md transition-all">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-gray-500">Active Jobs</CardTitle>
-            <Shirt className="h-4 w-4 text-purple-500" />
+            <div className="p-2 bg-purple-50 rounded-lg">
+              <Shirt className="h-4 w-4 text-purple-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.active}</div>
+            <div className="text-2xl font-bold text-gray-900">{stats.active}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border border-green-100 shadow-sm hover:shadow-md transition-all">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-gray-500">Completed</CardTitle>
-            <CheckCircle className="h-4 w-4 text-green-500" />
+            <div className="p-2 bg-green-50 rounded-lg">
+              <CheckCircle className="h-4 w-4 text-green-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.completed}</div>
+            <div className="text-2xl font-bold text-gray-900">{stats.completed}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border border-blue-100 shadow-sm hover:shadow-md transition-all">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium text-gray-500">Total Earnings</CardTitle>
-            <TrendingUp className="h-4 w-4 text-blue-500" />
+            <div className="p-2 bg-blue-50 rounded-lg">
+              <TrendingUp className="h-4 w-4 text-blue-600" />
+            </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${stats.earnings}</div>
+            <div className="text-2xl font-bold text-gray-900">${stats.earnings}</div>
           </CardContent>
         </Card>
       </div>

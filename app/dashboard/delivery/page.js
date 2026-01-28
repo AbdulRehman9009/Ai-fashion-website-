@@ -162,34 +162,40 @@ export default function DeliveryDashboard() {
         {/* Earnings Tab */}
         <TabsContent value="earnings" className="space-y-4">
           <div className="grid gap-6 md:grid-cols-3">
-            <Card className="bg-gradient-to-br from-blue-50 to-white">
+            <Card className="bg-white border border-blue-100 shadow-sm hover:shadow-md transition-all">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-blue-700">Today's Earnings</CardTitle>
-                <Calendar className="h-4 w-4 text-blue-500" />
+                <CardTitle className="text-sm font-medium text-gray-500">Today's Earnings</CardTitle>
+                <div className="p-2 bg-blue-50 rounded-lg">
+                  <Calendar className="h-4 w-4 text-blue-600" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-blue-700">${earnings?.today || 0}</div>
+                <div className="text-2xl font-bold text-blue-700">${earnings?.today || 0}</div>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-green-50 to-white">
+            <Card className="bg-white border border-green-100 shadow-sm hover:shadow-md transition-all">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-green-700">This Week</CardTitle>
-                <TrendingUp className="h-4 w-4 text-green-500" />
+                <CardTitle className="text-sm font-medium text-gray-500">This Week</CardTitle>
+                <div className="p-2 bg-green-50 rounded-lg">
+                  <TrendingUp className="h-4 w-4 text-green-600" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-green-700">${earnings?.thisWeek || 0}</div>
+                <div className="text-2xl font-bold text-green-700">${earnings?.thisWeek || 0}</div>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-purple-50 to-white">
+            <Card className="bg-white border border-purple-100 shadow-sm hover:shadow-md transition-all">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-sm font-medium text-purple-700">Total Earnings</CardTitle>
-                <CreditCard className="h-4 w-4 text-purple-500" />
+                <CardTitle className="text-sm font-medium text-gray-500">Total Earnings</CardTitle>
+                <div className="p-2 bg-purple-50 rounded-lg">
+                  <CreditCard className="h-4 w-4 text-purple-600" />
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-purple-700">${earnings?.total || 0}</div>
-                <p className="text-xs text-purple-600 mt-1">
+                <div className="text-2xl font-bold text-purple-700">${earnings?.total || 0}</div>
+                <p className="text-xs text-purple-600 mt-1 font-medium">
                   {earnings?.deliveries?.completed || 0} completed deliveries
                 </p>
               </CardContent>

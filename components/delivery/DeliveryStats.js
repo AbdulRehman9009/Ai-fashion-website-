@@ -42,25 +42,21 @@ export default function DeliveryStats({ stats, earnings }) {
                 return (
                     <Card
                         key={index}
-                        className={card.large ? "md:col-span-2 bg-gradient-to-br from-green-600 to-green-700 text-white" : ""}
+                        className="bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all h-full"
                     >
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className={`text-sm font-medium ${card.large ? "text-green-100" : "text-gray-600"}`}>
+                            <CardTitle className="text-sm font-medium text-gray-500">
                                 {card.title}
                             </CardTitle>
-                            <div className={`${card.large ? "bg-white/20" : card.bgColor} p-2 rounded-full`}>
-                                <Icon className={`h-4 w-4 ${card.large ? "text-white" : card.color}`} />
+                            <div className={`${card.bgColor} p-2 rounded-lg`}>
+                                <Icon className={`h-4 w-4 ${card.color}`} />
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className={`text-3xl font-bold ${card.large ? "" : "text-gray-900"}`}>
+                            <div className="text-2xl font-bold text-gray-900">
                                 {card.value}
                             </div>
-                            {card.large && earnings && (
-                                <p className="text-sm text-green-100 mt-1">
-                                    {earnings.pending > 0 ? `$${earnings.pending} pending` : "All paid"}
-                                </p>
-                            )}
+                            {/* Additional info logic if needed, simplified for clean look */}
                         </CardContent>
                     </Card>
                 );

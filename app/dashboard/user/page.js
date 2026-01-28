@@ -64,74 +64,80 @@ function ShopsTab() {
 
   return (
     <div className="space-y-6">
-      <Card className="border-0 shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-orange-50 to-pink-50 border-b">
+      <Card className="border border-gray-200 shadow-sm">
+        <CardHeader className="bg-white border-b border-gray-100 pb-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="bg-orange-100 p-2 rounded-lg">
+              <div className="bg-orange-50 p-2 rounded-lg border border-orange-100">
                 <Store className="h-5 w-5 text-orange-600" />
               </div>
               <div>
-                <CardTitle className="text-xl">Discover Shops</CardTitle>
-                <CardDescription>Browse shops and explore their products</CardDescription>
+                <CardTitle className="text-lg font-semibold text-gray-900">Featured Shops</CardTitle>
+                <CardDescription className="text-sm text-gray-500">Explore top-rated tailors and fabric stores</CardDescription>
               </div>
             </div>
             <Link href="/shops">
-              <Button variant="outline" size="sm" className="gap-2">
+              <Button variant="outline" size="sm" className="gap-2 text-gray-600 hover:text-gray-900">
                 View All <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
           </div>
         </CardHeader>
-        <CardContent className="p-4 sm:p-6">
+        <CardContent className="p-6">
           {shops.length === 0 ? (
-            <div className="text-center py-12">
-              <Store className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-              <h3 className="text-lg font-medium text-gray-600">No shops available</h3>
-              <p className="text-sm text-gray-500 mt-1">Check back later for new shops</p>
+            <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+              <Store className="h-12 w-12 mx-auto text-gray-300 mb-3" />
+              <h3 className="text-base font-medium text-gray-900">No shops available yet</h3>
+              <p className="text-sm text-gray-500">Check back soon for new additions.</p>
             </div>
           ) : (
-            <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {shops.map((shop) => (
                 <Link key={shop._id} href={`/shops/${shop._id}`}>
-                  <Card className="overflow-hidden hover:shadow-lg transition-all h-full group cursor-pointer border-2 hover:border-orange-200">
-                    <div className="h-24 bg-gradient-to-r from-orange-400 to-pink-400 relative">
-                      {shop.banner && (
-                        <img src={shop.banner} alt={shop.name} className="w-full h-full object-cover" />
+                  <div className="group border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-all bg-white">
+                    <div className="h-32 bg-gray-100 relative overflow-hidden">
+                      {shop.banner ? (
+                        <img src={shop.banner} alt={shop.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                      ) : (
+                        <div className="w-full h-full bg-slate-900/5 flex items-center justify-center">
+                          <Store className="h-8 w-8 text-gray-300" />
+                        </div>
                       )}
-                      <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
                     </div>
-                    <CardContent className="p-4 relative">
-                      <div className="-mt-10 mb-2">
-                        {shop.logo ? (
-                          <img src={shop.logo} alt={shop.name} className="w-16 h-16 rounded-xl object-cover border-4 border-white shadow-lg" />
-                        ) : (
-                          <div className="w-16 h-16 rounded-xl bg-gray-100 flex items-center justify-center border-4 border-white shadow-lg">
-                            <Store className="h-8 w-8 text-gray-400" />
+                    <div className="p-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="-mt-10 mb-2 p-1 bg-white rounded-lg inline-block shadow-sm">
+                          {shop.logo ? (
+                            <img src={shop.logo} alt={shop.name} className="w-12 h-12 rounded-lg object-cover border border-gray-100" />
+                          ) : (
+                            <div className="w-12 h-12 rounded-lg bg-gray-50 flex items-center justify-center border border-gray-100">
+                              <Store className="h-6 w-6 text-gray-400" />
+                            </div>
+                          )}
+                        </div>
+                        {shop.ratingCount > 0 && (
+                          <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded text-xs font-medium border border-gray-100">
+                            <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                            <span>{shop.ratingAvg?.toFixed(1)}</span>
                           </div>
                         )}
                       </div>
-                      <h3 className="font-semibold text-gray-900 mb-1 line-clamp-1 group-hover:text-orange-600 transition-colors">
-                        {shop.name}
-                      </h3>
+
+                      <h3 className="font-semibold text-gray-900 truncate pr-2">{shop.name}</h3>
+
                       {shop.location?.city && (
-                        <div className="flex items-center gap-1 text-xs text-gray-500 mb-2">
+                        <div className="flex items-center gap-1 text-xs text-gray-500 mt-1 mb-3">
                           <MapPin className="h-3 w-3" />
                           <span>{shop.location.city}</span>
                         </div>
                       )}
-                      {shop.ratingCount > 0 && (
-                        <div className="flex items-center gap-1">
-                          <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
-                          <span className="text-sm font-medium text-gray-900">{shop.ratingAvg?.toFixed(1)}</span>
-                          <span className="text-xs text-gray-500">({shop.ratingCount})</span>
-                        </div>
-                      )}
-                      <div className="mt-3 text-xs text-orange-600 font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
-                        View Products <ArrowRight className="h-3 w-3" />
+
+                      <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs">
+                        <span className="text-gray-500">View Collection</span>
+                        <ArrowRight className="h-3 w-3 text-orange-600 group-hover:translate-x-1 transition-transform" />
                       </div>
-                    </CardContent>
-                  </Card>
+                    </div>
+                  </div>
                 </Link>
               ))}
             </div>
@@ -334,72 +340,64 @@ export default function UserDashboard() {
 
   return (
     <div className="min-h-screen pb-20">
-      {/* Compact Header */}
-      <div className="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white p-4 sm:p-6 rounded-2xl mb-6">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold">
-              {getTimeBasedGreeting()}, {session?.user?.name?.split(' ')[0] || "there"}! 👋
-            </h1>
-            <p className="text-purple-100 text-sm sm:text-base mt-1">
-              Get AI-powered outfit recommendations
-            </p>
-          </div>
+      {/* Welcome Section */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-gray-900">
+          {getTimeBasedGreeting()}, {session?.user?.name?.split(' ')[0] || "User"}
+        </h2>
+        <p className="text-gray-500 mt-1">Here's what's happening today.</p>
+      </div>
+
+      {/* Stats Cards - Business Style */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+        <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-gray-500 uppercase tracking-wide">Active Orders</span>
+              <ShoppingBag className="h-4 w-4 text-blue-600" />
+            </div>
+            <div className="text-3xl font-bold text-gray-900">{stats.activeOrders}</div>
+          </CardContent>
+        </Card>
+
+        <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-gray-500 uppercase tracking-wide">Completed</span>
+              <CheckCircle className="h-4 w-4 text-green-600" />
+            </div>
+            <div className="text-3xl font-bold text-gray-900">{stats.completedOrders}</div>
+          </CardContent>
+        </Card>
+
+        <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium text-gray-500 uppercase tracking-wide">Pending Payment</span>
+              <Clock className="h-4 w-4 text-orange-600" />
+            </div>
+            <div className="text-3xl font-bold text-gray-900">{stats.pendingPayments}</div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Tab Navigation - Clean Segmented Control */}
+      <div className="border-b border-gray-200 mb-8 overflow-x-auto">
+        <div className="flex space-x-8 min-w-max">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`group flex items-center gap-2 py-4 px-1 border-b-2 text-sm font-medium transition-all ${activeTab === tab.id
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+            >
+              <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? "text-blue-600" : "text-gray-400 group-hover:text-gray-500"}`} />
+              {tab.label}
+            </button>
+          ))}
         </div>
-      </div>
-
-      {/* Stats Cards - Responsive Grid */}
-      <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6">
-        <Card className="border-l-4 border-l-purple-500">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm text-gray-500">Active</p>
-                <p className="text-xl sm:text-2xl font-bold">{stats.activeOrders}</p>
-              </div>
-              <ShoppingBag className="h-5 w-5 sm:h-6 sm:w-6 text-purple-500 hidden sm:block" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-l-4 border-l-green-500">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm text-gray-500">Done</p>
-                <p className="text-xl sm:text-2xl font-bold">{stats.completedOrders}</p>
-              </div>
-              <CheckCircle className="h-5 w-5 sm:h-6 sm:w-6 text-green-500 hidden sm:block" />
-            </div>
-          </CardContent>
-        </Card>
-        <Card className="border-l-4 border-l-orange-500">
-          <CardContent className="p-3 sm:p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs sm:text-sm text-gray-500">Pending</p>
-                <p className="text-xl sm:text-2xl font-bold">{stats.pendingPayments}</p>
-              </div>
-              <Clock className="h-5 w-5 sm:h-6 sm:w-6 text-orange-500 hidden sm:block" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Tab Navigation - Mobile Friendly */}
-      <div className="flex gap-1 p-1 bg-gray-100 rounded-xl mb-6 overflow-x-auto">
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`flex items-center justify-center gap-2 flex-1 min-w-0 rounded-lg px-3 py-2.5 text-sm font-medium transition-all ${activeTab === tab.id
-              ? "bg-white shadow text-gray-900"
-              : "text-gray-500 hover:text-gray-700"
-              }`}
-          >
-            <tab.icon className="h-4 w-4 flex-shrink-0" />
-            <span className="truncate">{tab.label}</span>
-          </button>
-        ))}
       </div>
 
       {/* AI Stylist Tab */}
@@ -412,15 +410,15 @@ export default function UserDashboard() {
             exit={{ opacity: 0, y: -10 }}
             className="space-y-6"
           >
-            <Card className="border-0 shadow-lg overflow-hidden">
-              <CardHeader className="bg-gradient-to-r from-purple-50 to-indigo-50 border-b pb-4">
+            <Card className="border border-gray-200 shadow-sm">
+              <CardHeader className="bg-white border-b border-gray-100 pb-4">
                 <div className="flex items-center gap-3">
-                  <div className="bg-purple-100 p-2 rounded-lg">
+                  <div className="bg-purple-50 p-2 rounded-lg border border-purple-100">
                     <Wand2 className="h-5 w-5 text-purple-600" />
                   </div>
                   <div>
-                    <CardTitle className="text-xl">AI Style Consultant</CardTitle>
-                    <CardDescription>Upload a photo & get personalized recommendations</CardDescription>
+                    <CardTitle className="text-lg font-semibold text-gray-900">AI Personal Stylist</CardTitle>
+                    <CardDescription className="text-sm text-gray-500">Get personalized outfit recommendations based on your unique features</CardDescription>
                   </div>
                 </div>
               </CardHeader>

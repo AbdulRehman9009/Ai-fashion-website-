@@ -17,19 +17,19 @@ import {
   Home,
   BarChart3,
   DollarSign,
-  Menu,
   X
 } from "lucide-react";
 
 export default function Sidebar({ role, isOpen, onClose }) {
   const pathname = usePathname();
 
-  const roleColors = {
-    USER: "from-blue-500 to-blue-600",
-    TAILOR: "from-purple-500 to-purple-600",
-    SHOPKEEPER: "from-orange-500 to-orange-600",
-    DELIVERY: "from-green-500 to-green-600",
-    ADMIN: "from-red-600 to-red-700",
+  // Role accents for active states (text & soft background)
+  const roleAccents = {
+    USER: "text-blue-600 bg-blue-50 hover:bg-blue-50",
+    TAILOR: "text-purple-600 bg-purple-50 hover:bg-purple-50",
+    SHOPKEEPER: "text-orange-600 bg-orange-50 hover:bg-orange-50",
+    DELIVERY: "text-green-600 bg-green-50 hover:bg-green-50",
+    ADMIN: "text-red-600 bg-red-50 hover:bg-red-50",
   };
 
   const links = {
@@ -43,15 +43,15 @@ export default function Sidebar({ role, isOpen, onClose }) {
       { href: "/dashboard/user/settings", label: "Settings", icon: Settings },
     ],
     TAILOR: [
-      { href: "/dashboard/tailor", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/dashboard/tailor", label: "Overview", icon: LayoutDashboard },
       { href: "/dashboard/tailor", label: "Orders", icon: Scissors },
       { href: "/dashboard/tailor/analytics", label: "Analytics", icon: BarChart3 },
       { href: "/dashboard/tailor/earnings", label: "Earnings", icon: DollarSign },
-      { href: "/dashboard/tailor/profile", label: "My Profile", icon: Users },
+      { href: "/dashboard/tailor/profile", label: "Profile", icon: Users },
       { href: "/dashboard/tailor/settings", label: "Settings", icon: Settings },
     ],
     SHOPKEEPER: [
-      { href: "/dashboard/shopkeeper", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/dashboard/shopkeeper", label: "Overview", icon: LayoutDashboard },
       { href: "/dashboard/shopkeeper/products", label: "Products", icon: Package },
       { href: "/dashboard/shopkeeper/products/new", label: "Add Product", icon: PlusCircle },
       { href: "/dashboard/shopkeeper", label: "Orders", icon: ShoppingBag },
@@ -60,15 +60,15 @@ export default function Sidebar({ role, isOpen, onClose }) {
       { href: "/dashboard/shopkeeper/settings", label: "Settings", icon: Settings },
     ],
     DELIVERY: [
-      { href: "/dashboard/delivery", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/dashboard/delivery", label: "Overview", icon: LayoutDashboard },
       { href: "/dashboard/delivery", label: "Deliveries", icon: Truck },
       { href: "/dashboard/delivery/analytics", label: "Analytics", icon: BarChart3 },
       { href: "/dashboard/delivery/earnings", label: "Earnings", icon: DollarSign },
-      { href: "/dashboard/delivery/profile", label: "My Profile", icon: Users },
+      { href: "/dashboard/delivery/profile", label: "Profile", icon: Users },
       { href: "/dashboard/delivery/settings", label: "Settings", icon: Settings },
     ],
     ADMIN: [
-      { href: "/dashboard/admin", label: "Dashboard", icon: LayoutDashboard },
+      { href: "/dashboard/admin", label: "Overview", icon: LayoutDashboard },
       { href: "/dashboard/admin/users", label: "Users", icon: Users },
       { href: "/dashboard/admin/shops", label: "Shops", icon: Package },
       { href: "/dashboard/admin/tailors", label: "Tailors", icon: Scissors },
@@ -80,83 +80,87 @@ export default function Sidebar({ role, isOpen, onClose }) {
   };
 
   const currentLinks = links[role] || [];
-  const colorGradient = roleColors[role] || "from-gray-700 to-gray-800";
+  const activeClass = roleAccents[role] || "text-gray-900 bg-gray-100";
 
   return (
     <>
       {/* Mobile Overlay */}
       <div
         className={cn(
-          "fixed inset-0 z-40 bg-black/50 md:hidden transition-opacity duration-300",
+          "fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm md:hidden transition-opacity duration-300",
           isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
         )}
         onClick={onClose}
       />
 
       {/* Sidebar Container */}
-      <div className={cn(
-        "fixed inset-y-0 left-0 z-50 w-64 flex-col border-r bg-white shadow-lg transition-transform duration-300 ease-in-out md:static md:translate-x-0 overflow-hidden flex",
-        isOpen ? "translate-x-0" : "-translate-x-full"
-      )}>
-        {/* Brand Header */}
-        <div className={`p-6 border-b bg-gradient-to-r ${colorGradient} flex justify-between items-center`}>
-          <Link href="/" className="flex items-center gap-3 group" onClick={onClose}>
-            <div className="h-10 w-10 rounded-full bg-white/20 backdrop-blur-sm text-white flex items-center justify-center font-bold text-lg shadow-lg group-hover:scale-110 transition-transform duration-200">
-              <span className="text-indigo-200">S</span>
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 w-64 flex flex-col border-r border-gray-200 bg-white shadow-xl md:shadow-none transition-transform duration-300 ease-in-out md:static md:translate-x-0",
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        {/* Header */}
+        <div className="flex h-16 items-center justify-between px-6 border-b border-gray-100 bg-white">
+          <Link href="/" className="flex items-center gap-2" onClick={onClose}>
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white">
+              <span className="font-serif font-bold text-lg">S</span>
             </div>
-            <div>
-              <h2 className="text-xl font-bold tracking-tight text-white lowercase">stylegenie</h2>
-              <p className="text-xs font-medium text-white/80">{role} Portal</p>
+            <div className="flex flex-col">
+              <span className="font-bold text-slate-900 leading-none">StyleGenie</span>
+              <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">{role}</span>
             </div>
           </Link>
-          <button onClick={onClose} className="md:hidden text-white hover:bg-white/20 p-1 rounded">
+          <button onClick={onClose} className="md:hidden text-gray-500 hover:text-gray-900">
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 space-y-1 px-3 py-4 overflow-y-auto scrollbar-custom">
+        <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-1">
           {currentLinks.map((link) => {
             const Icon = link.icon;
             const isActive = pathname === link.href || (link.href.includes("?") && pathname.includes(link.href.split("?")[0]));
+
             return (
               <Link
                 key={link.href + link.label}
                 href={link.href}
                 onClick={onClose}
                 className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
-                  "hover:bg-gray-100 hover:translate-x-1 hover:shadow-sm",
-                  isActive ? `bg-gradient-to-r ${colorGradient} text-white shadow-md` : "text-gray-600 hover:text-gray-900"
+                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-200 group",
+                  isActive
+                    ? activeClass
+                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 )}
               >
-                <Icon className="h-4 w-4 shrink-0" />
-                <span className="truncate">{link.label}</span>
+                <Icon className={cn("h-4 w-4 shrink-0 transition-colors", isActive ? "opacity-100" : "opacity-60 group-hover:opacity-100")} />
+                <span>{link.label}</span>
               </Link>
             );
           })}
         </nav>
 
-        {/* Quick Actions */}
-        <div className="px-3 py-2 border-t bg-gray-50/50">
-          <Link href="/" className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 transition-all duration-200">
-            <Home className="h-4 w-4" />
-            <span>Back to Home</span>
+        {/* Footer Actions */}
+        <div className="border-t border-gray-100 p-3 space-y-1 bg-gray-50/30">
+          <Link
+            href="/"
+            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+          >
+            <Home className="h-4 w-4 opacity-60" />
+            <span>Home</span>
           </Link>
-        </div>
-
-        {/* Logout */}
-        <div className="p-4 border-t bg-gray-50">
           <Button
             variant="ghost"
-            className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 transition-all duration-200"
+            className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 h-auto py-2 px-3 font-medium"
             onClick={() => signOut({ callbackUrl: "/" })}
           >
-            <LogOut className="mr-2 h-4 w-4" />
-            Log Out
+            <LogOut className="mr-3 h-4 w-4" />
+            Sign Out
           </Button>
         </div>
-      </div>
+      </aside>
     </>
   );
 }
+

@@ -1,6 +1,5 @@
 "use client";
-import { useState } from "react";
-import React from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
@@ -10,7 +9,7 @@ import CartSidebar from "@/components/cart/CartSidebar";
 import {
     Menu, X, Scissors, User, Store, Truck, LogOut,
     ShoppingCart, Heart, LayoutDashboard, Settings,
-    Package, ChevronDown
+    Package, ChevronDown, BarChart3, CreditCard
 } from "lucide-react";
 import Image from "next/image";
 
@@ -23,7 +22,7 @@ export default function Navbar() {
     const pathname = usePathname();
 
     // Determine current role context from URL
-    const currentRole = React.useMemo(() => {
+    const currentRole = useMemo(() => {
         if (!pathname) return null;
         if (pathname.startsWith("/tailor") || pathname.startsWith("/auth/tailor") || pathname.startsWith("/dashboard/tailor")) return "tailor";
         if (pathname.startsWith("/shopkeeper") || pathname.startsWith("/auth/shopkeeper") || pathname.startsWith("/dashboard/shopkeeper")) return "shopkeeper";
@@ -33,10 +32,10 @@ export default function Navbar() {
     }, [pathname]);
 
     const roleLinks = [
-        { href: "/customer", label: "For Customers", icon: User, role: "user" },
-        { href: "/tailor", label: "For Tailors", icon: Scissors, role: "tailor" },
-        { href: "/shopkeeper", label: "For Shops", icon: Store, role: "shopkeeper" },
-        { href: "/delivery", label: "For Delivery", icon: Truck, role: "delivery" },
+        { href: "/customer", label: "Customer", icon: User, role: "user" },
+        { href: "/tailor", label: "Tailor", icon: Scissors, role: "tailor" },
+        { href: "/shopkeeper", label: "Shop Owner", icon: Store, role: "shopkeeper" },
+        { href: "/delivery", label: "Delivery", icon: Truck, role: "delivery" },
     ];
 
     const getAuthLinks = () => {
@@ -56,41 +55,65 @@ export default function Navbar() {
         return `/dashboard/${role === "user" ? "user" : role}`;
     };
 
-    // Dynamic home link - redirects to dashboard if logged in
-    const getHomeLink = () => session ? getDashboardLink() : "/";
+    // Role-specific navigation items for logged-in users
+    const getRoleNavItems = () => {
+        if (!session) return [];
+        const role = session.user.role;
 
-    const navLinks = [
-        { href: getHomeLink(), label: "Home", isDynamic: true },
+        switch (role) {
+            case "USER":
+                return [
+                    { href: "/dashboard/user/products", label: "Shop" },
+                    { href: "/dashboard/user/orders", label: "My Orders" },
+                ];
+            case "TAILOR":
+                return [
+                    { href: "/dashboard/tailor", label: "Orders" },
+                    { href: "/dashboard/tailor/earnings", label: "Earnings" },
+                ];
+            case "SHOPKEEPER":
+                return [
+                    { href: "/dashboard/shopkeeper/products", label: "Products" },
+                    { href: "/dashboard/shopkeeper", label: "Orders" },
+                ];
+            case "DELIVERY":
+                return [
+                    { href: "/dashboard/delivery", label: "Deliveries" },
+                    { href: "/dashboard/delivery/earnings", label: "Earnings" },
+                ];
+            case "ADMIN":
+                return [
+                    { href: "/dashboard/admin/users", label: "Users" },
+                    { href: "/dashboard/admin/shops", label: "Shops" },
+                ];
+            default:
+                return [];
+        }
+    };
+
+    const sessionNavItems = getRoleNavItems();
+
+    // Default public links
+    const publicLinks = [
+        { href: "/", label: "Home" },
         { href: "/features", label: "Features" },
         { href: "/about", label: "About" },
     ];
 
+    const navLinks = session ? sessionNavItems : publicLinks;
     const authLinks = getAuthLinks();
-
-    const getRoleColor = () => {
-        switch (currentRole) {
-            case "tailor": return { bg: "bg-purple-600", hover: "hover:bg-purple-700", text: "text-purple-600" };
-            case "shopkeeper": return { bg: "bg-orange-600", hover: "hover:bg-orange-700", text: "text-orange-600" };
-            case "delivery": return { bg: "bg-green-600", hover: "hover:bg-green-700", text: "text-green-600" };
-            default: return { bg: "bg-blue-600", hover: "hover:bg-blue-700", text: "text-blue-600" };
-        }
-    };
-
-    const roleColor = getRoleColor();
 
     return (
         <>
-            <nav className="sticky top-0 z-50 w-full border-b bg-white/80 backdrop-blur-xl supports-backdrop-filter:bg-white/80 shadow-sm">
+            <nav className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
                 <div className="container mx-auto px-4">
                     <div className="flex h-16 items-center justify-between">
                         {/* Logo */}
-                        <Link href="/" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-                            <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-indigo-600 to-pink-500 text-white shadow-lg flex items-center justify-center">
-                                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
-                                    <path d="M6 8c1.5-2 4-3 7-3 3 0 5 1.5 5 4 0 2.5-2.5 4-5 5-2.5 1-4 2.5-4 4" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
+                        <Link href={session ? getDashboardLink() : "/"} className="flex items-center space-x-2 transition-opacity hover:opacity-80">
+                            <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-slate-900 text-white">
+                                <span className="text-xl font-bold font-serif">S</span>
                             </div>
-                            <span className="text-xl font-bold bg-gradient-to-r from-indigo-600 to-pink-500 bg-clip-text text-transparent lowercase">
+                            <span className="text-xl font-bold text-slate-900 tracking-tight">
                                 StyleGenie
                             </span>
                         </Link>
@@ -101,32 +124,31 @@ export default function Navbar() {
                                 <Link
                                     key={link.href}
                                     href={link.href}
-                                    className={`text-sm font-medium transition-all hover:text-indigo-600 relative group ${pathname === link.href ? "text-indigo-600" : "text-gray-700"}`}
+                                    className={`text-sm font-medium transition-colors ${pathname === link.href ? "text-slate-900" : "text-slate-500 hover:text-slate-900"
+                                        }`}
                                 >
                                     {link.label}
-                                    <span className={`absolute -bottom-1 left-0 h-0.5 bg-indigo-600 transition-all ${pathname === link.href ? "w-full" : "w-0 group-hover:w-full"}`}></span>
                                 </Link>
                             ))}
 
-                            {/* Role Dropdown */}
+                            {/* Role Selector for Public Visitors */}
                             {!session && (
                                 <div className="relative group">
-                                    <button className="text-sm font-medium text-gray-700 transition-colors hover:text-indigo-600 flex items-center gap-1">
-                                        Get Started
+                                    <button className="flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">
+                                        Partner with us
                                         <ChevronDown className="w-4 h-4" />
                                     </button>
-                                    <div className="absolute left-0 mt-2 w-56 rounded-xl shadow-xl bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
-                                        <div className="py-2">
-                                            {roleLinks.map((link) => {
+                                    <div className="absolute top-full right-0 pt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                                        <div className="bg-white rounded-lg shadow-lg border p-1 ring-1 ring-black ring-opacity-5">
+                                            {roleLinks.slice(1).map((link) => { // Skip Customer
                                                 const Icon = link.icon;
-                                                const isActive = currentRole === link.role;
                                                 return (
                                                     <Link
                                                         key={link.href}
                                                         href={link.href}
-                                                        className={`flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 ${isActive ? "bg-indigo-50 text-indigo-600 font-medium" : "text-gray-700"}`}
+                                                        className="flex items-center gap-3 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md"
                                                     >
-                                                        <Icon className="h-5 w-5" />
+                                                        <Icon className="h-4 w-4 text-slate-500" />
                                                         {link.label}
                                                     </Link>
                                                 );
@@ -138,100 +160,104 @@ export default function Navbar() {
                         </div>
 
                         {/* Right Section */}
-                        <div className="hidden md:flex md:items-center md:space-x-3">
+                        <div className="hidden md:flex md:items-center md:space-x-4">
                             {session ? (
                                 <>
-                                    {/* Wishlist Icon */}
-                                    <Link href={getDashboardLink() + "?tab=wishlist"}>
-                                        <button className="relative p-2 text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all">
-                                            <Heart className="h-5 w-5" />
-                                        </button>
-                                    </Link>
+                                    {/* Role Badge */}
+                                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 capitalize">
+                                        {session.user.role.toLowerCase()}
+                                    </span>
 
-                                    {/* Cart Icon with Badge */}
-                                    <button
-                                        onClick={() => setCartOpen(true)}
-                                        className="relative p-2 text-gray-700 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-all"
-                                    >
-                                        <ShoppingCart className="h-5 w-5" />
-                                        {cartCount > 0 && (
-                                            <span className="absolute -top-1 -right-1 h-5 w-5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-lg">
-                                                {cartCount > 9 ? '9+' : cartCount}
-                                            </span>
-                                        )}
-                                    </button>
+                                    {/* Cart Icon (Only for Users) */}
+                                    {session.user.role === 'USER' && (
+                                        <>
+                                            <Link href={getDashboardLink() + "?tab=wishlist"} className="text-slate-500 hover:text-slate-900 p-2">
+                                                <Heart className="h-5 w-5" />
+                                            </Link>
+                                            <button
+                                                onClick={() => setCartOpen(true)}
+                                                className="relative p-2 text-slate-500 hover:text-slate-900 transition-colors"
+                                            >
+                                                <ShoppingCart className="h-5 w-5" />
+                                                {cartCount > 0 && (
+                                                    <span className="absolute -top-1 -right-1 h-5 w-5 bg-slate-900 text-white text-xs font-bold rounded-full flex items-center justify-center shadow-sm border-2 border-white">
+                                                        {cartCount > 9 ? '9+' : cartCount}
+                                                    </span>
+                                                )}
+                                            </button>
+                                        </>
+                                    )}
 
                                     {/* User Menu */}
-                                    <div className="relative">
+                                    <div className="relative ml-2">
                                         <button
                                             onClick={() => setUserMenuOpen(!userMenuOpen)}
-                                            className="flex items-center gap-3 px-3 py-2 rounded-xl hover:bg-gradient-to-r hover:from-indigo-50 hover:to-purple-50 transition-all group"
+                                            className="flex items-center gap-2 transition-opacity hover:opacity-80"
                                         >
-                                            <div className="relative h-9 w-9 rounded-lg bg-gradient-to-br from-indigo-600 to-purple-600 flex items-center justify-center text-white font-semibold shadow-md overflow-hidden">
-                                                {session.user?.image ? (
-                                                    <Image src={session.user.image} alt={session.user.name || "User"} fill className="object-cover" />
-                                                ) : (
-                                                    <span className="text-sm uppercase">{session.user?.name?.[0] || 'U'}</span>
-                                                )}
-                                            </div>
-                                            <div className="text-left hidden lg:block">
-                                                <p className="text-sm font-semibold text-gray-800">{session.user?.name?.split(' ')[0] || 'User'}</p>
-                                                <p className="text-xs text-gray-500 capitalize">{session.user?.role?.toLowerCase()}</p>
-                                            </div>
-                                            <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
+                                            {session.user?.image ? (
+                                                <Image src={session.user.image} alt="User" width={32} height={32} className="rounded-full border border-slate-200" />
+                                            ) : (
+                                                <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-medium text-sm border border-slate-200">
+                                                    {session.user?.name?.[0]?.toUpperCase() || 'U'}
+                                                </div>
+                                            )}
                                         </button>
 
                                         {/* User Dropdown */}
                                         {userMenuOpen && (
-                                            <div className="absolute right-0 mt-2 w-64 rounded-xl shadow-2xl bg-white ring-1 ring-black ring-opacity-5 overflow-hidden">
-                                                <div className="bg-gradient-to-r from-indigo-600 to-purple-600 p-4 text-white">
-                                                    <p className="font-semibold">{session.user?.name}</p>
-                                                    <p className="text-sm opacity-90">{session.user?.email}</p>
+                                            <>
+                                                <div
+                                                    className="fixed inset-0 z-30"
+                                                    onClick={() => setUserMenuOpen(false)}
+                                                />
+                                                <div className="absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white border ring-1 ring-black ring-opacity-5 z-40 py-1">
+                                                    <div className="px-4 py-3 border-b bg-slate-50">
+                                                        <p className="font-semibold text-sm text-slate-900 truncate">{session.user?.name}</p>
+                                                        <p className="text-xs text-slate-500 truncate">{session.user?.email}</p>
+                                                    </div>
+
+                                                    <div className="p-1">
+                                                        <Link href={getDashboardLink()} onClick={() => setUserMenuOpen(false)}>
+                                                            <button className="flex items-center gap-2 px-3 py-2 w-full text-left text-sm text-slate-700 hover:bg-slate-50 rounded-md">
+                                                                <LayoutDashboard className="h-4 w-4 text-slate-500" />
+                                                                Dashboard
+                                                            </button>
+                                                        </Link>
+
+                                                        <Link href={session.user.role === 'SHOPKEEPER' ? '/dashboard/shopkeeper/settings' : `/dashboard/${session.user.role.toLowerCase()}/settings`} onClick={() => setUserMenuOpen(false)}>
+                                                            <button className="flex items-center gap-2 px-3 py-2 w-full text-left text-sm text-slate-700 hover:bg-slate-50 rounded-md">
+                                                                <Settings className="h-4 w-4 text-slate-500" />
+                                                                Settings
+                                                            </button>
+                                                        </Link>
+                                                    </div>
+
+                                                    <div className="border-t mt-1 p-1">
+                                                        <button
+                                                            onClick={() => {
+                                                                setUserMenuOpen(false);
+                                                                signOut({ callbackUrl: "/" });
+                                                            }}
+                                                            className="flex items-center gap-2 px-3 py-2 w-full text-left text-sm text-red-600 hover:bg-red-50 rounded-md"
+                                                        >
+                                                            <LogOut className="h-4 w-4" />
+                                                            Logout
+                                                        </button>
+                                                    </div>
                                                 </div>
-                                                <div className="py-2">
-                                                    <Link href={getDashboardLink()} onClick={() => setUserMenuOpen(false)}>
-                                                        <button className="flex items-center gap-3 px-4 py-2.5 w-full text-left text-sm text-gray-700 hover:bg-indigo-50 transition-colors">
-                                                            <LayoutDashboard className="h-4 w-4" />
-                                                            Dashboard
-                                                        </button>
-                                                    </Link>
-                                                    <Link href={getDashboardLink() + "?tab=orders"} onClick={() => setUserMenuOpen(false)}>
-                                                        <button className="flex items-center gap-3 px-4 py-2.5 w-full text-left text-sm text-gray-700 hover:bg-indigo-50 transition-colors">
-                                                            <Package className="h-4 w-4" />
-                                                            Orders
-                                                        </button>
-                                                    </Link>
-                                                    <Link href={session.user.role === 'SHOPKEEPER' ? '/dashboard/shopkeeper/settings' : `/dashboard/${session.user.role.toLowerCase()}/settings`} onClick={() => setUserMenuOpen(false)}>
-                                                        <button className="flex items-center gap-3 px-4 py-2.5 w-full text-left text-sm text-gray-700 hover:bg-indigo-50 transition-colors">
-                                                            <Settings className="h-4 w-4" />
-                                                            Settings
-                                                        </button>
-                                                    </Link>
-                                                    <div className="border-t my-2"></div>
-                                                    <button
-                                                        onClick={() => {
-                                                            setUserMenuOpen(false);
-                                                            signOut({ callbackUrl: "/" });
-                                                        }}
-                                                        className="flex items-center gap-3 px-4 py-2.5 w-full text-left text-sm text-red-600 hover:bg-red-50 transition-colors"
-                                                    >
-                                                        <LogOut className="h-4 w-4" />
-                                                        Logout
-                                                    </button>
-                                                </div>
-                                            </div>
+                                            </>
                                         )}
                                     </div>
                                 </>
                             ) : (
                                 <>
                                     <Link href={authLinks.loginPath}>
-                                        <Button variant="ghost" size="sm" className="text-gray-700 hover:text-indigo-600 hover:bg-indigo-50">
-                                            Sign In
+                                        <Button variant="ghost" size="sm" className="text-slate-600 hover:text-slate-900">
+                                            Log in
                                         </Button>
                                     </Link>
                                     <Link href={authLinks.registerPath}>
-                                        <Button size="sm" className={`${roleColor.bg} ${roleColor.hover} text-white shadow-md hover:shadow-lg transition-all`}>
+                                        <Button size="sm" className="bg-slate-900 text-white hover:bg-slate-800 shadow-sm">
                                             Get Started
                                         </Button>
                                     </Link>
@@ -241,7 +267,7 @@ export default function Navbar() {
 
                         {/* Mobile Menu Button */}
                         <button
-                            className="md:hidden rounded-lg p-2 text-gray-700 hover:bg-gray-100"
+                            className="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-md"
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         >
                             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -252,12 +278,13 @@ export default function Navbar() {
                 {/* Mobile Menu */}
                 {mobileMenuOpen && (
                     <div className="md:hidden border-t bg-white">
-                        <div className="container mx-auto px-4 py-4 space-y-3">
+                        <div className="container mx-auto px-4 py-4 space-y-2">
                             {navLinks.map((link) => (
                                 <Link
                                     key={link.href}
                                     href={link.href}
-                                    className={`block py-2 text-base font-medium hover:text-indigo-600 ${pathname === link.href ? "text-indigo-600" : "text-gray-700"}`}
+                                    className={`block px-3 py-2 rounded-md text-base font-medium ${pathname === link.href ? "bg-slate-100 text-slate-900" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                                        }`}
                                     onClick={() => setMobileMenuOpen(false)}
                                 >
                                     {link.label}
@@ -265,69 +292,59 @@ export default function Navbar() {
                             ))}
 
                             {!session && (
-                                <div className="pt-2 border-t">
-                                    <p className="text-xs font-semibold text-gray-500 uppercase mb-2">Get Started As</p>
-                                    {roleLinks.map((link) => {
-                                        const Icon = link.icon;
-                                        return (
-                                            <Link
-                                                key={link.href}
-                                                href={link.href}
-                                                className="flex items-center gap-2 py-2 text-base font-medium text-gray-700 hover:text-indigo-600"
-                                                onClick={() => setMobileMenuOpen(false)}
-                                            >
-                                                <Icon className="h-4 w-4" />
-                                                {link.label}
-                                            </Link>
-                                        );
-                                    })}
+                                <div className="pt-4 border-t mt-4">
+                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 px-3">Partner with us</p>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        {roleLinks.map((link) => {
+                                            const Icon = link.icon;
+                                            return (
+                                                <Link
+                                                    key={link.href}
+                                                    href={link.href}
+                                                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-md border border-transparent hover:border-slate-200"
+                                                    onClick={() => setMobileMenuOpen(false)}
+                                                >
+                                                    <Icon className="h-4 w-4" />
+                                                    {link.label}
+                                                </Link>
+                                            );
+                                        })}
+                                    </div>
                                 </div>
                             )}
 
-                            {session ? (
-                                <div className="pt-2 border-t space-y-2">
-                                    <Link href={getDashboardLink()} onClick={() => setMobileMenuOpen(false)}>
-                                        <Button variant="outline" className="w-full justify-start gap-2">
-                                            <LayoutDashboard className="h-4 w-4" />
-                                            Dashboard
+                            <div className="pt-4 border-t mt-4 flex flex-col gap-2">
+                                {session ? (
+                                    <>
+                                        <Link href={getDashboardLink()} onClick={() => setMobileMenuOpen(false)}>
+                                            <Button variant="outline" className="w-full justify-start gap-2">
+                                                <LayoutDashboard className="h-4 w-4" />
+                                                Dashboard
+                                            </Button>
+                                        </Link>
+                                        <Button
+                                            variant="ghost"
+                                            className="w-full justify-start gap-2 text-red-600 hover:bg-red-50 hover:text-red-700"
+                                            onClick={() => {
+                                                setMobileMenuOpen(false);
+                                                signOut({ callbackUrl: "/" });
+                                            }}
+                                        >
+                                            <LogOut className="h-4 w-4" />
+                                            Logout
                                         </Button>
-                                    </Link>
-                                    <div
-                                        onClick={() => { setMobileMenuOpen(false); setCartOpen(true); }}
-                                        className="w-full cursor-pointer"
-                                        role="button"
-                                        tabIndex={0}
-                                        onKeyDown={(e) => e.key === 'Enter' && (setMobileMenuOpen(false), setCartOpen(true))}
-                                    >
-                                        <Button variant="outline" className="w-full justify-start gap-2" asChild>
-                                            <span>
-                                                <ShoppingCart className="h-4 w-4" />
-                                                Cart {cartCount > 0 && `(${cartCount})`}
-                                            </span>
-                                        </Button>
-                                    </div>
-                                    <Button
-                                        variant="ghost"
-                                        className="w-full justify-start gap-2 text-red-600 hover:bg-red-50"
-                                        onClick={() => {
-                                            setMobileMenuOpen(false);
-                                            signOut({ callbackUrl: "/" });
-                                        }}
-                                    >
-                                        <LogOut className="h-4 w-4" />
-                                        Logout
-                                    </Button>
-                                </div>
-                            ) : (
-                                <div className="pt-2 border-t space-y-2">
-                                    <Link href={authLinks.loginPath} onClick={() => setMobileMenuOpen(false)}>
-                                        <Button variant="outline" className="w-full">Sign In</Button>
-                                    </Link>
-                                    <Link href={authLinks.registerPath} onClick={() => setMobileMenuOpen(false)}>
-                                        <Button className={`w-full ${roleColor.bg} ${roleColor.hover} text-white`}>Get Started</Button>
-                                    </Link>
-                                </div>
-                            )}
+                                    </>
+                                ) : (
+                                    <>
+                                        <Link href={authLinks.loginPath} onClick={() => setMobileMenuOpen(false)}>
+                                            <Button variant="outline" className="w-full border-slate-200 text-slate-700">Log in</Button>
+                                        </Link>
+                                        <Link href={authLinks.registerPath} onClick={() => setMobileMenuOpen(false)}>
+                                            <Button className="w-full bg-slate-900 text-white">Get Started</Button>
+                                        </Link>
+                                    </>
+                                )}
+                            </div>
                         </div>
                     </div>
                 )}
@@ -338,3 +355,4 @@ export default function Navbar() {
         </>
     );
 }
+

@@ -8,6 +8,7 @@ import { Store, Eye, EyeOff, Loader2, CheckCircle, AlertCircle } from "lucide-re
 import { toast } from "react-toastify";
 import axios from "axios";
 import ShopkeeperProfileForm from "@/components/profile-forms/ShopkeeperProfileForm";
+import DeleteAccountSection from "@/components/settings/DeleteAccountSection";
 
 export default function ShopkeeperSettingsPage() {
     const [shop, setShop] = useState(null);
@@ -60,7 +61,7 @@ export default function ShopkeeperSettingsPage() {
     }
 
     return (
-        <div className="space-y-6 animate-in fade-in duration-500">
+        <div className="max-w-3xl mx-auto space-y-6 animate-in fade-in duration-500">
             <div>
                 <h2 className="text-2xl font-bold tracking-tight">Shop Settings</h2>
                 <p className="text-muted-foreground">
@@ -117,6 +118,10 @@ export default function ShopkeeperSettingsPage() {
 
             {/* Profile Form */}
             <ShopkeeperProfileForm onComplete={fetchShop} />
+
+            {/* Delete Account */}
+            <DeleteAccountSection />
         </div>
     );
 }
+

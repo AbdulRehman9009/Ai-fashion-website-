@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { ArrowLeft, Loader2, Package } from "lucide-react";
 import OrderTimeline from "@/components/OrderTimeline";
 import Link from "next/link";
+import CheckoutButton from "@/components/checkout/CheckoutButton";
 
 export default function OrderDetailPage() {
     const { id } = useParams();
@@ -115,6 +116,16 @@ export default function OrderDetailPage() {
                                 <span>Total</span>
                                 <span>${order.pricing?.grandTotal?.toFixed(2)}</span>
                             </div>
+
+                            {order.paymentStatus !== "PAID" && (
+                                <div className="pt-4">
+                                    <CheckoutButton
+                                        orderId={order._id}
+                                        amount={order.pricing?.grandTotal}
+                                        currency={order.pricing?.currency}
+                                    />
+                                </div>
+                            )}
                         </CardContent>
                     </Card>
                 </div>

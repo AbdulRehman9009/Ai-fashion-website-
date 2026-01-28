@@ -7,6 +7,7 @@ import { Loader2, Save } from "lucide-react";
 import { toast } from "react-toastify";
 import ImageUpload from "@/components/ui/image-upload";
 import PasswordChangeForm from "@/components/settings/PasswordChangeForm";
+import DeleteAccountSection from "@/components/settings/DeleteAccountSection";
 
 export default function DeliverySettings() {
     const [loading, setLoading] = useState(true);
@@ -65,7 +66,7 @@ export default function DeliverySettings() {
             <h2 className="text-2xl font-bold">Delivery Settings</h2>
 
             {/* Profile Information */}
-            <form onSubmit={handleSubmit} className="space-y-6 bg-white p-6 rounded-lg shadow border">
+            <form onSubmit={handleSubmit} className="space-y-6 bg-white p-4 sm:p-6 rounded-lg shadow border">
                 <h3 className="text-lg font-semibold border-b pb-2">Profile Information</h3>
 
                 <div className="space-y-2">
@@ -90,7 +91,7 @@ export default function DeliverySettings() {
                 </div>
 
                 <div className="flex justify-end pt-4">
-                    <Button type="submit" disabled={saving} className="bg-green-600 hover:bg-green-700">
+                    <Button type="submit" disabled={saving} className="w-full sm:w-auto bg-green-600 hover:bg-green-700">
                         {saving ? <Loader2 className="animate-spin h-4 w-4 mr-2" /> : <Save className="h-4 w-4 mr-2" />}
                         Save Changes
                     </Button>
@@ -99,6 +100,10 @@ export default function DeliverySettings() {
 
             {/* Password Change */}
             <PasswordChangeForm />
+
+            {/* Delete Account */}
+            <DeleteAccountSection />
         </div>
     );
 }
+

@@ -51,20 +51,21 @@ export default function ShopkeeperDashboard() {
   return (
     <div className="space-y-8 pb-10">
       {/* Greeting */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between bg-gradient-to-r from-orange-600 to-red-600 p-8 rounded-3xl text-white shadow-xl">
+      {/* Greeting */}
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between bg-white border border-gray-200 p-6 rounded-xl shadow-sm">
         <div>
-          <h2 className="text-3xl font-bold">Store Dashboard</h2>
-          <p className="text-orange-100 opacity-90">Manage your products, track orders, and view revenue.</p>
+          <h2 className="text-2xl font-bold text-gray-900">Store Dashboard</h2>
+          <p className="text-gray-500 mt-1">Manage your products, track orders, and view revenue.</p>
         </div>
         <div className="mt-4 md:mt-0">
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <Link href="/dashboard/shopkeeper/settings">
-              <Button variant="ghost" className="text-white hover:bg-white/10">
+              <Button variant="outline" className="text-gray-600">
                 Settings
               </Button>
             </Link>
             <Link href="/dashboard/shopkeeper/products/new">
-              <Button variant="secondary" className="bg-white text-orange-700 hover:bg-orange-50 font-semibold shadow-md">
+              <Button className="bg-orange-600 hover:bg-orange-700 text-white shadow-sm">
                 <Plus className="mr-2 h-4 w-4" /> Add Product
               </Button>
             </Link>
