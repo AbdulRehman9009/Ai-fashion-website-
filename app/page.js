@@ -37,7 +37,7 @@ export default function Home() {
                   </Button>
                 </Link>
                 <Link href="/features">
-                  <Button size="lg" variant="outline" className="w-full sm:w-auto text-base h-14 px-8 border-slate-500 text-slate-200 hover:bg-white/10 hover:text-white backdrop-blur-sm">
+                  <Button size="lg" variant="outline" className="w-full sm:w-auto text-base h-14 px-8 border-slate-500 bg-transparent text-slate-200 hover:bg-white/10 hover:text-white backdrop-blur-sm">
                     See How It Works
                   </Button>
                 </Link>

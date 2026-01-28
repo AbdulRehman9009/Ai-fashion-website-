@@ -20,6 +20,7 @@ export default function AuthForm({ role, type }) { // type: "login" | "register"
   const [loading, setLoading] = useState(false);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [passwordFeedback, setPasswordFeedback] = useState("");
+  const [formError, setFormError] = useState("");
   // const [captchaToken, setCaptchaToken] = useState(null); // Temporarily disabled for testing
 
   const router = useRouter();
@@ -54,9 +55,15 @@ export default function AuthForm({ role, type }) { // type: "login" | "register"
     else setPasswordFeedback("Strong");
   }, [password]);
 
+  // Clear errors when user types
+  useEffect(() => {
+    setFormError("");
+  }, [email, password, name]);
+
   async function handleSubmit(e) {
     e.preventDefault();
     setLoading(true);
+    setFormError("");
 
     try {
       // Temporarily disabled reCAPTCHA for testing
@@ -124,6 +131,8 @@ export default function AuthForm({ role, type }) { // type: "login" | "register"
         router.push(`/dashboard/${role.toLowerCase()}`);
       }
     } catch (err) {
+      console.error("Auth Error:", err);
+      setFormError(err.message || "Something went wrong");
       toast.error(err.message);
     } finally {
       setLoading(false);
@@ -239,21 +248,40 @@ export default function AuthForm({ role, type }) { // type: "login" | "register"
               </button>
             </div>
 
-            {type === "register" && password && (
-              <div className="space-y-1 pt-1">
-                <div className="flex h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full transition-all duration-300 ${passwordStrength <= 2 ? 'bg-red-500' :
-                      passwordStrength === 3 ? 'bg-yellow-500' : 'bg-green-500'
-                      }`}
-                    style={{ width: `${(passwordStrength / 4) * 100}%` }}
-                  />
+            {/* Password Requirements Checklist (Register Mode) */}
+            {type === "register" && (
+              <div className="space-y-2 rounded-lg bg-gray-50 p-3 text-sm">
+                <p className="font-medium text-gray-700">Password Requirements:</p>
+                <div className="grid grid-cols-1 gap-1 text-xs text-gray-500">
+                  <div className={`flex items-center gap-2 ${password.length >= 8 ? "text-green-600 font-medium" : ""}`}>
+                    {password.length >= 8 ? <Check className="h-3 w-3" /> : <div className="h-3 w-3 rounded-full border border-gray-400" />}
+                    At least 8 characters
+                  </div>
+                  <div className={`flex items-center gap-2 ${/[A-Z]/.test(password) ? "text-green-600 font-medium" : ""}`}>
+                    {/[A-Z]/.test(password) ? <Check className="h-3 w-3" /> : <div className="h-3 w-3 rounded-full border border-gray-400" />}
+                    One uppercase letter
+                  </div>
+                  <div className={`flex items-center gap-2 ${/[a-z]/.test(password) ? "text-green-600 font-medium" : ""}`}>
+                    {/[a-z]/.test(password) ? <Check className="h-3 w-3" /> : <div className="h-3 w-3 rounded-full border border-gray-400" />}
+                    One lowercase letter
+                  </div>
+                  <div className={`flex items-center gap-2 ${/[0-9]/.test(password) ? "text-green-600 font-medium" : ""}`}>
+                    {/[0-9]/.test(password) ? <Check className="h-3 w-3" /> : <div className="h-3 w-3 rounded-full border border-gray-400" />}
+                    One number
+                  </div>
+                  <div className={`flex items-center gap-2 ${/[^A-Za-z0-9]/.test(password) ? "text-green-600 font-medium" : ""}`}>
+                    {/[^A-Za-z0-9]/.test(password) ? <Check className="h-3 w-3" /> : <div className="h-3 w-3 rounded-full border border-gray-400" />}
+                    One special character
+                  </div>
                 </div>
-                <p className={`text-xs text-right font-medium ${passwordStrength <= 2 ? 'text-red-500' :
-                  passwordStrength === 3 ? 'text-yellow-600' : 'text-green-600'
-                  }`}>
-                  {passwordFeedback}
-                </p>
+              </div>
+            )}
+
+            {/* General Error Message */}
+            {/* General Error Message */}
+            {formError && (
+              <div className="rounded-md bg-red-50 p-3 text-sm text-red-500 font-medium border border-red-200 animate-in fade-in slide-in-from-top-1">
+                {formError}
               </div>
             )}
 
@@ -283,6 +311,6 @@ export default function AuthForm({ role, type }) { // type: "login" | "register"
           </Link>
         </p>
       </CardFooter>
-    </Card>
+    </Card >
   );
 }

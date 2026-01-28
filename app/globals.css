@@ -57,7 +57,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
+/* @media (prefers-color-scheme: dark) {
   :root {
     --background: #0f172a;
     --foreground: #f8fafc;
@@ -74,7 +74,7 @@
     --gradient-start: #818cf8;
     --gradient-end: #a78bfa;
   }
-}
+} */
 
 * {
   border-color: var(--border);
