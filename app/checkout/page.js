@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { validateCart, getCartShopId } from "@/lib/utils/cartValidation";
 import {
     ShoppingCart, ArrowLeft, Trash2, Plus, Minus, MapPin,
     CreditCard, Truck, Package, ShieldCheck, Loader2,
@@ -56,6 +57,28 @@ export default function CheckoutPage() {
         }
     }, [session]);
 
+    // Auto-fill shipping info from profile when entering shipping step
+    const fetchAndFillShippingData = async () => {
+        try {
+            const res = await axios.get("/api/profile/shipping");
+            if (res.data.hasShippingData && res.data.shippingAddress) {
+                const addr = res.data.shippingAddress;
+                setShippingInfo(prev => ({
+                    ...prev,
+                    fullName: addr.name || prev.fullName,
+                    phone: addr.phone || prev.phone,
+                    address: addr.street || prev.address,
+                    city: addr.city || prev.city,
+                    state: addr.state || prev.state,
+                    zipCode: addr.zip || prev.zipCode,
+                    country: addr.country || prev.country,
+                }));
+            }
+        } catch (error) {
+            console.error("Error fetching shipping data:", error);
+        }
+    };
+
     // Calculate totals (USD pricing)
     const calculations = useMemo(() => {
         const subtotal = cart.reduce((total, item) => {
@@ -76,6 +99,28 @@ export default function CheckoutPage() {
         setShippingInfo(prev => ({ ...prev, [name]: value }));
     };
 
+    // Handle payment success (for manual/COD payments when Paddle is not configured)
+    const handlePaymentSuccess = async () => {
+        if (!orderCreated?._id) {
+            toast.error("No order found. Please try creating your order again.");
+            return;
+        }
+
+        setLoading(true);
+        try {
+            // Show confirmation for Pay Later / COD option
+            toast.info("Order placed! Payment will be collected on delivery (COD).");
+            clearCart();
+            // Redirect to orders page to see the pending order
+            router.push(`/dashboard/user?tab=orders`);
+        } catch (error) {
+            console.error("Error processing order:", error);
+            toast.error("Something went wrong. Please check your orders.");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const validateShipping = () => {
         const required = ['fullName', 'phone', 'address', 'city', 'state', 'zipCode'];
         for (const field of required) {
@@ -88,35 +133,66 @@ export default function CheckoutPage() {
     };
 
     const handleCreateOrder = async () => {
+        // Validate shipping info
         if (!validateShipping()) return;
+
+        // Validate cart is not empty
         if (cart.length === 0) {
             toast.error("Your cart is empty");
             return;
         }
 
+        // Validate multi-shop constraint
+        const cartValidation = validateCart(cart);
+        if (!cartValidation.valid) {
+            toast.error(cartValidation.error);
+            return;
+        }
+
         setLoading(true);
         try {
-            // Group items by shop for multi-shop orders
+            // Get shopId from cart
+            const shopId = getCartShopId(cart);
+            if (!shopId) {
+                toast.error("Unable to determine shop. Please try again.");
+                setLoading(false);
+                return;
+            }
+
             const orderItems = cart.map(item => ({
-                product: item.product._id,
+                productId: item.product._id,
                 quantity: item.quantity,
-                price: item.product.price,
-                selectedOptions: item.selectedOptions || {}
             }));
 
             const response = await axios.post("/api/orders", {
                 items: orderItems,
-                shippingAddress: shippingInfo,
-                subtotal: calculations.subtotal,
-                shippingFee: calculations.shippingFee,
-                tax: calculations.tax,
-                totalAmount: calculations.total
+                shopId: shopId.toString(),
+                shippingAddress: {
+                    street: shippingInfo.address,
+                    city: shippingInfo.city,
+                    state: shippingInfo.state,
+                    zip: shippingInfo.zipCode,
+                    country: shippingInfo.country,
+                    phone: shippingInfo.phone,
+                    fullName: shippingInfo.fullName,
+                    notes: shippingInfo.notes,
+                },
             });
 
-            if (response.data.success) {
-                setOrderCreated(response.data.data);
+            if (response.data.id) {
+                const orderId = response.data.id;
+                setOrderCreated({
+                    _id: orderId,
+                    paddleCheckoutUrl: response.data.checkoutUrl || null
+                });
                 setStep(3);
-                toast.success("Order created! Proceeding to payment...");
+
+                // Don't auto-redirect - let user choose payment method
+                if (response.data.checkoutUrl) {
+                    toast.success("Order created! Choose your payment method.");
+                } else {
+                    toast.info("Order created. Payment on delivery available.");
+                }
             }
         } catch (error) {
             console.error("Order creation error:", error);
@@ -126,11 +202,32 @@ export default function CheckoutPage() {
         }
     };
 
-    const handlePaymentSuccess = () => {
-        clearCart();
-        router.push(`/dashboard/user?tab=orders`);
-        toast.success("Payment successful! Your order is being processed.");
-    };
+    // Poll order status to verify payment completion via webhook
+    useEffect(() => {
+        if (!orderCreated?._id) return;
+
+        const pollInterval = setInterval(async () => {
+            try {
+                const res = await axios.get(`/api/orders/${orderCreated._id}`);
+                if (res.data.paymentStatus === "COMPLETED") {
+                    clearInterval(pollInterval);
+                    clearCart();
+                    toast.success("Payment verified! Your order is confirmed.");
+                    router.push(`/dashboard/user?tab=orders`);
+                }
+            } catch (err) {
+                console.error("Order status poll error:", err);
+            }
+        }, 3000); // Poll every 3 seconds
+
+        // Cleanup after 5 minutes
+        const timeout = setTimeout(() => clearInterval(pollInterval), 300000);
+
+        return () => {
+            clearInterval(pollInterval);
+            clearTimeout(timeout);
+        };
+    }, [orderCreated, clearCart, router]);
 
     // Loading state
     if (status === "loading") {
@@ -144,11 +241,11 @@ export default function CheckoutPage() {
     // Empty cart
     if (cartCount === 0 && !orderCreated) {
         return (
-            <div className="min-h-screen bg-gray-50 py-8 px-4">
+            <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4">
                 <div className="max-w-2xl mx-auto text-center">
-                    <div className="bg-white rounded-2xl shadow-lg p-8 sm:p-12">
-                        <ShoppingCart className="h-20 w-20 mx-auto text-gray-300 mb-6" />
-                        <h1 className="text-2xl font-bold text-gray-900 mb-2">Your cart is empty</h1>
+                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 sm:p-12">
+                        <ShoppingCart className="h-20 w-20 mx-auto text-gray-300 dark:text-gray-600 mb-6" />
+                        <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Your cart is empty</h1>
                         <p className="text-gray-500 mb-6">Add some products to your cart to proceed with checkout.</p>
                         <Link href="/shops">
                             <Button className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
@@ -162,16 +259,16 @@ export default function CheckoutPage() {
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 py-6 px-4 sm:py-10">
+        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 py-6 px-4 sm:py-10">
             <div className="max-w-6xl mx-auto">
                 {/* Header */}
                 <div className="flex items-center gap-4 mb-6 sm:mb-8">
-                    <Link href="/dashboard/user" className="p-2 hover:bg-white rounded-lg transition-colors">
-                        <ArrowLeft className="h-5 w-5" />
+                    <Link href="/dashboard/user" className="p-2 hover:bg-white dark:hover:bg-gray-800 rounded-lg transition-colors">
+                        <ArrowLeft className="h-5 w-5 text-gray-600 dark:text-gray-400" />
                     </Link>
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Checkout</h1>
-                        <p className="text-sm text-gray-500 mt-1">{cartCount} items in your cart</p>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Checkout</h1>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{cartCount} items in your cart</p>
                     </div>
                 </div>
 
@@ -222,13 +319,13 @@ export default function CheckoutPage() {
                                         </CardHeader>
                                         <CardContent className="space-y-4">
                                             {cart.map((item, index) => (
-                                                <div key={index} className="flex gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-xl">
+                                                <div key={index} className="flex gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 dark:bg-gray-800 rounded-xl">
                                                     {/* Product Image */}
                                                     <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-200">
                                                         {item.product?.images?.[0] ? (
                                                             <Image
                                                                 src={item.product.images[0]}
-                                                                alt={item.product.name}
+                                                                alt={item.product?.title || "Product image"}
                                                                 fill
                                                                 className="object-cover"
                                                             />
@@ -290,7 +387,10 @@ export default function CheckoutPage() {
                                             ))}
 
                                             <Button
-                                                onClick={() => setStep(2)}
+                                                onClick={() => {
+                                                    fetchAndFillShippingData();
+                                                    setStep(2);
+                                                }}
                                                 className="w-full h-12 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-base"
                                             >
                                                 Continue to Shipping
@@ -444,10 +544,10 @@ export default function CheckoutPage() {
                                     exit={{ opacity: 0, x: 20 }}
                                 >
                                     <Card className="border-0 shadow-lg">
-                                        <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 border-b">
+                                        <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border-b dark:border-gray-700">
                                             <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-green-100 rounded-full">
-                                                    <CheckCircle className="h-6 w-6 text-green-600" />
+                                                <div className="p-2 bg-green-100 dark:bg-green-800/50 rounded-full">
+                                                    <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
                                                 </div>
                                                 <div>
                                                     <CardTitle>Order Created Successfully!</CardTitle>
@@ -458,39 +558,67 @@ export default function CheckoutPage() {
                                             </div>
                                         </CardHeader>
                                         <CardContent className="p-6 space-y-6">
-                                            <div className="bg-indigo-50 p-4 rounded-xl">
-                                                <div className="flex items-center gap-2 text-indigo-700 mb-2">
-                                                    <CreditCard className="h-5 w-5" />
-                                                    <span className="font-semibold">Payment Options</span>
+                                            {/* Payment Method Selection */}
+                                            <div className="space-y-4">
+                                                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Choose Payment Method</h3>
+
+                                                {/* Paddle Card Payment Option */}
+                                                {orderCreated?.paddleCheckoutUrl && (
+                                                    <div className="border border-indigo-200 dark:border-indigo-800 rounded-xl p-4 bg-indigo-50 dark:bg-indigo-900/30">
+                                                        <div className="flex items-center gap-2 text-indigo-700 dark:text-indigo-400 mb-2">
+                                                            <CreditCard className="h-5 w-5" />
+                                                            <span className="font-semibold">Pay with Card (Paddle)</span>
+                                                        </div>
+                                                        <p className="text-sm text-indigo-600 dark:text-indigo-300 mb-4">
+                                                            Secure payment via credit/debit card. Powered by Paddle.
+                                                        </p>
+                                                        <Button
+                                                            onClick={() => window.location.href = orderCreated.paddleCheckoutUrl}
+                                                            className="w-full h-12 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                                                        >
+                                                            <CreditCard className="mr-2 h-5 w-5" />
+                                                            Pay ${calculations.total.toFixed(2)} with Card
+                                                        </Button>
+                                                    </div>
+                                                )}
+
+                                                {/* COD Payment Option */}
+                                                <div className="border border-amber-200 dark:border-amber-800 rounded-xl p-4 bg-amber-50 dark:bg-amber-900/30">
+                                                    <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 mb-2">
+                                                        <Truck className="h-5 w-5" />
+                                                        <span className="font-semibold">Cash on Delivery (COD)</span>
+                                                    </div>
+                                                    <p className="text-sm text-amber-600 dark:text-amber-300 mb-4">
+                                                        Pay when your order arrives. No online payment required.
+                                                    </p>
+                                                    <Button
+                                                        onClick={handlePaymentSuccess}
+                                                        disabled={loading}
+                                                        variant="outline"
+                                                        className="w-full h-12 border-amber-600 dark:border-amber-500 text-amber-700 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/50"
+                                                    >
+                                                        {loading ? (
+                                                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                                                        ) : (
+                                                            <CheckCircle className="mr-2 h-5 w-5" />
+                                                        )}
+                                                        Confirm Order - Pay on Delivery
+                                                    </Button>
                                                 </div>
-                                                <p className="text-sm text-indigo-600">
-                                                    Complete your payment to confirm the order.
-                                                </p>
                                             </div>
 
-                                            {/* Payment Methods */}
-                                            <div className="space-y-3">
-                                                <Button
-                                                    onClick={handlePaymentSuccess}
-                                                    className="w-full h-14 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-base"
-                                                >
-                                                    <CreditCard className="mr-2 h-5 w-5" />
-                                                    Pay ${calculations.total.toFixed(2)}
-                                                </Button>
-
-                                                <div className="flex items-center gap-2 justify-center text-xs text-gray-500">
-                                                    <ShieldCheck className="h-4 w-4 text-green-500" />
-                                                    <span>Secure payment - Your data is protected</span>
-                                                </div>
+                                            <div className="flex items-center gap-2 justify-center text-xs text-gray-500 dark:text-gray-400 pt-2">
+                                                <ShieldCheck className="h-4 w-4 text-green-500" />
+                                                <span>Your order and payment are protected</span>
                                             </div>
 
-                                            <div className="pt-4 border-t">
+                                            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
                                                 <Button
                                                     variant="outline"
                                                     onClick={() => router.push("/dashboard/user?tab=orders")}
                                                     className="w-full"
                                                 >
-                                                    Pay Later - View My Orders
+                                                    View My Orders
                                                 </Button>
                                             </div>
                                         </CardContent>

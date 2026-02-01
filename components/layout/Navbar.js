@@ -6,6 +6,7 @@ import { useSession, signOut } from "next-auth/react";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import CartSidebar from "@/components/cart/CartSidebar";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 import {
     Menu, X, Scissors, User, Store, Truck, LogOut,
     ShoppingCart, Heart, LayoutDashboard, Settings,
@@ -105,15 +106,15 @@ export default function Navbar() {
 
     return (
         <>
-            <nav className="sticky top-0 z-50 w-full border-b bg-white shadow-sm">
+            <nav className="sticky top-0 z-50 w-full border-b bg-white dark:bg-gray-900 dark:border-gray-800 shadow-sm">
                 <div className="container mx-auto px-4">
                     <div className="flex h-16 items-center justify-between">
                         {/* Logo */}
                         <Link href={session ? getDashboardLink() : "/"} className="flex items-center space-x-2 transition-opacity hover:opacity-80">
-                            <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-slate-900 text-white">
+                            <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-slate-900 dark:bg-indigo-600 text-white">
                                 <span className="text-xl font-bold font-serif">S</span>
                             </div>
-                            <span className="text-xl font-bold text-slate-900 tracking-tight">
+                            <span className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
                                 StyleGenie
                             </span>
                         </Link>
@@ -124,7 +125,7 @@ export default function Navbar() {
                                 <Link
                                     key={link.href}
                                     href={link.href}
-                                    className={`text-sm font-medium transition-colors ${pathname === link.href ? "text-slate-900" : "text-slate-500 hover:text-slate-900"
+                                    className={`text-sm font-medium transition-colors ${pathname === link.href ? "text-slate-900 dark:text-white" : "text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white"
                                         }`}
                                 >
                                     {link.label}
@@ -161,22 +162,24 @@ export default function Navbar() {
 
                         {/* Right Section */}
                         <div className="hidden md:flex md:items-center md:space-x-4">
+                            {/* Theme Toggle */}
+                            <ThemeToggle />
                             {session ? (
                                 <>
                                     {/* Role Badge */}
-                                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 border border-slate-200 capitalize">
+                                    <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 border border-slate-200 dark:border-gray-700 capitalize">
                                         {session.user.role.toLowerCase()}
                                     </span>
 
                                     {/* Cart Icon (Only for Users) */}
                                     {session.user.role === 'USER' && (
                                         <>
-                                            <Link href={getDashboardLink() + "?tab=wishlist"} className="text-slate-500 hover:text-slate-900 p-2">
+                                            <Link href={getDashboardLink() + "?tab=wishlist"} className="text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white p-2">
                                                 <Heart className="h-5 w-5" />
                                             </Link>
                                             <button
                                                 onClick={() => setCartOpen(true)}
-                                                className="relative p-2 text-slate-500 hover:text-slate-900 transition-colors"
+                                                className="relative p-2 text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white transition-colors"
                                             >
                                                 <ShoppingCart className="h-5 w-5" />
                                                 {cartCount > 0 && (
@@ -265,19 +268,34 @@ export default function Navbar() {
                             )}
                         </div>
 
-                        {/* Mobile Menu Button */}
-                        <button
-                            className="md:hidden p-2 text-slate-600 hover:bg-slate-100 rounded-md"
-                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        >
-                            {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-                        </button>
+                        {/* Mobile Menu Button & Cart */}
+                        <div className="flex items-center gap-2 md:hidden">
+                            {session?.user?.role === 'USER' && (
+                                <button
+                                    onClick={() => setCartOpen(true)}
+                                    className="relative p-2 text-slate-600 hover:bg-slate-100 rounded-md"
+                                >
+                                    <ShoppingCart className="h-6 w-6" />
+                                    {cartCount > 0 && (
+                                        <span className="absolute -top-1 -right-1 h-4 w-4 bg-slate-900 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                                            {cartCount > 9 ? '9+' : cartCount}
+                                        </span>
+                                    )}
+                                </button>
+                            )}
+                            <button
+                                className="p-2 text-slate-600 hover:bg-slate-100 rounded-md"
+                                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                            >
+                                {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 {/* Mobile Menu */}
                 {mobileMenuOpen && (
-                    <div className="md:hidden border-t bg-white">
+                    <div className="md:hidden border-t bg-white dark:bg-gray-900 dark:border-gray-800">
                         <div className="container mx-auto px-4 py-4 space-y-2">
                             {navLinks.map((link) => (
                                 <Link

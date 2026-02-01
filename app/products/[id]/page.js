@@ -21,6 +21,7 @@ import {
 import { toast } from "react-toastify";
 import axios from "axios";
 import Link from "next/link";
+import { useCart } from "@/contexts/CartContext";
 
 export default function ProductDetailPage() {
     const params = useParams();
@@ -52,14 +53,35 @@ export default function ProductDetailPage() {
         }
     };
 
+    const { addToCart } = useCart();
+
     const handleAddToCart = async () => {
+        console.log("Add to Cart clicked", { productId: product._id, quantity });
         setAddingToCart(true);
         try {
-            // TODO: Implement cart functionality
-            await new Promise(resolve => setTimeout(resolve, 500));
-            toast.success(`Added ${quantity} item(s) to cart`);
+            const success = await addToCart(product._id, quantity);
+            console.log("Add to Cart result:", success);
+            if (!success) {
+                // Context already shows error toast, but log for debugging
+                console.error("Failed to add to cart - returned false");
+            }
         } catch (error) {
+            console.error("Add to Cart exception:", error);
             toast.error("Failed to add to cart");
+        } finally {
+            setAddingToCart(false);
+        }
+    };
+
+    const handleBuyNow = async () => {
+        setAddingToCart(true);
+        try {
+            const success = await addToCart(product._id, quantity);
+            if (success) {
+                router.push('/checkout');
+            }
+        } catch (error) {
+            console.error(error);
         } finally {
             setAddingToCart(false);
         }
@@ -248,7 +270,12 @@ export default function ProductDetailPage() {
                             <Button
                                 variant="outline"
                                 className="flex-1 h-12 text-lg border-orange-600 text-orange-600 hover:bg-orange-50"
+                                onClick={handleBuyNow}
+                                disabled={addingToCart || product.stock === 0}
                             >
+                                {addingToCart ? (
+                                    <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                                ) : null}
                                 Buy Now
                             </Button>
                         </div>

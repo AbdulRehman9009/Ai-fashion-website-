@@ -72,12 +72,12 @@ function ShopsTab() {
                 <Store className="h-5 w-5 text-orange-600" />
               </div>
               <div>
-                <CardTitle className="text-lg font-semibold text-gray-900">Featured Shops</CardTitle>
+                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">Featured Shops</CardTitle>
                 <CardDescription className="text-sm text-gray-500">Explore top-rated tailors and fabric stores</CardDescription>
               </div>
             </div>
             <Link href="/shops">
-              <Button variant="outline" size="sm" className="gap-2 text-gray-600 hover:text-gray-900">
+              <Button variant="outline" size="sm" className="gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
                 View All <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
@@ -85,17 +85,17 @@ function ShopsTab() {
         </CardHeader>
         <CardContent className="p-6">
           {shops.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+            <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg border border-dashed border-gray-200 dark:border-gray-700">
               <Store className="h-12 w-12 mx-auto text-gray-300 mb-3" />
-              <h3 className="text-base font-medium text-gray-900">No shops available yet</h3>
+              <h3 className="text-base font-medium text-gray-900 dark:text-gray-100">No shops available yet</h3>
               <p className="text-sm text-gray-500">Check back soon for new additions.</p>
             </div>
           ) : (
             <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
               {shops.map((shop) => (
                 <Link key={shop._id} href={`/shops/${shop._id}`}>
-                  <div className="group border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-all bg-white">
-                    <div className="h-32 bg-gray-100 relative overflow-hidden">
+                  <div className="group border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:shadow-md transition-all bg-white dark:bg-gray-800">
+                    <div className="h-32 bg-gray-100 dark:bg-gray-700 relative overflow-hidden">
                       {shop.banner ? (
                         <img src={shop.banner} alt={shop.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                       ) : (
@@ -110,7 +110,7 @@ function ShopsTab() {
                           {shop.logo ? (
                             <img src={shop.logo} alt={shop.name} className="w-12 h-12 rounded-lg object-cover border border-gray-100" />
                           ) : (
-                            <div className="w-12 h-12 rounded-lg bg-gray-50 flex items-center justify-center border border-gray-100">
+                            <div className="w-12 h-12 rounded-lg bg-gray-50 dark:bg-gray-700 flex items-center justify-center border border-gray-100 dark:border-gray-600">
                               <Store className="h-6 w-6 text-gray-400" />
                             </div>
                           )}
@@ -123,7 +123,7 @@ function ShopsTab() {
                         )}
                       </div>
 
-                      <h3 className="font-semibold text-gray-900 truncate pr-2">{shop.name}</h3>
+                      <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate pr-2">{shop.name}</h3>
 
                       {shop.location?.city && (
                         <div className="flex items-center gap-1 text-xs text-gray-500 mt-1 mb-3">
@@ -389,8 +389,8 @@ export default function UserDashboard() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`group flex items-center gap-2 py-4 px-1 border-b-2 text-sm font-medium transition-all ${activeTab === tab.id
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                ? "border-blue-600 text-blue-600"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                 }`}
             >
               <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? "text-blue-600" : "text-gray-400 group-hover:text-gray-500"}`} />

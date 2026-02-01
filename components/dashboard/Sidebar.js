@@ -25,11 +25,11 @@ export default function Sidebar({ role, isOpen, onClose }) {
 
   // Role accents for active states (text & soft background)
   const roleAccents = {
-    USER: "text-blue-600 bg-blue-50 hover:bg-blue-50",
-    TAILOR: "text-purple-600 bg-purple-50 hover:bg-purple-50",
-    SHOPKEEPER: "text-orange-600 bg-orange-50 hover:bg-orange-50",
-    DELIVERY: "text-green-600 bg-green-50 hover:bg-green-50",
-    ADMIN: "text-red-600 bg-red-50 hover:bg-red-50",
+    USER: "text-blue-600 bg-blue-50 hover:bg-blue-50 dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/30",
+    TAILOR: "text-purple-600 bg-purple-50 hover:bg-purple-50 dark:text-purple-400 dark:bg-purple-900/30 dark:hover:bg-purple-900/30",
+    SHOPKEEPER: "text-orange-600 bg-orange-50 hover:bg-orange-50 dark:text-orange-400 dark:bg-orange-900/30 dark:hover:bg-orange-900/30",
+    DELIVERY: "text-green-600 bg-green-50 hover:bg-green-50 dark:text-green-400 dark:bg-green-900/30 dark:hover:bg-green-900/30",
+    ADMIN: "text-red-600 bg-red-50 hover:bg-red-50 dark:text-red-400 dark:bg-red-900/30 dark:hover:bg-red-900/30",
   };
 
   const links = {
@@ -96,22 +96,22 @@ export default function Sidebar({ role, isOpen, onClose }) {
       {/* Sidebar Container */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 flex flex-col border-r border-gray-200 bg-white shadow-xl md:shadow-none transition-transform duration-300 ease-in-out md:static md:translate-x-0",
+          "fixed inset-y-0 left-0 z-50 w-64 flex flex-col border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xl md:shadow-none transition-transform duration-300 ease-in-out md:static md:translate-x-0",
           isOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         {/* Header */}
-        <div className="flex h-16 items-center justify-between px-6 border-b border-gray-100 bg-white">
+        <div className="flex h-16 items-center justify-between px-6 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
           <Link href="/" className="flex items-center gap-2" onClick={onClose}>
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-white">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 dark:bg-indigo-600 text-white">
               <span className="font-serif font-bold text-lg">S</span>
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-slate-900 leading-none">StyleGenie</span>
-              <span className="text-[10px] font-medium text-slate-500 uppercase tracking-wider">{role}</span>
+              <span className="font-bold text-slate-900 dark:text-white leading-none">StyleGenie</span>
+              <span className="text-[10px] font-medium text-slate-500 dark:text-gray-400 uppercase tracking-wider">{role}</span>
             </div>
           </Link>
-          <button onClick={onClose} className="md:hidden text-gray-500 hover:text-gray-900">
+          <button onClick={onClose} className="md:hidden text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -131,7 +131,7 @@ export default function Sidebar({ role, isOpen, onClose }) {
                   "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-200 group",
                   isActive
                     ? activeClass
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
                 )}
               >
                 <Icon className={cn("h-4 w-4 shrink-0 transition-colors", isActive ? "opacity-100" : "opacity-60 group-hover:opacity-100")} />
@@ -142,10 +142,10 @@ export default function Sidebar({ role, isOpen, onClose }) {
         </nav>
 
         {/* Footer Actions */}
-        <div className="border-t border-gray-100 p-3 space-y-1 bg-gray-50/30">
+        <div className="border-t border-gray-100 dark:border-gray-800 p-3 space-y-1 bg-gray-50/30 dark:bg-gray-800/30">
           <Link
             href="/"
-            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-colors"
+            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
             <Home className="h-4 w-4 opacity-60" />
             <span>Home</span>

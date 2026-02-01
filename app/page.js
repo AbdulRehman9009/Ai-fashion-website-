@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
-    <main className="flex flex-col min-h-screen bg-white">
+    <main className="flex flex-col min-h-screen bg-white dark:bg-gray-950">
 
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden py-20 lg:py-32">
@@ -106,7 +106,7 @@ export default function Home() {
       </section>
 
       {/* How It Works */}
-      <section className="py-20 lg:py-28 bg-slate-50 relative">
+      <section className="py-20 lg:py-28 bg-slate-50 dark:bg-gray-900 relative">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(99,102,241,0.05),transparent_50%)]" />
         <div className="container mx-auto px-4 sm:px-6 relative">
           <div className="text-center mb-16">
@@ -114,8 +114,8 @@ export default function Home() {
               <Clock className="h-4 w-4" />
               Simple 3-Step Process
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">How It Works</h2>
-            <p className="text-slate-600 max-w-2xl mx-auto text-lg">From AI recommendations to doorstep delivery, we've made custom fashion effortless.</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">How It Works</h2>
+            <p className="text-slate-600 dark:text-gray-400 max-w-2xl mx-auto text-lg">From AI recommendations to doorstep delivery, we've made custom fashion effortless.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
@@ -143,9 +143,9 @@ export default function Home() {
               }
             ].map((step, idx) => (
               <div key={idx} className="group relative">
-                <div className="relative p-6 lg:p-8 rounded-2xl bg-white border border-slate-100 shadow-sm hover:shadow-xl transition-all duration-300 h-full">
+                <div className="relative p-6 lg:p-8 rounded-2xl bg-white dark:bg-gray-800 border border-slate-100 dark:border-gray-700 shadow-sm hover:shadow-xl transition-all duration-300 h-full">
                   {/* Step Number */}
-                  <div className="absolute -top-3 -right-3 w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center font-bold text-sm">
+                  <div className="absolute -top-3 -right-3 w-10 h-10 rounded-full bg-slate-900 dark:bg-indigo-600 text-white flex items-center justify-center font-bold text-sm">
                     {step.step}
                   </div>
 
@@ -155,8 +155,8 @@ export default function Home() {
                     }`}>
                     <step.icon className="h-7 w-7" />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-3">{step.title}</h3>
-                  <p className="text-slate-600 leading-relaxed text-sm lg:text-base">{step.desc}</p>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{step.title}</h3>
+                  <p className="text-slate-600 dark:text-gray-400 leading-relaxed text-sm lg:text-base">{step.desc}</p>
                 </div>
 
                 {/* Connector Line */}
@@ -170,7 +170,7 @@ export default function Home() {
       </section>
 
       {/* Features Grid */}
-      <section className="py-20 lg:py-28 bg-white">
+      <section className="py-20 lg:py-28 bg-white dark:bg-gray-950">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
             <div>
@@ -178,10 +178,10 @@ export default function Home() {
                 <Award className="h-4 w-4" />
                 Why Choose StyleGenie
               </div>
-              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
-                The Future of <span className="text-indigo-600">Custom Fashion</span>
+              <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-6">
+                The Future of <span className="text-indigo-600 dark:text-indigo-400">Custom Fashion</span>
               </h2>
-              <p className="text-lg text-slate-600 mb-8">
+              <p className="text-lg text-slate-600 dark:text-gray-400 mb-8">
                 We combine cutting-edge AI technology with traditional craftsmanship to deliver a fashion experience like no other.
               </p>
 
@@ -192,13 +192,13 @@ export default function Home() {
                   { icon: Clock, title: "Fast Turnaround", desc: "Urgent delivery options available for time-sensitive occasions." },
                   { icon: Star, title: "Premium Quality", desc: "Only the finest fabrics and meticulous attention to detail." },
                 ].map((feature, idx) => (
-                  <div key={idx} className="flex items-start gap-4 p-4 rounded-xl bg-slate-50 hover:bg-slate-100 transition-colors">
-                    <div className="p-2.5 rounded-lg bg-indigo-100 text-indigo-600 flex-shrink-0">
+                  <div key={idx} className="flex items-start gap-4 p-4 rounded-xl bg-slate-50 dark:bg-gray-800 hover:bg-slate-100 dark:hover:bg-gray-700 transition-colors">
+                    <div className="p-2.5 rounded-lg bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 flex-shrink-0">
                       <feature.icon className="h-5 w-5" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-slate-900">{feature.title}</h3>
-                      <p className="text-sm text-slate-600">{feature.desc}</p>
+                      <h3 className="font-semibold text-slate-900 dark:text-white">{feature.title}</h3>
+                      <p className="text-sm text-slate-600 dark:text-gray-400">{feature.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -245,11 +245,11 @@ export default function Home() {
       </section>
 
       {/* Role CTAs */}
-      <section className="py-20 lg:py-28 bg-slate-50">
+      <section className="py-20 lg:py-28 bg-slate-50 dark:bg-gray-900">
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Join Our Platform</h2>
-            <p className="text-slate-600 max-w-2xl mx-auto text-lg">Choose how you want to be part of the StyleGenie revolution.</p>
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">Join Our Platform</h2>
+            <p className="text-slate-600 dark:text-gray-400 max-w-2xl mx-auto text-lg">Choose how you want to be part of the StyleGenie revolution.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
@@ -282,8 +282,8 @@ export default function Home() {
                     "border-amber-200 hover:border-amber-400 hover:shadow-lg hover:shadow-amber-100"
                   }`}>
                   <div className="text-4xl mb-4">{role.icon}</div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">{role.title}</h3>
-                  <p className="text-slate-600 mb-4 text-sm lg:text-base">{role.desc}</p>
+                  <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{role.title}</h3>
+                  <p className="text-slate-600 dark:text-gray-400 mb-4 text-sm lg:text-base">{role.desc}</p>
                   <div className={`inline-flex items-center gap-1 font-medium ${role.color === "indigo" ? "text-indigo-600" :
                     role.color === "purple" ? "text-purple-600" :
                       "text-amber-600"

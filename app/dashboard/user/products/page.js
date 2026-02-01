@@ -120,7 +120,7 @@ export default function CustomerProductsPage() {
     const hasActiveFilters = category !== "All" || productType !== "all" || searchQuery || priceRange.min || priceRange.max;
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
             {/* Header */}
             <div className="bg-gradient-to-r from-orange-500 to-pink-500 text-white">
                 <div className="container mx-auto px-4 py-8 md:py-12">
@@ -136,11 +136,11 @@ export default function CustomerProductsPage() {
 
             <div className="container mx-auto px-4 py-6">
                 {/* Search & Filter Bar */}
-                <div className="bg-white rounded-xl shadow-sm border p-4 mb-6">
+                <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border dark:border-gray-700 p-4 mb-6">
                     <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
                         {/* Search Input */}
                         <div className="relative flex-1">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
                             <Input
                                 placeholder="Search products..."
                                 value={searchQuery}
@@ -192,7 +192,7 @@ export default function CustomerProductsPage() {
 
                     {/* Extended Filters */}
                     {showFilters && (
-                        <div className="mt-4 pt-4 border-t grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="mt-4 pt-4 border-t dark:border-gray-700 grid grid-cols-2 md:grid-cols-4 gap-4">
                             <Select value={productType} onValueChange={setProductType}>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Product Type" />
@@ -253,10 +253,10 @@ export default function CustomerProductsPage() {
 
                 {/* View Mode Toggle (Desktop) */}
                 <div className="hidden md:flex justify-between items-center mb-4">
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
                         {products.length} products found
                     </p>
-                    <div className="flex gap-1 border rounded-lg p-1">
+                    <div className="flex gap-1 border dark:border-gray-700 rounded-lg p-1">
                         <Button
                             size="sm"
                             variant={viewMode === "grid" ? "default" : "ghost"}
@@ -280,10 +280,10 @@ export default function CustomerProductsPage() {
                         <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
                     </div>
                 ) : products.length === 0 ? (
-                    <div className="text-center py-20 bg-white rounded-xl border">
+                    <div className="text-center py-20 bg-white dark:bg-gray-800 rounded-xl border dark:border-gray-700">
                         <Package className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-                        <h3 className="text-lg font-medium text-gray-600">No products found</h3>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <h3 className="text-lg font-medium text-gray-600 dark:text-gray-300">No products found</h3>
+                        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                             Try adjusting your filters or search query
                         </p>
                         {hasActiveFilters && (
@@ -333,7 +333,7 @@ function ProductCard({ product, viewMode }) {
         return (
             <Card className="overflow-hidden hover:shadow-lg transition-all">
                 <div className="flex">
-                    <div className="w-32 h-32 sm:w-48 sm:h-48 bg-gray-100 shrink-0">
+                    <div className="w-32 h-32 sm:w-48 sm:h-48 bg-gray-100 dark:bg-gray-700 shrink-0">
                         {product.images?.[0] ? (
                             <img
                                 src={product.images[0]}
@@ -349,15 +349,15 @@ function ProductCard({ product, viewMode }) {
                     <CardContent className="flex-1 p-4">
                         <div className="flex justify-between items-start">
                             <div className="flex-1">
-                                <h3 className="font-semibold text-gray-900 line-clamp-1">{product.title}</h3>
-                                <p className="text-sm text-gray-500">{product.category}</p>
+                                <h3 className="font-semibold text-gray-900 dark:text-gray-100 line-clamp-1">{product.title}</h3>
+                                <p className="text-sm text-gray-500 dark:text-gray-400">{product.category}</p>
                                 {product.shop && (
                                     <Link href={`/shops/${product.shop._id}`} className="inline-flex items-center gap-2 mt-2 group">
                                         {product.shop.logo && (
                                             <img
                                                 src={product.shop.logo}
                                                 alt={product.shop.name}
-                                                className="w-6 h-6 rounded-full object-cover border border-gray-200"
+                                                className="w-6 h-6 rounded-full object-cover border border-gray-200 dark:border-gray-600"
                                             />
                                         )}
                                         <span className="text-sm font-medium text-orange-600 group-hover:text-orange-700 group-hover:underline">
@@ -368,7 +368,7 @@ function ProductCard({ product, viewMode }) {
                             </div>
                             <button
                                 onClick={() => setLiked(!liked)}
-                                className="p-2 hover:bg-gray-100 rounded-full"
+                                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
                             >
                                 <Heart className={`h-5 w-5 ${liked ? "fill-red-500 text-red-500" : "text-gray-400"}`} />
                             </button>
@@ -391,7 +391,7 @@ function ProductCard({ product, viewMode }) {
 
     return (
         <Card className="overflow-hidden group hover:shadow-lg transition-all">
-            <div className="aspect-square bg-gray-100 relative overflow-hidden">
+            <div className="aspect-square bg-gray-100 dark:bg-gray-700 relative overflow-hidden">
                 {product.images?.[0] ? (
                     <img
                         src={product.images[0]}
@@ -414,7 +414,7 @@ function ProductCard({ product, viewMode }) {
                 {/* Like Button */}
                 <button
                     onClick={() => setLiked(!liked)}
-                    className="absolute top-2 right-2 p-2 bg-white/80 backdrop-blur-sm rounded-full hover:bg-white transition-colors"
+                    className="absolute top-2 right-2 p-2 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-full hover:bg-white dark:hover:bg-gray-800 transition-colors"
                 >
                     <Heart className={`h-4 w-4 ${liked ? "fill-red-500 text-red-500" : "text-gray-600"}`} />
                 </button>
@@ -430,15 +430,15 @@ function ProductCard({ product, viewMode }) {
             </div>
 
             <CardContent className="p-3">
-                <h3 className="font-medium text-gray-900 line-clamp-1 text-sm">{product.title}</h3>
-                <p className="text-xs text-gray-500 mt-0.5">{product.category}</p>
+                <h3 className="font-medium text-gray-900 dark:text-gray-100 line-clamp-1 text-sm">{product.title}</h3>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{product.category}</p>
                 {product.shop && (
                     <Link href={`/shops/${product.shop._id}`} className="inline-flex items-center gap-1.5 mt-1.5 group">
                         {product.shop.logo && (
                             <img
                                 src={product.shop.logo}
                                 alt={product.shop.name}
-                                className="w-4 h-4 rounded-full object-cover border border-gray-200"
+                                className="w-4 h-4 rounded-full object-cover border border-gray-200 dark:border-gray-600"
                             />
                         )}
                         <span className="text-xs font-medium text-orange-600 group-hover:text-orange-700 truncate">

@@ -189,6 +189,17 @@ export default function DeliveryProfileForm({ onComplete }) {
                                             required
                                         />
                                     </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="cnicId">CNIC Number *</Label>
+                                        <Input
+                                            id="cnicId"
+                                            name="cnicId"
+                                            value={formData.cnicId}
+                                            onChange={handleChange}
+                                            placeholder="12345-1234567-1"
+                                            required
+                                        />
+                                    </div>
                                 </div>
                             </CardContent>
                         </Card>

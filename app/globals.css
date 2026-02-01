@@ -57,14 +57,52 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* @media (prefers-color-scheme: dark) {
-  :root {
+/* Tailwind v4 dark mode variant - enables class-based dark mode */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Base body styles using CSS variables */
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Dark Mode - Class-based (next-themes) and system preference */
+.dark,
+html.dark {
+  --background: #0f172a;
+  --foreground: #f8fafc;
+  --primary: #818cf8;
+  --primary-foreground: #ffffff;
+  --primary-hover: #6366f1;
+  --secondary: #1e293b;
+  --accent: #a78bfa;
+  --accent-hover: #8b5cf6;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+  --border: #334155;
+  --card: #1e293b;
+  --card-foreground: #f8fafc;
+  --card-hover: #334155;
+  --gradient-start: #818cf8;
+  --gradient-end: #a78bfa;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.4);
+  --shadow-glow: 0 0 20px rgba(129, 140, 248, 0.2);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
     --background: #0f172a;
     --foreground: #f8fafc;
     --primary: #818cf8;
+    --primary-foreground: #ffffff;
     --primary-hover: #6366f1;
     --secondary: #1e293b;
     --accent: #a78bfa;
+    --accent-hover: #8b5cf6;
     --muted: #1e293b;
     --muted-foreground: #94a3b8;
     --border: #334155;
@@ -74,7 +112,7 @@
     --gradient-start: #818cf8;
     --gradient-end: #a78bfa;
   }
-} */
+}
 
 * {
   border-color: var(--border);

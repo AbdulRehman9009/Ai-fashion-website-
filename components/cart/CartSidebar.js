@@ -43,16 +43,16 @@ export default function CartSidebar({ isOpen, onClose }) {
                         animate={{ x: 0 }}
                         exit={{ x: "100%" }}
                         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                        className="fixed right-0 top-0 h-screen max-h-screen w-full sm:w-[420px] bg-white dark:bg-gray-900 shadow-2xl z-50 flex flex-col overflow-hidden"
+                        className="fixed right-0 top-0 h-full sm:h-auto sm:max-h-[90vh] sm:top-4 sm:right-4 sm:rounded-2xl w-full sm:w-[400px] bg-white dark:bg-gray-900 shadow-2xl z-50 flex flex-col overflow-hidden border-l sm:border border-gray-200 dark:border-gray-800"
                     >
                         {/* Header */}
-                        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+                        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
                             <div className="flex items-center gap-3">
-                                <div className="p-2 bg-indigo-100 rounded-lg">
-                                    <ShoppingCart className="h-5 w-5 text-indigo-600" />
+                                <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg">
+                                    <ShoppingCart className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                                 </div>
                                 <div>
-                                    <h2 className="text-xl font-bold">Your Cart</h2>
+                                    <h2 className="text-xl font-bold text-gray-900 dark:text-white">Your Cart</h2>
                                     <p className="text-sm text-gray-500">{cartCount} items</p>
                                 </div>
                             </div>
@@ -67,9 +67,9 @@ export default function CartSidebar({ isOpen, onClose }) {
                         {/* Cart Items */}
                         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3">
                             {cart.length === 0 ? (
-                                <div className="flex flex-col items-center justify-center h-full text-gray-500">
+                                <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400">
                                     <ShoppingCart className="h-20 w-20 mb-4 opacity-20" />
-                                    <p className="text-lg font-medium">Your cart is empty</p>
+                                    <p className="text-lg font-medium text-gray-700 dark:text-gray-300">Your cart is empty</p>
                                     <p className="text-sm">Start shopping to add items!</p>
                                 </div>
                             ) : (
@@ -87,7 +87,7 @@ export default function CartSidebar({ isOpen, onClose }) {
                                             {item.product?.images?.[0] ? (
                                                 <Image
                                                     src={item.product.images[0]}
-                                                    alt={item.product.name}
+                                                    alt={item.product?.title || "Product image"}
                                                     fill
                                                     className="object-cover"
                                                 />
@@ -100,17 +100,17 @@ export default function CartSidebar({ isOpen, onClose }) {
 
                                         {/* Product Info */}
                                         <div className="flex-1 min-w-0">
-                                            <h3 className="font-semibold text-sm truncate">
+                                            <h3 className="font-semibold text-sm truncate text-gray-900 dark:text-gray-100">
                                                 {item.product?.name || "Product"}
                                             </h3>
-                                            <p className="text-xs text-gray-500 truncate">
+                                            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                                                 {item.product?.shop?.name || "Shop"}
                                             </p>
                                             <div className="flex items-center justify-between mt-1">
-                                                <p className="text-indigo-600 font-bold">
+                                                <p className="text-indigo-600 dark:text-indigo-400 font-bold">
                                                     ${(item.product?.basePrice || 0).toFixed(2)}
                                                 </p>
-                                                <p className="text-sm font-medium text-gray-700">
+                                                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
                                                     = ${((item.product?.basePrice || 0) * item.quantity).toFixed(2)}
                                                 </p>
                                             </div>
@@ -156,11 +156,11 @@ export default function CartSidebar({ isOpen, onClose }) {
                                 {/* Price Breakdown */}
                                 <div className="space-y-2 text-sm">
                                     <div className="flex justify-between">
-                                        <span className="text-gray-600">Subtotal</span>
-                                        <span className="font-medium">${calculations.subtotal.toFixed(2)}</span>
+                                        <span className="text-gray-600 dark:text-gray-400">Subtotal</span>
+                                        <span className="font-medium text-gray-900 dark:text-gray-100">${calculations.subtotal.toFixed(2)}</span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-600 flex items-center gap-1">
+                                        <span className="text-gray-600 dark:text-gray-400 flex items-center gap-1">
                                             <Truck className="h-3 w-3" /> Shipping
                                         </span>
                                         <span className={calculations.shippingFee === 0 ? "text-green-600 font-medium" : ""}>
@@ -168,8 +168,8 @@ export default function CartSidebar({ isOpen, onClose }) {
                                         </span>
                                     </div>
                                     <div className="flex justify-between">
-                                        <span className="text-gray-600">Tax (5%)</span>
-                                        <span className="font-medium">${calculations.tax.toFixed(2)}</span>
+                                        <span className="text-gray-600 dark:text-gray-400">Tax (5%)</span>
+                                        <span className="font-medium text-gray-900 dark:text-gray-100">${calculations.tax.toFixed(2)}</span>
                                     </div>
                                 </div>
 
@@ -182,8 +182,8 @@ export default function CartSidebar({ isOpen, onClose }) {
 
                                 {/* Total */}
                                 <div className="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-600">
-                                    <span className="text-lg font-bold">Total</span>
-                                    <span className="text-2xl font-bold text-indigo-600">
+                                    <span className="text-lg font-bold text-gray-900 dark:text-gray-100">Total</span>
+                                    <span className="text-2xl font-bold text-indigo-600 dark:text-indigo-400">
                                         ${calculations.total.toFixed(2)}
                                     </span>
                                 </div>

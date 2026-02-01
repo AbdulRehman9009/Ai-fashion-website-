@@ -102,7 +102,7 @@ export async function POST(req) {
     const checkoutSession = await createCheckoutSession({
       orderId: order._id.toString(),
       items: orderItems.map(item => ({
-        priceId: item.paddlePriceId, // Use the stored Paddle Price ID
+        paddlePriceId: item.paddlePriceId, // Use correct field name
         quantity: item.quantity
       })),
       customerEmail: token.email,
@@ -119,19 +119,21 @@ export async function POST(req) {
         checkoutUrl: checkoutSession.url
       }, { status: 201 });
     } else {
-      // Fallback or error handling if checkout generation fails
-      // For now, return order ID but no URL (frontend should handle this)
-      console.error("Failed to generate checkout URL", checkoutSession);
+      // No Paddle checkout URL - allow COD (Cash on Delivery)
+      console.log("Paddle checkout not available - proceeding with COD option");
       return NextResponse.json({
         id: String(order._id),
-        error: "Payment initialization failed. Please try again."
-      }, { status: 201 }); // 201 because order *was* created, but payment failed init
+        paymentMethod: "COD",
+        message: "Order created successfully. Pay on delivery."
+      }, { status: 201 });
     }
   } catch (error) {
     console.error("Checkout creation error:", error);
+    // Order was created, proceed with COD
     return NextResponse.json({
       id: String(order._id),
-      error: "Payment initialization failed."
+      paymentMethod: "COD",
+      message: "Order created. Pay on delivery."
     }, { status: 201 });
   }
 }

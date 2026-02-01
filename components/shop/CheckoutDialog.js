@@ -97,7 +97,7 @@ export default function CheckoutDialog({ open, onOpenChange, product, onSuccess 
           {/* Steps Indicator could go here, but let's keep it simple with dynamic content */}
 
           {/* Order Configuration */}
-          <div className="space-y-4 rounded-lg bg-gray-50 p-4 border border-gray-100">
+          <div className="space-y-4 rounded-lg bg-gray-50 dark:bg-gray-800/50 p-4 border border-gray-100 dark:border-gray-700">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Scissors className="h-4 w-4 text-purple-600" />
@@ -127,7 +127,7 @@ export default function CheckoutDialog({ open, onOpenChange, product, onSuccess 
               value={address}
               onChange={(e) => setAddress(e.target.value)}
               placeholder="123 Fashion Ave, Design City"
-              className="bg-white"
+              className="bg-white dark:bg-gray-800"
             />
           </div>
 
@@ -151,7 +151,7 @@ export default function CheckoutDialog({ open, onOpenChange, product, onSuccess 
           </div>
 
           {/* Summary */}
-          <div className="space-y-2 pt-4 border-t border-gray-100">
+          <div className="space-y-2 pt-4 border-t border-gray-100 dark:border-gray-700">
             <div className="flex justify-between text-sm">
               <span className="text-gray-500">Subtotal</span>
               <span>${price}</span>

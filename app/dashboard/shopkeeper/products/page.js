@@ -82,12 +82,12 @@ export default function ShopkeeperProductsPage() {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div className="flex items-center gap-3">
-                    <div className="bg-orange-100 p-2 sm:p-3 rounded-full">
+                    <div className="bg-orange-100 dark:bg-orange-900/50 p-2 sm:p-3 rounded-full">
                         <Package className="h-5 w-5 sm:h-6 sm:w-6 text-orange-600" />
                     </div>
                     <div>
-                        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Products</h2>
-                        <p className="text-sm sm:text-base text-gray-500">Manage your product catalog</p>
+                        <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white">Products</h2>
+                        <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">Manage your product catalog</p>
                     </div>
                 </div>
 
@@ -115,7 +115,7 @@ export default function ShopkeeperProductsPage() {
 
             {/* Search */}
             <div className="relative max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
                 <Input
                     placeholder="Search products..."
                     value={searchQuery}
@@ -128,8 +128,8 @@ export default function ShopkeeperProductsPage() {
             {filteredProducts.length === 0 ? (
                 <Card className="p-12 text-center">
                     <AlertCircle className="h-12 w-12 mx-auto text-gray-300 mb-4" />
-                    <h3 className="text-lg font-medium text-gray-600">No products found</h3>
-                    <p className="text-sm text-gray-500 mt-1">
+                    <h3 className="text-lg font-medium text-gray-600 dark:text-gray-300">No products found</h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                         {searchQuery ? "Try a different search term" : "Add your first product to get started"}
                     </p>
                 </Card>
@@ -138,7 +138,7 @@ export default function ShopkeeperProductsPage() {
                     {filteredProducts.map((product) => (
                         <Card key={product._id} className="overflow-hidden hover:shadow-lg transition-shadow">
                             {/* Product Image */}
-                            <div className="aspect-square bg-gray-100 relative">
+                            <div className="aspect-square bg-gray-100 dark:bg-gray-700 relative">
                                 {product.images?.[0] ? (
                                     <img
                                         src={product.images[0]}
@@ -159,8 +159,8 @@ export default function ShopkeeperProductsPage() {
                             </div>
 
                             <CardContent className="p-4">
-                                <h3 className="font-semibold text-gray-900 truncate">{product.title}</h3>
-                                <p className="text-sm text-gray-500 mt-1">{product.category}</p>
+                                <h3 className="font-semibold text-gray-900 dark:text-white truncate">{product.title}</h3>
+                                <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{product.category}</p>
 
                                 <div className="flex items-center justify-between mt-3">
                                     <span className="text-lg font-bold text-orange-600">
@@ -186,7 +186,7 @@ export default function ShopkeeperProductsPage() {
                                     <Button
                                         size="sm"
                                         variant="outline"
-                                        className="text-red-600 hover:bg-red-50"
+                                        className="text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30"
                                         onClick={() => handleDelete(product._id)}
                                     >
                                         <Trash2 className="h-4 w-4" />

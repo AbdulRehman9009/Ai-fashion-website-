@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,6 +13,7 @@ import { useCart } from "@/contexts/CartContext";
 
 export default function ShopProfilePage() {
     const params = useParams();
+    const router = useRouter();
     const shopId = params.id;
     const { addToCart, loading: cartLoading } = useCart();
     const [shop, setShop] = useState(null);
@@ -235,16 +236,33 @@ export default function ShopProfilePage() {
                                                     {product.stock > 0 ? "In Stock" : "Out of Stock"}
                                                 </Badge>
                                             </div>
-                                            {/* Add to Cart Button */}
-                                            <Button
-                                                size="sm"
-                                                className="w-full mt-2 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
-                                                disabled={product.stock <= 0 || cartLoading}
-                                                onClick={(e) => handleAddToCart(e, product._id)}
-                                            >
-                                                <ShoppingCart className="h-4 w-4 mr-1" />
-                                                Add to Cart
-                                            </Button>
+                                            {/* Action Buttons */}
+                                            <div className="flex gap-2 mt-2 w-full">
+                                                <Button
+                                                    size="sm"
+                                                    className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                                                    disabled={product.stock <= 0 || cartLoading}
+                                                    onClick={(e) => handleAddToCart(e, product._id)}
+                                                >
+                                                    <ShoppingCart className="h-4 w-4 mr-1" />
+                                                    Add
+                                                </Button>
+                                                <Button
+                                                    size="sm"
+                                                    className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                                                    disabled={product.stock <= 0 || cartLoading}
+                                                    onClick={async (e) => {
+                                                        e.preventDefault();
+                                                        e.stopPropagation();
+                                                        const success = await addToCart(product._id, 1);
+                                                        if (success) {
+                                                            router.push('/checkout');
+                                                        }
+                                                    }}
+                                                >
+                                                    Buy Now
+                                                </Button>
+                                            </div>
                                         </CardContent>
                                     </Link>
                                 </Card>

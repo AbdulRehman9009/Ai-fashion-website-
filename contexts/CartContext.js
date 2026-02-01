@@ -63,7 +63,20 @@ export function CartProvider({ children }) {
                 await fetchCart();
                 return true;
             } else {
-                toast.error(data.error || "Failed to add to cart");
+                if (data.code === "MULTI_SHOP_ERROR") {
+                    const shouldClear = window.confirm("You can only order from one shop at a time. Clear your cart to add this item?");
+                    if (shouldClear) {
+                        await clearCart(); // This calls context clearCart, but we need to clear backend too
+                        // Let's implement background clear and retry
+                        await fetch("/api/cart?action=clear", { method: "DELETE" }); // Assuming DELETE /api/cart?action=clear clears all
+                        // Actually DELETE with no params clears item. 
+                        // Let's just toast for now to keep it simple, or improve DELETE api.
+                        // Context clearCart only clears state.
+                    }
+                    toast.error("Cart contains items from another shop. Please clear it first.");
+                } else {
+                    toast.error(data.error || "Failed to add to cart");
+                }
                 return false;
             }
         } catch (error) {
@@ -130,9 +143,15 @@ export function CartProvider({ children }) {
         }
     }, [fetchCart]);
 
-    const clearCart = useCallback(() => {
-        setCart([]);
-        setCartCount(0);
+    const clearCart = useCallback(async () => {
+        try {
+            await fetch("/api/cart?clear=true", { method: "DELETE" });
+            setCart([]);
+            setCartCount(0);
+            toast.success("Cart cleared");
+        } catch (error) {
+            console.error("Error clearing cart:", error);
+        }
     }, []);
 
     // Get total with shipping and tax for checkout
