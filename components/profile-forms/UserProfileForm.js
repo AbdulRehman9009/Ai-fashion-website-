@@ -231,7 +231,7 @@ export default function UserProfileForm({ onComplete }) {
                                 <div className="space-y-2">
                                     <Label htmlFor="shirtSize">Shirt Size</Label>
                                     <Select name="shirtSize" value={formData.shirtSize} onValueChange={(v) => handleSelectChange("shirtSize", v)}>
-                                        <SelectTrigger className="bg-white">
+                                        <SelectTrigger>
                                             <SelectValue placeholder="Select Size" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -248,11 +248,11 @@ export default function UserProfileForm({ onComplete }) {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="space-y-2">
                                         <Label htmlFor="pantSize">Waist (in)</Label>
-                                        <Input id="pantSize" name="pantSize" type="number" value={formData.pantSize} onChange={handleChange} placeholder="32" className="bg-white" />
+                                        <Input id="pantSize" name="pantSize" type="number" value={formData.pantSize} onChange={handleChange} placeholder="32" />
                                     </div>
                                     <div className="space-y-2">
                                         <Label htmlFor="shoeSize">Shoe Size (US)</Label>
-                                        <Input id="shoeSize" name="shoeSize" type="number" value={formData.shoeSize} onChange={handleChange} placeholder="9" className="bg-white" />
+                                        <Input id="shoeSize" name="shoeSize" type="number" value={formData.shoeSize} onChange={handleChange} placeholder="9" />
                                     </div>
                                 </div>
                             </CardContent>

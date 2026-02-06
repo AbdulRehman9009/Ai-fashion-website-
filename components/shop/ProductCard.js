@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 export default function ProductCard({ product, onAddToCart, onBuyNow }) {
   return (
     <Card className="flex flex-col h-full overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="relative aspect-[4/5] bg-gray-100 overflow-hidden">
+      <div className="relative aspect-[4/5] bg-gray-100 dark:bg-gray-800 overflow-hidden">
         {product.imageUrl ? (
           <img
             src={product.imageUrl}
@@ -17,10 +17,10 @@ export default function ProductCard({ product, onAddToCart, onBuyNow }) {
             className="object-cover w-full h-full hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <div className="flex items-center justify-center h-full text-gray-400">No Image</div>
+          <div className="flex items-center justify-center h-full text-gray-400 dark:text-gray-500">No Image</div>
         )}
         {product.type === "READY_TO_WEAR" && (
-          <span className="absolute top-2 right-2 bg-black/70 text-white text-xs px-2 py-1 rounded">Ready to Wear</span>
+          <span className="absolute top-2 right-2 bg-black/70 dark:bg-black/80 text-white text-xs px-2 py-1 rounded">Ready to Wear</span>
         )}
       </div>
       <CardHeader className="p-4">
@@ -33,14 +33,14 @@ export default function ProductCard({ product, onAddToCart, onBuyNow }) {
         </div>
       </CardHeader>
       <CardContent className="p-4 pt-0 flex-1">
-        <p className="text-sm text-gray-600 line-clamp-2">{product.description}</p>
+        <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{product.description}</p>
         <div className="flex flex-wrap gap-1 mt-2">
           {product.tags.slice(0, 3).map(tag => (
-            <span key={tag} className="text-xs bg-gray-100 px-2 py-0.5 rounded-full text-gray-600">{tag}</span>
+            <span key={tag} className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full text-gray-600 dark:text-gray-400">{tag}</span>
           ))}
         </div>
       </CardContent>
-      <CardFooter className="p-4 border-t gap-2">
+      <CardFooter className="p-4 border-t dark:border-gray-700 gap-2">
         <Button className="flex-1 gap-2" variant="outline" onClick={() => onAddToCart(product)}>
           <ShoppingCart className="h-4 w-4" /> Add
         </Button>

@@ -53,11 +53,11 @@ export default function WishlistTab() {
 
     return (
         <div className="space-y-6">
-            <Card className="border-0 shadow-lg">
-                <CardHeader className="bg-gradient-to-r from-pink-50 to-red-50 border-b">
+            <Card className="border-0 shadow-lg dark:bg-gray-900">
+                <CardHeader className="bg-gradient-to-r from-pink-50 to-red-50 dark:from-pink-900/20 dark:to-red-900/20 border-b dark:border-gray-800">
                     <div className="flex items-center gap-3">
-                        <div className="bg-pink-100 p-2 rounded-lg">
-                            <Heart className="h-5 w-5 text-pink-600" />
+                        <div className="bg-pink-100 dark:bg-pink-900/50 p-2 rounded-lg">
+                            <Heart className="h-5 w-5 text-pink-600 dark:text-pink-400" />
                         </div>
                         <div>
                             <CardTitle className="text-xl">My Wishlist</CardTitle>
@@ -70,9 +70,9 @@ export default function WishlistTab() {
                 <CardContent className="p-4 sm:p-6">
                     {wishlist.length === 0 ? (
                         <div className="text-center py-12">
-                            <Heart className="h-16 w-16 mx-auto text-gray-300 mb-4" />
-                            <h3 className="text-lg font-medium text-gray-600">Your wishlist is empty</h3>
-                            <p className="text-sm text-gray-500 mt-1 mb-4">
+                            <Heart className="h-16 w-16 mx-auto text-gray-300 dark:text-gray-600 mb-4" />
+                            <h3 className="text-lg font-medium text-gray-600 dark:text-gray-400">Your wishlist is empty</h3>
+                            <p className="text-sm text-gray-500 dark:text-gray-500 mt-1 mb-4">
                                 Browse shops and add products you love!
                             </p>
                             <Link href="/shops">
@@ -93,7 +93,7 @@ export default function WishlistTab() {
                                         key={product._id}
                                         className="overflow-hidden group hover:shadow-lg transition-all border-2 hover:border-pink-200"
                                     >
-                                        <div className="aspect-square bg-gray-100 relative overflow-hidden">
+                                        <div className="aspect-square bg-gray-100 dark:bg-gray-800 relative overflow-hidden">
                                             {product.images?.[0] ? (
                                                 <img
                                                     src={product.images[0]}
@@ -102,13 +102,13 @@ export default function WishlistTab() {
                                                 />
                                             ) : (
                                                 <div className="w-full h-full flex items-center justify-center">
-                                                    <Package className="h-12 w-12 text-gray-300" />
+                                                    <Package className="h-12 w-12 text-gray-300 dark:text-gray-600" />
                                                 </div>
                                             )}
                                             <button
                                                 onClick={() => removeFromWishlist(product._id)}
                                                 disabled={removingId === product._id}
-                                                className="absolute top-2 right-2 p-2 bg-white/90 rounded-full shadow-md hover:bg-red-50 transition-colors disabled:opacity-50"
+                                                className="absolute top-2 right-2 p-2 bg-white/90 dark:bg-gray-800/90 rounded-full shadow-md hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors disabled:opacity-50"
                                                 title="Remove from wishlist"
                                             >
                                                 {removingId === product._id ? (
@@ -120,13 +120,13 @@ export default function WishlistTab() {
                                         </div>
                                         <CardContent className="p-4">
                                             <Link href={`/products/${product._id}`}>
-                                                <h3 className="font-semibold text-gray-900 line-clamp-1 hover:text-pink-600 transition-colors">
+                                                <h3 className="font-semibold text-gray-900 dark:text-gray-100 line-clamp-1 hover:text-pink-600 dark:hover:text-pink-400 transition-colors">
                                                     {product.title}
                                                 </h3>
                                             </Link>
                                             {product.shop && (
                                                 <Link href={`/shops/${product.shop._id}`}>
-                                                    <div className="flex items-center gap-2 mt-1 text-sm text-gray-500 hover:text-pink-600 transition-colors">
+                                                    <div className="flex items-center gap-2 mt-1 text-sm text-gray-500 dark:text-gray-400 hover:text-pink-600 dark:hover:text-pink-400 transition-colors">
                                                         {product.shop.logo ? (
                                                             <img
                                                                 src={product.shop.logo}

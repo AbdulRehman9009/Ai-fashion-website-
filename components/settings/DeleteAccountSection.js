@@ -48,16 +48,16 @@ export default function DeleteAccountSection() {
 
     return (
         <>
-            <div className="bg-white p-4 sm:p-6 rounded-lg shadow border border-red-200">
-                <h3 className="text-lg font-semibold text-red-600 border-b border-red-100 pb-2 flex items-center gap-2">
+            <div className="bg-white dark:bg-gray-900 p-4 sm:p-6 rounded-lg shadow border border-red-200 dark:border-red-900/50">
+                <h3 className="text-lg font-semibold text-red-600 dark:text-red-400 border-b border-red-100 dark:border-red-900/50 pb-2 flex items-center gap-2">
                     <AlertTriangle className="h-5 w-5" />
                     Danger Zone
                 </h3>
 
                 <div className="mt-4 space-y-4">
-                    <div className="p-4 bg-red-50 rounded-lg border border-red-100">
-                        <h4 className="font-medium text-red-800">Delete Account</h4>
-                        <p className="text-sm text-red-600 mt-1">
+                    <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-100 dark:border-red-900/50">
+                        <h4 className="font-medium text-red-800 dark:text-red-300">Delete Account</h4>
+                        <p className="text-sm text-red-600 dark:text-red-400 mt-1">
                             Once you delete your account, there is no going back. All your data will be permanently removed.
                         </p>
                     </div>
@@ -77,30 +77,30 @@ export default function DeleteAccountSection() {
             {/* Delete Confirmation Modal */}
             {showModal && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-                    <div className="bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+                    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
                         <div className="p-4 sm:p-6">
                             <div className="flex items-center justify-between mb-4">
-                                <h3 className="text-xl font-bold text-red-600 flex items-center gap-2">
+                                <h3 className="text-xl font-bold text-red-600 dark:text-red-400 flex items-center gap-2">
                                     <AlertTriangle className="h-6 w-6" />
                                     Delete Account
                                 </h3>
                                 <button
                                     onClick={() => setShowModal(false)}
-                                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                                    className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
                                 >
                                     <X className="h-5 w-5" />
                                 </button>
                             </div>
 
                             <div className="space-y-4">
-                                <div className="p-4 bg-red-50 rounded-lg border border-red-200">
-                                    <p className="text-sm text-red-700 font-medium">
+                                <div className="p-4 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-900/50">
+                                    <p className="text-sm text-red-700 dark:text-red-300 font-medium">
                                         ⚠️ This action is irreversible!
                                     </p>
-                                    <p className="text-sm text-red-600 mt-2">
+                                    <p className="text-sm text-red-600 dark:text-red-400 mt-2">
                                         Deleting your account will:
                                     </p>
-                                    <ul className="text-sm text-red-600 mt-2 list-disc list-inside space-y-1">
+                                    <ul className="text-sm text-red-600 dark:text-red-400 mt-2 list-disc list-inside space-y-1">
                                         <li>Remove all your personal data</li>
                                         <li>Delete your profile and preferences</li>
                                         <li>Remove access to all services</li>

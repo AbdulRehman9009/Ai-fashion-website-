@@ -19,9 +19,9 @@ export default function EarningsChart({ data = [], colorClass = "#3b82f6" }) {
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             return (
-                <div className="rounded-lg border bg-white p-3 shadow-lg">
-                    <p className="text-sm font-medium text-gray-900">{label}</p>
-                    <p className="text-sm text-gray-600">
+                <div className="rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-3 shadow-lg">
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{label}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">
                         Earnings: <span className="font-semibold" style={{ color: colorClass }}>{formatCurrency(payload[0].value)}</span>
                     </p>
                 </div>

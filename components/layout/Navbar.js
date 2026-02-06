@@ -140,16 +140,16 @@ export default function Navbar() {
                                         <ChevronDown className="w-4 h-4" />
                                     </button>
                                     <div className="absolute top-full right-0 pt-2 w-56 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-                                        <div className="bg-white rounded-lg shadow-lg border p-1 ring-1 ring-black ring-opacity-5">
+                                        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg border dark:border-gray-700 p-1 ring-1 ring-black ring-opacity-5 dark:ring-white dark:ring-opacity-10">
                                             {roleLinks.slice(1).map((link) => { // Skip Customer
                                                 const Icon = link.icon;
                                                 return (
                                                     <Link
                                                         key={link.href}
                                                         href={link.href}
-                                                        className="flex items-center gap-3 px-3 py-2 text-sm text-slate-700 hover:bg-slate-50 rounded-md"
+                                                        className="flex items-center gap-3 px-3 py-2 text-sm text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 rounded-md"
                                                     >
-                                                        <Icon className="h-4 w-4 text-slate-500" />
+                                                        <Icon className="h-4 w-4 text-slate-500 dark:text-gray-400" />
                                                         {link.label}
                                                     </Link>
                                                 );
@@ -200,7 +200,7 @@ export default function Navbar() {
                                             {session.user?.image ? (
                                                 <Image src={session.user.image} alt="User" width={32} height={32} className="rounded-full border border-slate-200" />
                                             ) : (
-                                                <div className="h-8 w-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-600 font-medium text-sm border border-slate-200">
+                                                <div className="h-8 w-8 rounded-full bg-slate-100 dark:bg-gray-800 flex items-center justify-center text-slate-600 dark:text-gray-300 font-medium text-sm border border-slate-200 dark:border-gray-700">
                                                     {session.user?.name?.[0]?.toUpperCase() || 'U'}
                                                 </div>
                                             )}
@@ -213,23 +213,23 @@ export default function Navbar() {
                                                     className="fixed inset-0 z-30"
                                                     onClick={() => setUserMenuOpen(false)}
                                                 />
-                                                <div className="absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white border ring-1 ring-black ring-opacity-5 z-40 py-1">
-                                                    <div className="px-4 py-3 border-b bg-slate-50">
-                                                        <p className="font-semibold text-sm text-slate-900 truncate">{session.user?.name}</p>
-                                                        <p className="text-xs text-slate-500 truncate">{session.user?.email}</p>
+                                                <div className="absolute right-0 mt-2 w-56 rounded-lg shadow-lg bg-white dark:bg-gray-800 border dark:border-gray-700 ring-1 ring-black ring-opacity-5 dark:ring-white dark:ring-opacity-10 z-40 py-1">
+                                                    <div className="px-4 py-3 border-b dark:border-gray-700 bg-slate-50 dark:bg-gray-700/50">
+                                                        <p className="font-semibold text-sm text-slate-900 dark:text-gray-100 truncate">{session.user?.name}</p>
+                                                        <p className="text-xs text-slate-500 dark:text-gray-400 truncate">{session.user?.email}</p>
                                                     </div>
 
                                                     <div className="p-1">
                                                         <Link href={getDashboardLink()} onClick={() => setUserMenuOpen(false)}>
-                                                            <button className="flex items-center gap-2 px-3 py-2 w-full text-left text-sm text-slate-700 hover:bg-slate-50 rounded-md">
-                                                                <LayoutDashboard className="h-4 w-4 text-slate-500" />
+                                                            <button className="flex items-center gap-2 px-3 py-2 w-full text-left text-sm text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 rounded-md">
+                                                                <LayoutDashboard className="h-4 w-4 text-slate-500 dark:text-gray-400" />
                                                                 Dashboard
                                                             </button>
                                                         </Link>
 
                                                         <Link href={session.user.role === 'SHOPKEEPER' ? '/dashboard/shopkeeper/settings' : `/dashboard/${session.user.role.toLowerCase()}/settings`} onClick={() => setUserMenuOpen(false)}>
-                                                            <button className="flex items-center gap-2 px-3 py-2 w-full text-left text-sm text-slate-700 hover:bg-slate-50 rounded-md">
-                                                                <Settings className="h-4 w-4 text-slate-500" />
+                                                            <button className="flex items-center gap-2 px-3 py-2 w-full text-left text-sm text-slate-700 dark:text-gray-300 hover:bg-slate-50 dark:hover:bg-gray-700 rounded-md">
+                                                                <Settings className="h-4 w-4 text-slate-500 dark:text-gray-400" />
                                                                 Settings
                                                             </button>
                                                         </Link>
@@ -241,7 +241,7 @@ export default function Navbar() {
                                                                 setUserMenuOpen(false);
                                                                 signOut({ callbackUrl: "/" });
                                                             }}
-                                                            className="flex items-center gap-2 px-3 py-2 w-full text-left text-sm text-red-600 hover:bg-red-50 rounded-md"
+                                                            className="flex items-center gap-2 px-3 py-2 w-full text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md"
                                                         >
                                                             <LogOut className="h-4 w-4" />
                                                             Logout
@@ -301,7 +301,7 @@ export default function Navbar() {
                                 <Link
                                     key={link.href}
                                     href={link.href}
-                                    className={`block px-3 py-2 rounded-md text-base font-medium ${pathname === link.href ? "bg-slate-100 text-slate-900" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                                    className={`block px-3 py-2 rounded-md text-base font-medium ${pathname === link.href ? "bg-slate-100 dark:bg-gray-800 text-slate-900 dark:text-gray-100" : "text-slate-600 dark:text-gray-400 hover:bg-slate-50 dark:hover:bg-gray-800 hover:text-slate-900 dark:hover:text-gray-100"
                                         }`}
                                     onClick={() => setMobileMenuOpen(false)}
                                 >
@@ -311,7 +311,7 @@ export default function Navbar() {
 
                             {!session && (
                                 <div className="pt-4 border-t mt-4">
-                                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3 px-3">Partner with us</p>
+                                    <p className="text-xs font-semibold text-slate-400 dark:text-gray-500 uppercase tracking-wider mb-3 px-3">Partner with us</p>
                                     <div className="grid grid-cols-2 gap-2">
                                         {roleLinks.map((link) => {
                                             const Icon = link.icon;
@@ -319,7 +319,7 @@ export default function Navbar() {
                                                 <Link
                                                     key={link.href}
                                                     href={link.href}
-                                                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900 rounded-md border border-transparent hover:border-slate-200"
+                                                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 dark:text-gray-400 hover:bg-slate-50 dark:hover:bg-gray-800 hover:text-slate-900 dark:hover:text-gray-100 rounded-md border border-transparent hover:border-slate-200 dark:hover:border-gray-700"
                                                     onClick={() => setMobileMenuOpen(false)}
                                                 >
                                                     <Icon className="h-4 w-4" />

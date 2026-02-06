@@ -69,8 +69,8 @@ export default function CheckoutButton({
                 {loading ? "Processing..." : `Pay ${currency} ${amount?.toFixed(2) || ""}`}
             </Button>
 
-            <div className="flex items-center justify-center gap-2 text-xs text-gray-500">
-                <ShieldCheck className="h-4 w-4 text-green-500" />
+            <div className="flex items-center justify-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+                <ShieldCheck className="h-4 w-4 text-green-500 dark:text-green-400" />
                 <span>Secure payment powered by Paddle</span>
             </div>
         </div>

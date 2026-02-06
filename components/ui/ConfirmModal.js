@@ -21,15 +21,15 @@ export default function ConfirmModal({
                 <DialogHeader>
                     <div className="flex items-center gap-3">
                         {variant === "destructive" && (
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100">
-                                <AlertTriangle className="h-5 w-5 text-red-600" />
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 dark:bg-red-900/30">
+                                <AlertTriangle className="h-5 w-5 text-red-600 dark:text-red-400" />
                             </div>
                         )}
                         <DialogTitle>{title}</DialogTitle>
                     </div>
                 </DialogHeader>
                 <div className="py-4">
-                    <p className="text-sm text-gray-600">{description}</p>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{description}</p>
                 </div>
                 <DialogFooter className="gap-2">
                     <Button

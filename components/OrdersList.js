@@ -71,14 +71,14 @@ export default function OrdersList({ role, limit, compact }) {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "PENDING": return "bg-yellow-100 text-yellow-800";
-      case "ACCEPTED": return "bg-blue-100 text-blue-800";
-      case "STITCHING": return "bg-purple-100 text-purple-800";
-      case "READY_FOR_DELIVERY": return "bg-teal-100 text-teal-800";
-      case "OUT_FOR_DELIVERY": return "bg-orange-100 text-orange-800";
-      case "DELIVERED": return "bg-green-100 text-green-800";
-      case "CANCELLED": return "bg-red-100 text-red-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "PENDING": return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300";
+      case "ACCEPTED": return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300";
+      case "STITCHING": return "bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300";
+      case "READY_FOR_DELIVERY": return "bg-teal-100 dark:bg-teal-900/30 text-teal-800 dark:text-teal-300";
+      case "OUT_FOR_DELIVERY": return "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300";
+      case "DELIVERED": return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300";
+      case "CANCELLED": return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300";
+      default: return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300";
     }
   };
 
@@ -97,24 +97,24 @@ export default function OrdersList({ role, limit, compact }) {
           </CardHeader>
         )}
         <CardContent className={compact ? "p-0" : ""}>
-          {error && <p className="text-red-600 text-sm mb-4 bg-red-50 p-2 rounded">{error}</p>}
+          {error && <p className="text-red-600 dark:text-red-400 text-sm mb-4 bg-red-50 dark:bg-red-900/20 p-2 rounded">{error}</p>}
 
           <div className="space-y-4">
             {orders.map((o) => (
-              <div key={o._id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 border rounded-xl hover:bg-gray-50 transition-all gap-4 shadow-sm hover:shadow-md cursor-pointer" onClick={() => setSelectedOrder(o)}>
+              <div key={o._id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 border dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all gap-4 shadow-sm hover:shadow-md cursor-pointer" onClick={() => setSelectedOrder(o)}>
                 <div className="flex gap-4 items-center flex-1">
                   {/* Product Image */}
-                  <div className="h-16 w-16 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100">
+                  <div className="h-16 w-16 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 dark:border-gray-600">
                     {(o.items?.[0]?.product?.imageUrl) ? (
                       <img src={o.items[0].product.imageUrl} alt="Product" className="h-full w-full object-cover" />
                     ) : (
-                      <div className="h-full w-full flex items-center justify-center text-gray-400 text-xs font-medium">No Img</div>
+                      <div className="h-full w-full flex items-center justify-center text-gray-400 dark:text-gray-500 text-xs font-medium">No Img</div>
                     )}
                   </div>
 
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
-                      <span className="font-bold text-gray-900">#{String(o._id).slice(-4).toUpperCase()}</span>
+                      <span className="font-bold text-gray-900 dark:text-gray-100">#{String(o._id).slice(-4).toUpperCase()}</span>
                       <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full font-bold ${getStatusColor(o.status)}`}>
                         {o.status.replace(/_/g, ' ')}
                       </span>
@@ -127,13 +127,13 @@ export default function OrdersList({ role, limit, compact }) {
 
                     {/* User Info for non-users */}
                     {role !== "USER" && o.user && (
-                      <div className="text-sm font-medium text-gray-700">
+                      <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
                         Customer: {o.user.name || o.user.email}
                       </div>
                     )}
 
-                    <div className="text-sm text-gray-500">
-                      {(o.items || []).length} items • <span className="font-medium text-gray-900">${(o.totalAmount || o.pricing?.grandTotal || 0).toFixed(2)}</span>
+                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                      {(o.items || []).length} items • <span className="font-medium text-gray-900 dark:text-gray-100">${(o.totalAmount || o.pricing?.grandTotal || 0).toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -148,7 +148,7 @@ export default function OrdersList({ role, limit, compact }) {
               </div>
             ))}
             {orders.length === 0 && !loading && (
-              <div className="text-center py-12 text-gray-400">
+              <div className="text-center py-12 text-gray-400 dark:text-gray-500">
                 <p>No orders yet.</p>
               </div>
             )}
@@ -176,9 +176,9 @@ export default function OrdersList({ role, limit, compact }) {
                   <OrderTimeline status={selectedOrder.status} />
                 </div>
 
-                <div className="bg-gray-50 p-4 rounded-lg space-y-2">
+                <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg space-y-2">
                   <h4 className="font-semibold text-sm">Shipping Address</h4>
-                  <div className="flex items-start text-sm text-gray-600 gap-2">
+                  <div className="flex items-start text-sm text-gray-600 dark:text-gray-400 gap-2">
                     <MapPin className="h-4 w-4 mt-0.5" />
                     <span>{selectedOrder.shippingAddress?.street}, {selectedOrder.shippingAddress?.city}</span>
                   </div>
@@ -191,12 +191,12 @@ export default function OrdersList({ role, limit, compact }) {
                   <div className="space-y-3">
                     {selectedOrder.items?.map((item, i) => (
                       <div key={i} className="flex gap-3 items-center">
-                        <div className="h-12 w-12 bg-gray-100 rounded-md overflow-hidden">
+                        <div className="h-12 w-12 bg-gray-100 dark:bg-gray-800 rounded-md overflow-hidden">
                           {item.product?.imageUrl && <img src={item.product.imageUrl} className="h-full w-full object-cover" />}
                         </div>
                         <div className="text-sm">
                           <p className="font-medium">{item.product?.name || "Product"}</p>
-                          <p className="text-gray-500">Qty: {item.quantity}</p>
+                          <p className="text-gray-500 dark:text-gray-400">Qty: {item.quantity}</p>
                         </div>
                       </div>
                     ))}
@@ -206,7 +206,7 @@ export default function OrdersList({ role, limit, compact }) {
                 <div className="border-t pt-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Payment Status</span>
-                    <span className={`font-bold ${selectedOrder.paymentStatus === 'PAID' ? 'text-green-600' : 'text-orange-500'}`}>
+                    <span className={`font-bold ${selectedOrder.paymentStatus === 'PAID' ? 'text-green-600 dark:text-green-400' : 'text-orange-500 dark:text-orange-400'}`}>
                       {selectedOrder.paymentStatus}
                     </span>
                   </div>

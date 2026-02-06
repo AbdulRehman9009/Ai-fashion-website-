@@ -14,8 +14,8 @@ export default function OrdersChart({ data = [], showLegend = true }) {
     const CustomTooltip = ({ active, payload, label }) => {
         if (active && payload && payload.length) {
             return (
-                <div className="rounded-lg border bg-white p-3 shadow-lg">
-                    <p className="mb-2 text-sm font-medium text-gray-900">{label}</p>
+                <div className="rounded-lg border dark:border-gray-700 bg-white dark:bg-gray-800 p-3 shadow-lg">
+                    <p className="mb-2 text-sm font-medium text-gray-900 dark:text-gray-100">{label}</p>
                     {payload.map((entry, index) => (
                         <p key={index} className="text-sm" style={{ color: entry.color }}>
                             {entry.name}: <span className="font-semibold">{entry.value}</span>

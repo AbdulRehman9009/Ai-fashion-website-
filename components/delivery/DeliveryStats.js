@@ -42,10 +42,10 @@ export default function DeliveryStats({ stats, earnings }) {
                 return (
                     <Card
                         key={index}
-                        className="bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all h-full"
+                        className="bg-white dark:bg-gray-900 border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-all h-full"
                     >
                         <CardHeader className="flex flex-row items-center justify-between pb-2">
-                            <CardTitle className="text-sm font-medium text-gray-500">
+                            <CardTitle className="text-sm font-medium text-gray-500 dark:text-gray-400">
                                 {card.title}
                             </CardTitle>
                             <div className={`${card.bgColor} p-2 rounded-lg`}>
@@ -53,7 +53,7 @@ export default function DeliveryStats({ stats, earnings }) {
                             </div>
                         </CardHeader>
                         <CardContent>
-                            <div className="text-2xl font-bold text-gray-900">
+                            <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                                 {card.value}
                             </div>
                             {/* Additional info logic if needed, simplified for clean look */}

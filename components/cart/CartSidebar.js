@@ -10,7 +10,6 @@ export default function CartSidebar({ isOpen, onClose }) {
     const { cart, cartCount, cartTotal, removeFromCart, updateQuantity, loading } = useCart();
     const router = useRouter();
 
-    // Calculate shipping and tax (USD pricing)
     const calculations = useMemo(() => {
         const subtotal = cartTotal || 0;
         const shippingFee = subtotal > 50 ? 0 : subtotal > 0 ? 8 : 0; // Free shipping over $50
@@ -28,7 +27,6 @@ export default function CartSidebar({ isOpen, onClose }) {
         <AnimatePresence>
             {isOpen && (
                 <>
-                    {/* Backdrop */}
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
@@ -36,16 +34,13 @@ export default function CartSidebar({ isOpen, onClose }) {
                         className="fixed inset-0 bg-black/50 z-50"
                         onClick={onClose}
                     />
-
-                    {/* Sidebar */}
                     <motion.div
                         initial={{ x: "100%" }}
                         animate={{ x: 0 }}
                         exit={{ x: "100%" }}
                         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                        className="fixed right-0 top-0 h-full sm:h-auto sm:max-h-[90vh] sm:top-4 sm:right-4 sm:rounded-2xl w-full sm:w-[400px] bg-white dark:bg-gray-900 shadow-2xl z-50 flex flex-col overflow-hidden border-l sm:border border-gray-200 dark:border-gray-800"
+                        className="fixed right-0 top-0 h-full sm:h-auto sm:max-h-[90vh] sm:top-4 sm:right-4 sm:rounded-2xl w-full sm:w-100 bg-white dark:bg-gray-900 shadow-2xl z-50 flex flex-col overflow-hidden border-l sm:border border-gray-200 dark:border-gray-800"
                     >
-                        {/* Header */}
                         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
                             <div className="flex items-center gap-3">
                                 <div className="p-2 bg-indigo-100 dark:bg-indigo-900/50 rounded-lg">
@@ -63,8 +58,6 @@ export default function CartSidebar({ isOpen, onClose }) {
                                 <X className="h-5 w-5" />
                             </button>
                         </div>
-
-                        {/* Cart Items */}
                         <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-3">
                             {cart.length === 0 ? (
                                 <div className="flex flex-col items-center justify-center h-full text-gray-500 dark:text-gray-400">
