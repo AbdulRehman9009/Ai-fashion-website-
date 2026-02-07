@@ -107,6 +107,8 @@ export async function POST(req) {
       })),
       customerEmail: token.email,
       customerName: token.name,
+      successUrl: `${process.env.NEXTAUTH_URL}/checkout/success`,
+      cancelUrl: `${process.env.NEXTAUTH_URL}/checkout`
     });
 
     if (checkoutSession && checkoutSession.url) {

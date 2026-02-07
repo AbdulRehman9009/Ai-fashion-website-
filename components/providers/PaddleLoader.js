@@ -8,9 +8,10 @@ export default function PaddleLoader() {
             onLoad={() => {
                 if (typeof window !== 'undefined' && window.Paddle) {
                     if (process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN) {
+                        // NOTE: Paddle.js v2 does NOT support 'environment' parameter
+                        // The environment is determined by the client token itself
                         window.Paddle.Initialize({
-                            token: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN,
-                            environment: process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT === 'production' ? 'production' : 'sandbox'
+                            token: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN
                         });
                         console.log("Paddle initialized");
                     } else {
