@@ -26,13 +26,16 @@ import {
   MapPin,
   Star,
   ArrowRight,
-  Heart
+  Heart,
+  TrendingUp,
+  ArrowUpRight
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "react-toastify";
+import { Badge } from "@/components/ui/badge";
 
 // ShopsTab Component - Displays available shops
 function ShopsTab() {
@@ -57,93 +60,94 @@ function ShopsTab() {
   if (loading) {
     return (
       <div className="flex justify-center items-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-orange-600" />
+        <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <Card className="border border-gray-200 shadow-sm">
-        <CardHeader className="bg-white border-b border-gray-100 pb-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-orange-50 p-2 rounded-lg border border-orange-100">
-                <Store className="h-5 w-5 text-orange-600" />
-              </div>
-              <div>
-                <CardTitle className="text-lg font-semibold text-gray-900 dark:text-gray-100">Featured Shops</CardTitle>
-                <CardDescription className="text-sm text-gray-500">Explore top-rated tailors and fabric stores</CardDescription>
-              </div>
-            </div>
-            <Link href="/shops">
-              <Button variant="outline" size="sm" className="gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100">
-                View All <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
-          </div>
-        </CardHeader>
-        <CardContent className="p-6">
-          {shops.length === 0 ? (
-            <div className="text-center py-12 bg-gray-50 dark:bg-gray-800 rounded-lg border border-dashed border-gray-200 dark:border-gray-700">
-              <Store className="h-12 w-12 mx-auto text-gray-300 mb-3" />
-              <h3 className="text-base font-medium text-gray-900 dark:text-gray-100">No shops available yet</h3>
-              <p className="text-sm text-gray-500">Check back soon for new additions.</p>
-            </div>
-          ) : (
-            <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
-              {shops.map((shop) => (
-                <Link key={shop._id} href={`/shops/${shop._id}`}>
-                  <div className="group border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden hover:shadow-md transition-all bg-white dark:bg-gray-800">
-                    <div className="h-32 bg-gray-100 dark:bg-gray-700 relative overflow-hidden">
-                      {shop.banner ? (
-                        <img src={shop.banner} alt={shop.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                      ) : (
-                        <div className="w-full h-full bg-slate-900/5 flex items-center justify-center">
-                          <Store className="h-8 w-8 text-gray-300" />
-                        </div>
-                      )}
-                    </div>
-                    <div className="p-4">
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="-mt-10 mb-2 p-1 bg-white rounded-lg inline-block shadow-sm">
-                          {shop.logo ? (
-                            <img src={shop.logo} alt={shop.name} className="w-12 h-12 rounded-lg object-cover border border-gray-100" />
-                          ) : (
-                            <div className="w-12 h-12 rounded-lg bg-gray-50 dark:bg-gray-700 flex items-center justify-center border border-gray-100 dark:border-gray-600">
-                              <Store className="h-6 w-6 text-gray-400" />
-                            </div>
-                          )}
-                        </div>
-                        {shop.ratingCount > 0 && (
-                          <div className="flex items-center gap-1 bg-gray-50 px-2 py-1 rounded text-xs font-medium border border-gray-100">
-                            <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
-                            <span>{shop.ratingAvg?.toFixed(1)}</span>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h3 className="text-xl font-bold text-gray-900 dark:text-white">Featured Shops</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Explore top-rated tailors and fabric stores near you.</p>
+        </div>
+        <Link href="/shops">
+          <Button variant="outline" size="sm" className="gap-2 text-gray-600 dark:text-gray-300 dark:border-gray-700 hover:text-gray-900 dark:hover:text-white">
+            View All <ArrowRight className="h-4 w-4" />
+          </Button>
+        </Link>
+      </div>
+
+      {shops.length === 0 ? (
+        <div className="text-center py-12 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-800">
+          <Store className="h-12 w-12 mx-auto text-gray-400 mb-3 opacity-50" />
+          <h3 className="text-base font-medium text-gray-900 dark:text-white">No shops available yet</h3>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Check back soon for new additions.</p>
+        </div>
+      ) : (
+        <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+          {shops.map((shop, index) => (
+            <motion.div
+              key={shop._id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <Link href={`/shops/${shop._id}`} className="block h-full group">
+                <div className="h-full border border-gray-200 dark:border-gray-800 rounded-2xl overflow-hidden hover:shadow-xl transition-all duration-300 bg-white dark:bg-gray-900 group-hover:-translate-y-1">
+                  <div className="h-48 bg-gray-100 dark:bg-gray-800 relative overflow-hidden">
+                    {shop.banner ? (
+                      <img src={shop.banner} alt={shop.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
+                        <Store className="h-10 w-10 text-gray-300 dark:text-gray-600" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-60" />
+
+                    <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
+                      <div className="bg-white dark:bg-gray-800 p-1 rounded-xl shadow-lg">
+                        {shop.logo ? (
+                          <img src={shop.logo} alt={shop.name} className="w-12 h-12 rounded-lg object-cover" />
+                        ) : (
+                          <div className="w-12 h-12 rounded-lg bg-purple-50 dark:bg-purple-900/30 flex items-center justify-center">
+                            <Store className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                           </div>
                         )}
                       </div>
-
-                      <h3 className="font-semibold text-gray-900 dark:text-gray-100 truncate pr-2">{shop.name}</h3>
-
-                      {shop.location?.city && (
-                        <div className="flex items-center gap-1 text-xs text-gray-500 mt-1 mb-3">
-                          <MapPin className="h-3 w-3" />
-                          <span>{shop.location.city}</span>
+                      {shop.ratingCount > 0 && (
+                        <div className="flex items-center gap-1 bg-white/90 dark:bg-black/80 backdrop-blur-sm px-2.5 py-1 rounded-full text-xs font-medium text-gray-900 dark:text-white shadow-sm">
+                          <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
+                          <span>{shop.ratingAvg?.toFixed(1)}</span>
                         </div>
                       )}
+                    </div>
+                  </div>
 
-                      <div className="pt-3 border-t border-gray-100 flex items-center justify-between text-xs">
-                        <span className="text-gray-500">View Collection</span>
-                        <ArrowRight className="h-3 w-3 text-orange-600 group-hover:translate-x-1 transition-transform" />
+                  <div className="p-5">
+                    <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">{shop.name}</h3>
+
+                    {shop.location?.city && (
+                      <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400 mb-4">
+                        <MapPin className="h-3.5 w-3.5" />
+                        <span>{shop.location.city}</span>
+                      </div>
+                    )}
+
+                    <div className="pt-4 border-t border-gray-100 dark:border-gray-800 flex items-center justify-between text-sm font-medium">
+                      <span className="text-purple-600 dark:text-purple-400">View Collection</span>
+                      <div className="w-8 h-8 rounded-full bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center group-hover:bg-purple-600 group-hover:text-white transition-colors duration-300">
+                        <ArrowRight className="h-4 w-4 transform group-hover:translate-x-0.5 transition-transform" />
                       </div>
                     </div>
                   </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                </div>
+              </Link>
+            </motion.div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -338,63 +342,85 @@ export default function UserDashboard() {
     { id: "shop", label: "Products", icon: ShoppingCart }
   ];
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
   return (
-    <div className="min-h-screen pb-20">
+    <div className="min-h-screen pb-20 space-y-8">
       {/* Welcome Section */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold text-gray-900">
-          {getTimeBasedGreeting()}, {session?.user?.name?.split(' ')[0] || "User"}
-        </h2>
-        <p className="text-gray-500 mt-1">Here's what's happening today.</p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-3xl font-bold text-gray-900 dark:text-white tracking-tight">
+            {getTimeBasedGreeting()}, {session?.user?.name?.split(' ')[0] || "User"}
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Ready to find your perfect style today?</p>
+        </div>
+        <Button className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white shadow-lg shadow-purple-500/20 rounded-xl hover:opacity-90 transition-opacity">
+          <Sparkles className="mr-2 h-4 w-4" /> New AI Style Scan
+        </Button>
       </div>
 
-      {/* Stats Cards - Business Style */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-500 uppercase tracking-wide">Active Orders</span>
-              <ShoppingBag className="h-4 w-4 text-blue-600" />
-            </div>
-            <div className="text-3xl font-bold text-gray-900">{stats.activeOrders}</div>
-          </CardContent>
-        </Card>
+      {/* Stats Cards - Animated */}
+      <motion.div
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+      >
+        <StatsCard
+          title="Active Orders"
+          value={stats.activeOrders}
+          icon={ShoppingBag}
+          trend="In Progress"
+          description="orders being processed"
+          color="blue"
+        />
+        <StatsCard
+          title="Completed"
+          value={stats.completedOrders}
+          icon={CheckCircle}
+          trend="Delivered"
+          description="past successful orders"
+          color="green"
+        />
+        <StatsCard
+          title="Pending Payment"
+          value={stats.pendingPayments}
+          icon={Clock}
+          trend="Action Needed"
+          description="awaiting payment"
+          color="orange"
+        />
+      </motion.div>
 
-        <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-500 uppercase tracking-wide">Completed</span>
-              <CheckCircle className="h-4 w-4 text-green-600" />
-            </div>
-            <div className="text-3xl font-bold text-gray-900">{stats.completedOrders}</div>
-          </CardContent>
-        </Card>
-
-        <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium text-gray-500 uppercase tracking-wide">Pending Payment</span>
-              <Clock className="h-4 w-4 text-orange-600" />
-            </div>
-            <div className="text-3xl font-bold text-gray-900">{stats.pendingPayments}</div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Tab Navigation - Clean Segmented Control */}
-      <div className="border-b border-gray-200 mb-8 overflow-x-auto">
-        <div className="flex space-x-8 min-w-max">
+      {/* Tab Navigation - Premium Pill Style */}
+      <div className="bg-white dark:bg-gray-900 p-1.5 rounded-2xl border border-gray-200 dark:border-gray-800 shadow-sm overflow-x-auto">
+        <div className="flex space-x-1 min-w-max">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`group flex items-center gap-2 py-4 px-1 border-b-2 text-sm font-medium transition-all ${activeTab === tab.id
-                ? "border-blue-600 text-blue-600"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+              className={`relative flex items-center gap-2 py-2.5 px-5 rounded-xl text-sm font-medium transition-all duration-300 ${activeTab === tab.id
+                ? "text-gray-900 dark:text-white bg-gray-100 dark:bg-gray-800 shadow-sm"
+                : "text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800/50"
                 }`}
             >
-              <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? "text-blue-600" : "text-gray-400 group-hover:text-gray-500"}`} />
+              <tab.icon className={`h-4 w-4 ${activeTab === tab.id ? "text-purple-600 dark:text-purple-400" : "text-gray-400"}`} />
               {tab.label}
+              {activeTab === tab.id && (
+                <motion.div
+                  layoutId="activeTab"
+                  className="absolute inset-0 bg-white dark:bg-gray-700 rounded-xl shadow-sm z-[-1]"
+                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                />
+              )}
             </button>
           ))}
         </div>
@@ -410,235 +436,277 @@ export default function UserDashboard() {
             exit={{ opacity: 0, y: -10 }}
             className="space-y-6"
           >
-            <Card className="border border-gray-200 shadow-sm">
-              <CardHeader className="bg-white border-b border-gray-100 pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="bg-purple-50 p-2 rounded-lg border border-purple-100">
-                    <Wand2 className="h-5 w-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-lg font-semibold text-gray-900">AI Personal Stylist</CardTitle>
-                    <CardDescription className="text-sm text-gray-500">Get personalized outfit recommendations based on your unique features</CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
+            <div className="grid lg:grid-cols-3 gap-8">
+              {/* Left Column - Input Form */}
+              <div className="lg:col-span-1 space-y-6">
+                <Card className="border-0 shadow-lg bg-white dark:bg-gray-900 overflow-hidden relative">
+                  <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-indigo-500" />
+                  <CardHeader>
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="bg-purple-100 dark:bg-purple-900/30 p-2.5 rounded-xl">
+                        <Wand2 className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-lg font-bold text-gray-900 dark:text-white">Style Preferences</CardTitle>
+                        <CardDescription>Let AI find your perfect look</CardDescription>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-6">
+                    <form onSubmit={handleSubmit(onSubmitAIStylist)} className="space-y-6">
+                      {/* Step 1: Photo Upload */}
+                      <div className="space-y-3">
+                        <Label className="text-sm font-semibold flex items-center justify-between">
+                          <span>1. Upload Photo</span>
+                          {imageFile && <span className="text-xs text-green-600 flex items-center"><CheckCircle className="h-3 w-3 mr-1" /> Ready</span>}
+                        </Label>
 
-              <CardContent className="p-4 sm:p-6">
-                <form onSubmit={handleSubmit(onSubmitAIStylist)} className="space-y-6">
-
-                  {/* Step 1: Photo Upload - SINGLE UPLOAD AREA */}
-                  <div className="space-y-3">
-                    <Label className="text-base font-semibold flex items-center gap-2">
-                      <span className="bg-purple-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">1</span>
-                      Your Photo
-                    </Label>
-
-                    <input
-                      ref={fileInputRef}
-                      type="file"
-                      accept="image/*"
-                      onChange={handleImageSelect}
-                      className="hidden"
-                    />
-
-                    {imagePreview ? (
-                      <div className="relative inline-block">
-                        <img
-                          src={imagePreview}
-                          alt="Your photo"
-                          className="h-40 sm:h-48 rounded-xl object-cover shadow-md"
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageSelect}
+                          className="hidden"
                         />
-                        <button
-                          type="button"
-                          onClick={clearImage}
-                          className="absolute -top-2 -right-2 bg-red-500 text-white p-1.5 rounded-full shadow-lg hover:bg-red-600"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        className="w-full border-2 border-dashed border-gray-300 rounded-xl p-6 sm:p-8 text-center hover:border-purple-400 hover:bg-purple-50/50 transition-all"
-                      >
-                        <Camera className="h-10 w-10 mx-auto text-gray-400 mb-2" />
-                        <p className="font-medium text-gray-700">Tap to upload photo</p>
-                        <p className="text-xs text-gray-500 mt-1">PNG, JPG up to 5MB</p>
-                      </button>
-                    )}
-                  </div>
 
-                  {/* Step 2: Event Type Selection */}
-                  <div className="space-y-3">
-                    <Label className="text-base font-semibold flex items-center gap-2">
-                      <span className="bg-purple-600 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">2</span>
-                      Occasion
-                    </Label>
-                    <div className="grid grid-cols-4 gap-2">
-                      {EVENT_TYPES.map((event) => (
-                        <label
-                          key={event.id}
-                          className={`cursor-pointer rounded-lg p-2 sm:p-3 text-center border-2 transition-all ${watchEventType === event.id
-                            ? "border-purple-500 bg-purple-50"
-                            : "border-gray-200 hover:border-gray-300"
-                            }`}
-                        >
-                          <input
-                            type="radio"
-                            value={event.id}
-                            {...register("eventType")}
-                            className="sr-only"
-                          />
-                          <div className="text-lg sm:text-xl">{event.emoji}</div>
-                          <div className="text-xs font-medium mt-1 truncate">{event.id}</div>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Step 3: Optional Preferences */}
-                  <div className="space-y-3">
-                    <Label className="text-base font-semibold flex items-center gap-2">
-                      <span className="bg-gray-400 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">3</span>
-                      Preferences <span className="text-gray-400 font-normal text-sm">(optional)</span>
-                    </Label>
-                    <div className="grid sm:grid-cols-2 gap-3">
-                      <select
-                        {...register("skinTone")}
-                        className="w-full h-11 rounded-lg border border-gray-200 px-3 text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                      >
-                        <option value="">Skin tone (AI detects)</option>
-                        {SKIN_TONES.map((tone) => (
-                          <option key={tone} value={tone}>{tone}</option>
-                        ))}
-                      </select>
-                      <Input
-                        {...register("stylePreferences")}
-                        placeholder="Style notes..."
-                        className="h-11 text-sm"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Submit Button */}
-                  <Button
-                    type="submit"
-                    className="w-full h-12 text-base bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl shadow-lg"
-                    disabled={aiLoading}
-                  >
-                    {aiLoading ? (
-                      <span className="flex items-center gap-2">
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                        {loadingMessages[loadingStep]}
-                      </span>
-                    ) : (
-                      <span className="flex items-center gap-2">
-                        <Sparkles className="h-5 w-5" />
-                        Generate My Style Guide
-                      </span>
-                    )}
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
-
-            {/* AI Results */}
-            {aiResults && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="space-y-6"
-              >
-                {/* Analysis Card */}
-                <Card className="bg-gradient-to-r from-indigo-900 to-purple-900 text-white border-0 overflow-hidden">
-                  <CardContent className="p-4 sm:p-6">
-                    <div className="flex items-center gap-2 mb-4">
-                      <Palette className="h-5 w-5 text-purple-300" />
-                      <h3 className="font-bold text-lg">Your Style Analysis</h3>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-4">
-                      <div className="bg-white/10 p-3 rounded-lg text-center">
-                        <p className="text-xs text-purple-200">Skin Tone</p>
-                        <p className="font-semibold text-sm mt-1">{aiResults.analysis?.skinTone || "Analyzed"}</p>
-                      </div>
-                      <div className="bg-white/10 p-3 rounded-lg text-center">
-                        <p className="text-xs text-purple-200">Occasion</p>
-                        <p className="font-semibold text-sm mt-1">{aiResults.analysis?.occasion?.split(' - ')[0] || watchEventType}</p>
-                      </div>
-                      <div className="bg-white/10 p-3 rounded-lg text-center">
-                        <p className="text-xs text-purple-200">Season</p>
-                        <p className="font-semibold text-sm mt-1">{aiResults.analysis?.seasonalSuggestion || "All"}</p>
-                      </div>
-                    </div>
-                    {aiResults.generalTips && (
-                      <p className="text-sm text-purple-100 italic">"{aiResults.generalTips}"</p>
-                    )}
-                  </CardContent>
-                </Card>
-
-                {/* Color Palettes */}
-                <h3 className="text-lg font-bold">Recommended Palettes</h3>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {aiResults.recommendations?.map((rec, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, scale: 0.95 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: i * 0.1 }}
-                      className="bg-white rounded-xl shadow-md overflow-hidden border"
-                    >
-                      {/* Color Bars */}
-                      <div className="flex h-16">
-                        <div className="flex-1" style={{ backgroundColor: rec.colorCombination?.primary }} title={rec.colorNames?.[0]} />
-                        <div className="flex-1" style={{ backgroundColor: rec.colorCombination?.secondary }} title={rec.colorNames?.[1]} />
-                        <div className="flex-1" style={{ backgroundColor: rec.colorCombination?.accent }} title={rec.colorNames?.[2]} />
-                      </div>
-                      <div className="p-4 space-y-3">
-                        <div className="flex items-center justify-between">
-                          <h4 className="font-bold">{rec.style}</h4>
-                          <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">{rec.outfitType}</span>
-                        </div>
-                        <div className="flex flex-wrap gap-1">
-                          {rec.colorNames?.map((c, ci) => (
-                            <span key={ci} className="text-xs bg-gray-100 px-2 py-0.5 rounded">{c}</span>
-                          ))}
-                        </div>
-                        <p className="text-sm text-gray-600">{rec.description}</p>
-                        <p className="text-xs text-gray-500"><strong>Tip:</strong> {rec.stylingTips}</p>
-
-                        {/* Matched Products */}
-                        {rec.matchedProducts?.length > 0 && (
-                          <div className="pt-2 border-t">
-                            <p className="text-xs font-medium text-gray-500 mb-2">SHOP THESE</p>
-                            <div className="flex gap-2">
-                              {rec.matchedProducts.slice(0, 3).map((p, pi) => (
-                                <button
-                                  key={pi}
-                                  onClick={() => handleAddToCart(p)}
-                                  className="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden hover:ring-2 hover:ring-purple-500 transition"
-                                  title={p.title}
-                                >
-                                  {p.image ? (
-                                    <img src={p.image} alt={p.title} className="w-full h-full object-cover" />
-                                  ) : (
-                                    <ShoppingBag className="h-5 w-5 m-auto text-gray-400" />
-                                  )}
-                                </button>
-                              ))}
+                        {imagePreview ? (
+                          <div className="relative group">
+                            <img
+                              src={imagePreview}
+                              alt="Your photo"
+                              className="w-full h-48 rounded-xl object-cover shadow-sm ring-1 ring-black/5"
+                            />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-xl flex items-center justify-center">
+                              <button
+                                type="button"
+                                onClick={clearImage}
+                                className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium shadow-lg transform scale-90 group-hover:scale-100 transition-all"
+                              >
+                                Remove Photo
+                              </button>
                             </div>
                           </div>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => fileInputRef.current?.click()}
+                            className="w-full h-32 border-2 border-dashed border-gray-200 dark:border-gray-700 rounded-xl flex flex-col items-center justify-center hover:border-purple-500 dark:hover:border-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/10 transition-all group"
+                          >
+                            <div className="bg-gray-50 dark:bg-gray-800 p-3 rounded-full mb-3 group-hover:scale-110 transition-transform">
+                              <Camera className="h-5 w-5 text-gray-400 group-hover:text-purple-500" />
+                            </div>
+                            <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Tap to upload</p>
+                          </button>
                         )}
                       </div>
+
+                      {/* Step 2: Event Type */}
+                      <div className="space-y-3">
+                        <Label className="text-sm font-semibold">2. Select Occasion</Label>
+                        <div className="grid grid-cols-4 gap-2">
+                          {[{ id: "Casual", emoji: "👕" }, { id: "Party", emoji: "🎉" }, { id: "Wedding", emoji: "💒" }, { id: "Formal", emoji: "👔" }, { id: "Date", emoji: "💕" }, { id: "Work", emoji: "💼" }, { id: "Trip", emoji: "🏖️" }, { id: "Fest", emoji: "🎊" }].map((event) => (
+                            <label
+                              key={event.id}
+                              className={`cursor-pointer rounded-xl p-2 text-center border transition-all ${watchEventType === event.id
+                                ? "border-purple-500 bg-purple-50 dark:bg-purple-900/20 ring-1 ring-purple-500"
+                                : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"
+                                }`}
+                            >
+                              <input type="radio" value={event.id} {...register("eventType")} className="sr-only" />
+                              <div className="text-xl mb-1">{event.emoji}</div>
+                              <div className="text-[10px] font-medium uppercase tracking-wide opacity-70">{event.id}</div>
+                            </label>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Step 3: Preferences */}
+                      <div className="space-y-3">
+                        <Label className="text-sm font-semibold">3. Details (Optional)</Label>
+                        <div className="space-y-3">
+                          <select
+                            {...register("skinTone")}
+                            className="w-full h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 text-sm focus:ring-2 focus:ring-purple-500 dark:text-white"
+                          >
+                            <option value="">Auto-detect skin tone</option>
+                            {["Fair - Cool", "Fair - Warm", "Medium - Cool", "Medium - Warm", "Olive", "Dark - Cool", "Dark - Warm"].map(t => <option key={t} value={t}>{t}</option>)}
+                          </select>
+                          <Input {...register("stylePreferences")} placeholder="Any specific style notes?..." className="h-10 text-sm bg-white dark:bg-gray-900" />
+                        </div>
+                      </div>
+
+                      <Button
+                        type="submit"
+                        className="w-full h-12 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white rounded-xl shadow-lg shadow-purple-500/25 font-medium transition-all hover:scale-[1.02] active:scale-[0.98]"
+                        disabled={aiLoading}
+                      >
+                        {aiLoading ? (
+                          <>
+                            <Loader2 className="h-5 w-5 animate-spin mr-2" />
+                            {loadingMessages[loadingStep]}
+                          </>
+                        ) : (
+                          <>
+                            <Sparkles className="h-5 w-5 mr-2" />
+                            Generate My Style
+                          </>
+                        )}
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Right Column - Results */}
+              <div className="lg:col-span-2">
+                <AnimatePresence mode="wait">
+                  {!aiResults ? (
+                    <motion.div
+                      initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                      className="h-full min-h-[400px] flex flex-col items-center justify-center text-center p-8 border-2 border-dashed border-gray-200 dark:border-gray-800 rounded-2xl bg-gray-50/50 dark:bg-gray-900/50"
+                    >
+                      <div className="w-20 h-20 bg-white dark:bg-gray-800 rounded-full shadow-sm flex items-center justify-center mb-6">
+                        <Sparkles className="h-10 w-10 text-gray-300 dark:text-gray-600" />
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">Your Style Guide Awaits</h3>
+                      <p className="text-gray-500 dark:text-gray-400 max-w-md mx-auto">
+                        Upload your photo and select an occasion to get personalized AI fashion recommendations tailored just for you.
+                      </p>
                     </motion.div>
-                  ))}
-                </div>
-              </motion.div>
-            )}
+                  ) : (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="space-y-6"
+                    >
+                      {/* Analysis Summary */}
+                      <Card className="bg-gradient-to-br from-indigo-900 via-purple-900 to-slate-900 text-white border-0 shadow-xl overflow-hidden">
+                        <div className="absolute top-0 right-0 p-32 bg-purple-500/20 blur-3xl rounded-full -mr-16 -mt-16" />
+                        <CardContent className="p-6 relative z-10">
+                          <div className="flex items-start justify-between mb-6">
+                            <div>
+                              <div className="flex items-center gap-2 text-purple-200 mb-1">
+                                <Palette className="h-4 w-4" />
+                                <span className="text-xs font-medium uppercase tracking-wider">Style Analysis</span>
+                              </div>
+                              <h3 className="text-2xl font-bold">Your Personal Lookbook</h3>
+                            </div>
+                            <Badge className="bg-white/10 hover:bg-white/20 text-white border-0 backdrop-blur-sm">
+                              {aiResults.analysis?.seasonalSuggestion || "All Season"}
+                            </Badge>
+                          </div>
+
+                          <div className="grid sm:grid-cols-3 gap-4 mb-6">
+                            <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/10">
+                              <span className="text-xs text-purple-200 block mb-1">Skin Tone</span>
+                              <span className="font-semibold">{aiResults.analysis?.skinTone || "Analyzed"}</span>
+                            </div>
+                            <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/10">
+                              <span className="text-xs text-purple-200 block mb-1">Occasion</span>
+                              <span className="font-semibold">{watchEventType}</span>
+                            </div>
+                            <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/10">
+                              <span className="text-xs text-purple-200 block mb-1">Vibe</span>
+                              <span className="font-semibold">Modern & Chic</span>
+                            </div>
+                          </div>
+
+                          {aiResults.generalTips && (
+                            <div className="bg-purple-900/50 rounded-lg p-4 border border-purple-500/30">
+                              <p className="text-sm italic text-purple-100">"{aiResults.generalTips}"</p>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+
+                      {/* Recommendations Grid */}
+                      <div className="grid gap-6">
+                        <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
+                          <Sparkles className="h-5 w-5 text-purple-600" /> Suggested Outfits
+                        </h3>
+                        {aiResults.recommendations?.map((rec, i) => (
+                          <motion.div
+                            key={i}
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: i * 0.1 }}
+                            className="bg-white dark:bg-gray-900 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-800 overflow-hidden hover:shadow-md transition-shadow"
+                          >
+                            <div className="flex flex-col md:flex-row">
+                              {/* Color Palette Strip */}
+                              <div className="md:w-32 flex md:flex-col h-16 md:h-auto">
+                                <div className="flex-1" style={{ backgroundColor: rec.colorCombination?.primary }} title={rec.colorNames?.[0]} />
+                                <div className="flex-1" style={{ backgroundColor: rec.colorCombination?.secondary }} title={rec.colorNames?.[1]} />
+                                <div className="flex-1" style={{ backgroundColor: rec.colorCombination?.accent }} title={rec.colorNames?.[2]} />
+                              </div>
+
+                              <div className="p-6 flex-1">
+                                <div className="flex justify-between items-start mb-2">
+                                  <div>
+                                    <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-1">{rec.style}</h4>
+                                    <div className="flex flex-wrap gap-2 mb-3">
+                                      <Badge variant="secondary" className="bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
+                                        {rec.outfitType}
+                                      </Badge>
+                                      {rec.colorNames?.map((c, ci) => (
+                                        <span key={ci} className="text-xs text-gray-500 border border-gray-100 dark:border-gray-700 px-2 py-0.5 rounded-full">{c}</span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                </div>
+
+                                <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 leading-relaxed">{rec.description}</p>
+
+                                <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3 mb-4">
+                                  <p className="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide mb-1">Stylist Tip</p>
+                                  <p className="text-sm text-gray-700 dark:text-gray-300 italic">"{rec.stylingTips}"</p>
+                                </div>
+
+                                {/* Matched Products */}
+                                {rec.matchedProducts?.length > 0 && (
+                                  <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                                    <p className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-3">Shop the Look</p>
+                                    <div className="flex gap-3 overflow-x-auto pb-2">
+                                      {rec.matchedProducts.slice(0, 4).map((p, pi) => (
+                                        <div key={pi} className="group relative flex-shrink-0 w-24">
+                                          <div className="aspect-square rounded-lg bg-gray-100 dark:bg-gray-800 overflow-hidden mb-2">
+                                            {p.image ? (
+                                              <img src={p.image} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                                            ) : (
+                                              <div className="w-full h-full flex items-center justify-center">
+                                                <ShoppingBag className="h-6 w-6 text-gray-300" />
+                                              </div>
+                                            )}
+                                            <button
+                                              onClick={() => handleAddToCart(p)}
+                                              className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                              <div className="bg-white text-black p-2 rounded-full shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform">
+                                                <ShoppingBag className="h-4 w-4" />
+                                              </div>
+                                            </button>
+                                          </div>
+                                          <p className="text-xs text-gray-700 dark:text-gray-300 truncate">{p.title}</p>
+                                          <p className="text-xs font-bold text-gray-900 dark:text-white">${p.price}</p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </div>
           </motion.div>
         )}
 
-        {/* Shops Tab */}
+        {/* Shops Tab - Wrapped with better container */}
         {activeTab === "shops" && (
           <motion.div
             key="shops"
@@ -650,51 +718,32 @@ export default function UserDashboard() {
           </motion.div>
         )}
 
-        {/* Wishlist Tab */}
         {activeTab === "wishlist" && (
-          <motion.div
-            key="wishlist"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-          >
+          <motion.div key="wishlist" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
             <WishlistTab />
           </motion.div>
         )}
 
-        {/* Orders Tab */}
         {activeTab === "orders" && (
-          <motion.div
-            key="orders"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-          >
-            <Card className="border-0 shadow-lg">
-              <CardHeader className="pb-2">
-                <CardTitle>My Orders</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0 sm:p-4">
+          <motion.div key="orders" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
+            <div className="bg-white dark:bg-gray-900 rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 overflow-hidden">
+              <div className="p-6 border-b border-gray-100 dark:border-gray-800">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Order History</h3>
+              </div>
+              <div className="p-0">
                 <OrdersList role="USER" key={refreshOrders} />
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </motion.div>
         )}
 
-        {/* Shop Tab */}
         {activeTab === "shop" && (
-          <motion.div
-            key="shop"
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-          >
+          <motion.div key="shop" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}>
             <ShopSection onAddToCart={handleAddToCart} />
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Checkout Dialog */}
       <CheckoutDialog
         open={!!selectedProduct}
         onOpenChange={(open) => !open && setSelectedProduct(null)}
@@ -702,5 +751,53 @@ export default function UserDashboard() {
         onSuccess={handleOrderSuccess}
       />
     </div>
+  );
+}
+
+function StatsCard({ title, value, icon: Icon, trend, trendUp = true, description, color }) {
+  const colors = {
+    blue: "from-blue-500 to-cyan-500",
+    green: "from-emerald-500 to-teal-500",
+    orange: "from-orange-500 to-amber-500",
+    purple: "from-purple-500 to-pink-500",
+  };
+
+  const lightColors = {
+    blue: "bg-blue-50 text-blue-700",
+    green: "bg-emerald-50 text-emerald-700",
+    orange: "bg-orange-50 text-orange-700",
+    purple: "bg-purple-50 text-purple-700",
+  };
+
+  return (
+    <motion.div variants={{ hidden: { y: 20, opacity: 0 }, show: { y: 0, opacity: 1 } }}>
+      <Card className="overflow-hidden border-none shadow-md hover:shadow-xl transition-all duration-300 group relative">
+        <div className="absolute top-0 left-0 w-1 h-full bg-gradient-to-b opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{ backgroundImage: `linear-gradient(to bottom, var(--${color}-500), transparent)` }} />
+
+        <CardContent className="p-6">
+          <div className="flex justify-between items-start mb-4">
+            <div className={`p-2.5 rounded-xl ${lightColors[color]} dark:bg-opacity-10 dark:text-white ring-1 ring-inset ring-black/5 dark:ring-white/10`}>
+              <Icon className="h-5 w-5" />
+            </div>
+            {trend && (
+              <div className={`flex items-center text-xs font-medium px-2 py-1 rounded-full ${color === 'orange' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30' : 'bg-green-100 text-green-700 dark:bg-green-900/30'} dark:text-${color}-400`}>
+                <TrendingUp className="h-3 w-3 mr-1" />
+                {trend}
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-1">
+            <h3 className="text-3xl font-bold tracking-tight text-gray-900 dark:text-white">{value}</h3>
+            <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{title}</p>
+          </div>
+
+          <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800 flex items-center text-xs text-gray-400">
+            <span>{description}</span>
+            <ArrowUpRight className="ml-auto h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+          </div>
+        </CardContent>
+      </Card>
+    </motion.div>
   );
 }

@@ -17,19 +17,21 @@ import {
   Home,
   BarChart3,
   DollarSign,
-  X
+  X,
+  ChevronRight
 } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function Sidebar({ role, isOpen, onClose }) {
   const pathname = usePathname();
 
   // Role accents for active states (text & soft background)
   const roleAccents = {
-    USER: "text-blue-600 bg-blue-50 hover:bg-blue-50 dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/30",
-    TAILOR: "text-purple-600 bg-purple-50 hover:bg-purple-50 dark:text-purple-400 dark:bg-purple-900/30 dark:hover:bg-purple-900/30",
-    SHOPKEEPER: "text-orange-600 bg-orange-50 hover:bg-orange-50 dark:text-orange-400 dark:bg-orange-900/30 dark:hover:bg-orange-900/30",
-    DELIVERY: "text-green-600 bg-green-50 hover:bg-green-50 dark:text-green-400 dark:bg-green-900/30 dark:hover:bg-green-900/30",
-    ADMIN: "text-red-600 bg-red-50 hover:bg-red-50 dark:text-red-400 dark:bg-red-900/30 dark:hover:bg-red-900/30",
+    USER: "text-blue-600 bg-blue-50/80 dark:text-blue-400 dark:bg-blue-500/10 border-blue-200 dark:border-blue-900",
+    TAILOR: "text-purple-600 bg-purple-50/80 dark:text-purple-400 dark:bg-purple-500/10 border-purple-200 dark:border-purple-900",
+    SHOPKEEPER: "text-orange-600 bg-orange-50/80 dark:text-orange-400 dark:bg-orange-500/10 border-orange-200 dark:border-orange-900",
+    DELIVERY: "text-green-600 bg-green-50/80 dark:text-green-400 dark:bg-green-500/10 border-green-200 dark:border-green-900",
+    ADMIN: "text-red-600 bg-red-50/80 dark:text-red-400 dark:bg-red-500/10 border-red-200 dark:border-red-900",
   };
 
   const links = {
@@ -80,47 +82,38 @@ export default function Sidebar({ role, isOpen, onClose }) {
   };
 
   const currentLinks = links[role] || [];
-  const activeClass = roleAccents[role] || "text-gray-900 bg-gray-100";
+  const activeClass = roleAccents[role] || "text-gray-900 bg-gray-100 border-gray-200";
 
   return (
     <>
-      {/* Mobile Overlay */}
-      <div
-        className={cn(
-          "fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-sm md:hidden transition-opacity duration-300",
-          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        )}
-        onClick={onClose}
-      />
-
-      {/* Sidebar Container */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 flex flex-col border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 shadow-xl md:shadow-none transition-transform duration-300 ease-in-out md:static md:translate-x-0",
-          isOpen ? "translate-x-0" : "-translate-x-full"
+          "w-64 flex flex-col border-r border-gray-200/50 dark:border-gray-800 bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl h-full",
+          "md:w-64 md:flex-shrink-0"
         )}
       >
         {/* Header */}
-        <div className="flex h-16 items-center justify-between px-6 border-b border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900">
-          <Link href="/" className="flex items-center gap-2" onClick={onClose}>
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 dark:bg-indigo-600 text-white">
-              <span className="font-serif font-bold text-lg">S</span>
+        <div className="flex h-16 items-center justify-between px-6 border-b border-gray-100 dark:border-gray-800">
+          <Link href="/" className="flex items-center gap-2 group" onClick={onClose}>
+            <div className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-slate-900 to-slate-700 dark:from-indigo-600 dark:to-indigo-500 text-white shadow-lg overflow-hidden transition-transform group-hover:scale-105">
+              <span className="font-serif font-bold text-lg relative z-10">S</span>
+              <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-slate-900 dark:text-white leading-none">StyleGenie</span>
-              <span className="text-[10px] font-medium text-slate-500 dark:text-gray-400 uppercase tracking-wider">{role}</span>
+              <span className="font-bold text-slate-900 dark:text-white leading-none tracking-tight">StyleGenie</span>
+              <span className="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">{role}</span>
             </div>
           </Link>
-          <button onClick={onClose} className="md:hidden text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white">
+          <button onClick={onClose} className="md:hidden text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-1 rounded-md">
             <X className="h-5 w-5" />
           </button>
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-6 px-3 space-y-1">
+        <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-1 scrollbar-none">
           {currentLinks.map((link) => {
             const Icon = link.icon;
-            const isActive = pathname === link.href || (link.href.includes("?") && pathname.includes(link.href.split("?")[0]));
+            const isActive = pathname === link.href || (link.href !== "/dashboard/" + role.toLowerCase() && pathname.startsWith(link.href));
 
             return (
               <Link
@@ -128,31 +121,42 @@ export default function Sidebar({ role, isOpen, onClose }) {
                 href={link.href}
                 onClick={onClose}
                 className={cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors duration-200 group",
+                  "relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 group overflow-hidden",
                   isActive
-                    ? activeClass
-                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white"
+                    ? activeClass + " shadow-sm border"
+                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white border border-transparent"
                 )}
               >
-                <Icon className={cn("h-4 w-4 shrink-0 transition-colors", isActive ? "opacity-100" : "opacity-60 group-hover:opacity-100")} />
-                <span>{link.label}</span>
+                {isActive && (
+                  <motion.div
+                    layoutId="sidebar-active"
+                    className="absolute inset-0 bg-current opacity-[0.03] dark:opacity-[0.05]"
+                    initial={false}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  />
+                )}
+
+                <Icon className={cn("h-4 w-4 shrink-0 transition-all duration-200", isActive ? "scale-110" : "group-hover:scale-110")} />
+                <span className="truncate">{link.label}</span>
+
+                {isActive && <ChevronRight className="ml-auto h-3 w-3 opacity-50" />}
               </Link>
             );
           })}
         </nav>
 
         {/* Footer Actions */}
-        <div className="border-t border-gray-100 dark:border-gray-800 p-3 space-y-1 bg-gray-50/30 dark:bg-gray-800/30">
+        <div className="border-t border-gray-100 dark:border-gray-800 p-4 space-y-2">
           <Link
             href="/"
-            className="flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors"
+            className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors"
           >
-            <Home className="h-4 w-4 opacity-60" />
-            <span>Home</span>
+            <Home className="h-4 w-4 opacity-70" />
+            <span>Home Website</span>
           </Link>
           <Button
             variant="ghost"
-            className="w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 h-auto py-2 px-3 font-medium"
+            className="w-full justify-start text-red-600 dark:text-red-400 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/10 h-10 px-3 font-medium rounded-xl transition-colors"
             onClick={() => signOut({ callbackUrl: "/" })}
           >
             <LogOut className="mr-3 h-4 w-4" />

@@ -11,11 +11,9 @@ import { Loader2, KeyRound, CheckCircle, Store } from "lucide-react";
 
 export default function ShopkeeperResetPasswordPage() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-orange-50/30 p-4">
-      <Suspense fallback={<div className="flex justify-center"><Loader2 className="h-8 w-8 animate-spin text-orange-600" /></div>}>
-        <ShopkeeperResetPasswordContent />
-      </Suspense>
-    </div>
+    <Suspense fallback={<div className="flex justify-center"><Loader2 className="h-8 w-8 animate-spin text-orange-600" /></div>}>
+      <ShopkeeperResetPasswordContent />
+    </Suspense>
   );
 }
 
