@@ -776,7 +776,7 @@ function StatsCard({ title, value, icon: Icon, trend, trendUp = true, descriptio
 
         <CardContent className="p-6">
           <div className="flex justify-between items-start mb-4">
-            <div className={`p-2.5 rounded-xl ${lightColors[color]} dark:bg-opacity-10 dark:text-white ring-1 ring-inset ring-black/5 dark:ring-white/10`}>
+            <div className={`p-2.5 rounded-xl ${lightColors[color]} dark:bg-${color}-900/30 dark:text-${color}-400 ring-1 ring-inset ring-black/5 dark:ring-white/10`}>
               <Icon className="h-5 w-5" />
             </div>
             {trend && (

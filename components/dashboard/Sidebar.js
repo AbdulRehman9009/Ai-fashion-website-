@@ -121,25 +121,25 @@ export default function Sidebar({ role, isOpen, onClose }) {
                 href={link.href}
                 onClick={onClose}
                 className={cn(
-                  "relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 group overflow-hidden",
+                  "relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 group overflow-hidden border",
                   isActive
-                    ? activeClass + " shadow-sm border"
-                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white border border-transparent"
+                    ? activeClass + " shadow-sm"
+                    : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white border-transparent"
                 )}
               >
                 {isActive && (
                   <motion.div
                     layoutId="sidebar-active"
-                    className="absolute inset-0 bg-current opacity-[0.03] dark:opacity-[0.05]"
+                    className="absolute inset-0 bg-current opacity-[0.03] dark:opacity-[0.05] pointer-events-none"
                     initial={false}
                     transition={{ type: "spring", stiffness: 300, damping: 30 }}
                   />
                 )}
 
-                <Icon className={cn("h-4 w-4 shrink-0 transition-all duration-200", isActive ? "scale-110" : "group-hover:scale-110")} />
-                <span className="truncate">{link.label}</span>
+                <Icon className={cn("h-4 w-4 shrink-0 transition-all duration-200 relative z-10", isActive ? "scale-110" : "group-hover:scale-110")} />
+                <span className="truncate relative z-10">{link.label}</span>
 
-                {isActive && <ChevronRight className="ml-auto h-3 w-3 opacity-50" />}
+                {isActive && <ChevronRight className="ml-auto h-3 w-3 opacity-50 relative z-10" />}
               </Link>
             );
           })}

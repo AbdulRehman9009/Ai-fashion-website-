@@ -277,16 +277,16 @@ export default function Home() {
               },
             ].map((role, idx) => (
               <Link key={idx} href={role.href} className="group">
-                <div className={`p-6 lg:p-8 rounded-2xl border-2 transition-all duration-300 h-full hover:-translate-y-1 bg-white ${role.color === "indigo" ? "border-indigo-200 hover:border-indigo-400 hover:shadow-lg hover:shadow-indigo-100" :
-                  role.color === "purple" ? "border-purple-200 hover:border-purple-400 hover:shadow-lg hover:shadow-purple-100" :
-                    "border-amber-200 hover:border-amber-400 hover:shadow-lg hover:shadow-amber-100"
+                <div className={`p-6 lg:p-8 rounded-2xl border-2 transition-all duration-300 h-full hover:-translate-y-1 bg-white dark:bg-gray-800 ${role.color === "indigo" ? "border-indigo-200 dark:border-indigo-900 hover:border-indigo-400 dark:hover:border-indigo-600 hover:shadow-lg hover:shadow-indigo-100 dark:hover:shadow-indigo-900/30" :
+                  role.color === "purple" ? "border-purple-200 dark:border-purple-900 hover:border-purple-400 dark:hover:border-purple-600 hover:shadow-lg hover:shadow-purple-100 dark:hover:shadow-purple-900/30" :
+                    "border-amber-200 dark:border-amber-900 hover:border-amber-400 dark:hover:border-amber-600 hover:shadow-lg hover:shadow-amber-100 dark:hover:shadow-amber-900/30"
                   }`}>
                   <div className="text-4xl mb-4">{role.icon}</div>
                   <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{role.title}</h3>
                   <p className="text-slate-600 dark:text-gray-400 mb-4 text-sm lg:text-base">{role.desc}</p>
-                  <div className={`inline-flex items-center gap-1 font-medium ${role.color === "indigo" ? "text-indigo-600" :
-                    role.color === "purple" ? "text-purple-600" :
-                      "text-amber-600"
+                  <div className={`inline-flex items-center gap-1 font-medium ${role.color === "indigo" ? "text-indigo-600 dark:text-indigo-400" :
+                    role.color === "purple" ? "text-purple-600 dark:text-purple-400" :
+                      "text-amber-600 dark:text-amber-400"
                     }`}>
                     Get Started <ChevronRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </div>
