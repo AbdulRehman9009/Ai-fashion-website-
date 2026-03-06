@@ -8,12 +8,22 @@ export default function PaddleLoader() {
             onLoad={() => {
                 if (typeof window !== 'undefined' && window.Paddle) {
                     if (process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN) {
-                        // NOTE: Paddle.js v2 does NOT support 'environment' parameter
-                        // The environment is determined by the client token itself
-                        window.Paddle.Initialize({
+                        const initConfig = {
                             token: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN
-                        });
-                        console.log("Paddle initialized");
+                        };
+
+                        // Set environment based on env variable
+                        // Sandbox tokens start with "test_", live tokens start with "live_"
+                        if (process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT === 'sandbox') {
+                            initConfig.environment = 'sandbox';
+                        }
+
+                        window.Paddle.Initialize(initConfig);
+                        console.log(
+                            "Paddle initialized in",
+                            process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT || "production",
+                            "mode"
+                        );
                     } else {
                         console.warn("Paddle Client Token not found");
                     }

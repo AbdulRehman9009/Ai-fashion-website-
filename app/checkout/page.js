@@ -209,7 +209,7 @@ export default function CheckoutPage() {
         const pollInterval = setInterval(async () => {
             try {
                 const res = await axios.get(`/api/orders/${orderCreated._id}`);
-                if (res.data.paymentStatus === "COMPLETED") {
+                if (res.data.paymentStatus === "PAID") {
                     clearInterval(pollInterval);
                     clearCart();
                     toast.success("Payment verified! Your order is confirmed.");

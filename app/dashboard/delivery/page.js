@@ -23,10 +23,10 @@ export default function DeliveryDashboard() {
       const data = res.data;
       setDeliveries(data);
 
-      // Calculate stats
-      const assigned = data.filter(d => ["OutForPickup", "OutForDelivery"].includes(d.status)).length;
+      // Calculate stats (Delivery statuses: Assigned, OutForPickup, PickedUp, OutForDelivery, Delivered)
+      const assigned = data.filter(d => ["OutForPickup", "PickedUp", "OutForDelivery"].includes(d.status)).length;
       const completed = data.filter(d => d.status === "Delivered").length;
-      const pending = data.filter(d => d.status === "DeliveryPending").length;
+      const pending = data.filter(d => d.status === "Assigned").length;
 
       setStats({ assigned, completed, pending });
     } catch (error) {
@@ -66,8 +66,9 @@ export default function DeliveryDashboard() {
     }
   };
 
-  const activeDeliveries = deliveries.filter(d => ["DeliveryPending", "OutForPickup", "OutForDelivery"].includes(d.status));
-  const completedDeliveries = deliveries.filter(d => ["Delivered", "Completed"].includes(d.status));
+  // Filter deliveries by their status (Delivery model uses: Assigned, OutForPickup, PickedUp, OutForDelivery, Delivered)
+  const activeDeliveries = deliveries.filter(d => ["Assigned", "OutForPickup", "PickedUp", "OutForDelivery"].includes(d.status));
+  const completedDeliveries = deliveries.filter(d => ["Delivered"].includes(d.status));
 
   const container = {
     hidden: { opacity: 0 },
@@ -182,12 +183,12 @@ export default function DeliveryDashboard() {
                     order={delivery}
                     actions={
                       <>
-                        {delivery.status === "DeliveryPending" && (
+                        {delivery.status === "Assigned" && (
                           <Button className="w-full bg-blue-600 hover:bg-blue-700 shadow-md" onClick={() => handleAction(delivery._id, "pickup")}>
                             <Package className="mr-2 h-4 w-4" /> Pickup Order
                           </Button>
                         )}
-                        {(delivery.status === "OutForPickup" || delivery.status === "OutForDelivery") && (
+                        {(delivery.status === "OutForPickup" || delivery.status === "PickedUp" || delivery.status === "OutForDelivery") && (
                           <Button className="w-full bg-green-600 hover:bg-green-700 shadow-md" onClick={() => handleAction(delivery._id, "confirm")}>
                             <CheckCircle className="mr-2 h-4 w-4" /> Confirm Delivery
                           </Button>

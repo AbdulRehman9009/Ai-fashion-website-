@@ -76,8 +76,6 @@ export async function POST(req) {
       quantity: i.quantity,
       unitPrice,
       totalPrice,
-      // Pass Paddle Price ID for checkout if available
-      paddlePriceId: p.paddlePriceId
     };
   });
 
@@ -97,17 +95,18 @@ export async function POST(req) {
     timeline: [{ byRole: "USER", event: "OrderCreated" }],
   });
 
-  // Generate Paddle Checkout Session
+  // Generate Paddle Checkout Session using INLINE pricing
+  // No paddlePriceId needed — we pass the order total directly
   try {
+    const itemNames = products.map(p => p.title || p.name).join(", ");
     const checkoutSession = await createCheckoutSession({
       orderId: order._id.toString(),
-      items: orderItems.map(item => ({
-        paddlePriceId: item.paddlePriceId, // Use correct field name
-        quantity: item.quantity
-      })),
+      orderName: `Order from ${shop.name || "StyleGenie"}`,
+      orderDescription: itemNames.length > 200 ? itemNames.slice(0, 197) + "..." : itemNames,
+      totalAmount: pricing.grandTotal,
+      currency: pricing.currency || "USD",
       customerEmail: token.email,
-      customerName: token.name,
-      successUrl: `${process.env.NEXTAUTH_URL}/checkout/success`,
+      successUrl: `${process.env.NEXTAUTH_URL}/checkout/success?orderId=${order._id}`,
       cancelUrl: `${process.env.NEXTAUTH_URL}/checkout`
     });
 
