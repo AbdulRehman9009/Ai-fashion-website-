@@ -2,7 +2,6 @@ import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { connectDB } from "@/lib/db";
 import Order from "@/models/Order";
-import User from "@/models/User";
 
 export async function GET(req) {
     try {
@@ -14,24 +13,27 @@ export async function GET(req) {
         await connectDB();
         const userId = token.sub; // or token.id
 
-        // Fetch counts
-        const activeOrders = await Order.countDocuments({
-            user: userId,
-            status: { $in: ["PENDING", "ACCEPTED", "STITCHING", "READY_FOR_DELIVERY", "OUT_FOR_DELIVERY"] }
-        });
+        // Run all stats counts in parallel
+        const ACTIVE_STATUSES = [
+            "OrderCreated", "PaymentConfirmed", "TailoringPending",
+            "TailoringInProgress", "TailoringCompleted", "DeliveryPending",
+            "OutForPickup", "PickedUp", "OutForDelivery"
+        ];
 
-        const completedOrders = await Order.countDocuments({
-            user: userId,
-            status: "DELIVERED"
-        });
-
-        // Assume pending payment if status is PENDING or AWAITING_PAYMENT (if that exists)
-        // For now, let's say "Pending" orders are pending payment if not paid. 
-        // We'll simulate this logic.
-        const pendingPayments = await Order.countDocuments({
-            user: userId,
-            paymentStatus: "PENDING"
-        });
+        const [activeOrders, completedOrders, pendingPayments] = await Promise.all([
+            Order.countDocuments({
+                user: userId,
+                status: { $in: ACTIVE_STATUSES }
+            }),
+            Order.countDocuments({
+                user: userId,
+                status: "Delivered"
+            }),
+            Order.countDocuments({
+                user: userId,
+                paymentStatus: "PENDING"
+            })
+        ]);
 
         return NextResponse.json({
             activeOrders,

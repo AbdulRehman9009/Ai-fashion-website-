@@ -353,7 +353,7 @@ export default function UserDashboard() {
   };
 
   return (
-    <div className="min-h-screen pb-20 space-y-8">
+    <div className="pb-20 space-y-8">
       {/* Welcome Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>

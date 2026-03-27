@@ -6,7 +6,7 @@ import { Shirt } from "lucide-react";
 export default function AuthLayout({ children }) {
   // Use static content to avoid SSR issues with usePathname
   const heroImage = "https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop";
-  const title = "Welcome to LuxeFashion";
+  const title = "Welcome to Style Genie";
   const subtitle = "Your AI-powered fashion companion for discovering your perfect style.";
   const Icon = Shirt;
 
@@ -29,7 +29,7 @@ export default function AuthLayout({ children }) {
           <div className="w-8 h-8 rounded-lg bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/30">
             <span className="text-white">AI</span>
           </div>
-          <span>LuxeFashion</span>
+          <span>Style Genie</span>
         </div>
 
         {/* Hero Content */}
@@ -51,7 +51,6 @@ export default function AuthLayout({ children }) {
             </p>
           </motion.div>
 
-          {/* Social Proof / Stats */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

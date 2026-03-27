@@ -8,7 +8,6 @@ export default function NotFound() {
     return (
         <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-950 flex items-center justify-center p-4">
             <div className="max-w-lg w-full text-center space-y-8">
-                {/* 404 Illustration */}
                 <div className="relative">
                     <h1 className="text-[150px] sm:text-[200px] font-black text-gray-200 dark:text-gray-800 leading-none select-none">
                         404
@@ -27,8 +26,6 @@ export default function NotFound() {
                         Oops! The page you're looking for doesn't exist or has been moved.
                     </p>
                 </div>
-
-                {/* Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <Link href="/">
                         <Button className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600">

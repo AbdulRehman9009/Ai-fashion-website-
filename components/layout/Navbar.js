@@ -22,7 +22,9 @@ export default function Navbar() {
     const { cartCount } = useCart();
     const pathname = usePathname();
 
-    // Determine current role context from URL
+    const isDashboard = pathname?.startsWith("/dashboard");
+    const isAuth = pathname?.startsWith("/auth");
+    if (isDashboard || isAuth) return null;
     const currentRole = useMemo(() => {
         if (!pathname) return null;
         if (pathname.startsWith("/tailor") || pathname.startsWith("/auth/tailor") || pathname.startsWith("/dashboard/tailor")) return "tailor";

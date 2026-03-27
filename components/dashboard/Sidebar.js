@@ -46,7 +46,7 @@ export default function Sidebar({ role, isOpen, onClose }) {
     ],
     TAILOR: [
       { href: "/dashboard/tailor", label: "Overview", icon: LayoutDashboard },
-      { href: "/dashboard/tailor", label: "Orders", icon: Scissors },
+      { href: "/dashboard/tailor/orders", label: "Orders", icon: Scissors },
       { href: "/dashboard/tailor/analytics", label: "Analytics", icon: BarChart3 },
       { href: "/dashboard/tailor/earnings", label: "Earnings", icon: DollarSign },
       { href: "/dashboard/tailor/profile", label: "Profile", icon: Users },
@@ -56,14 +56,14 @@ export default function Sidebar({ role, isOpen, onClose }) {
       { href: "/dashboard/shopkeeper", label: "Overview", icon: LayoutDashboard },
       { href: "/dashboard/shopkeeper/products", label: "Products", icon: Package },
       { href: "/dashboard/shopkeeper/products/new", label: "Add Product", icon: PlusCircle },
-      { href: "/dashboard/shopkeeper", label: "Orders", icon: ShoppingBag },
+      { href: "/dashboard/shopkeeper/orders", label: "Orders", icon: ShoppingBag },
       { href: "/dashboard/shopkeeper/analytics", label: "Analytics", icon: BarChart3 },
       { href: "/dashboard/shopkeeper/earnings", label: "Earnings", icon: DollarSign },
       { href: "/dashboard/shopkeeper/settings", label: "Settings", icon: Settings },
     ],
     DELIVERY: [
       { href: "/dashboard/delivery", label: "Overview", icon: LayoutDashboard },
-      { href: "/dashboard/delivery", label: "Deliveries", icon: Truck },
+      { href: "/dashboard/delivery/deliveries", label: "Deliveries", icon: Truck },
       { href: "/dashboard/delivery/analytics", label: "Analytics", icon: BarChart3 },
       { href: "/dashboard/delivery/earnings", label: "Earnings", icon: DollarSign },
       { href: "/dashboard/delivery/profile", label: "Profile", icon: Users },
@@ -80,6 +80,7 @@ export default function Sidebar({ role, isOpen, onClose }) {
       { href: "/dashboard/admin/settings", label: "Settings", icon: Settings },
     ],
   };
+
 
   const currentLinks = links[role] || [];
   const activeClass = roleAccents[role] || "text-gray-900 bg-gray-100 border-gray-200";

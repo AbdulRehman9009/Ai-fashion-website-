@@ -20,6 +20,23 @@ import { logger } from "@/lib/logger";
 const apiKey = process.env.GEMINI_API_KEY || "";
 const genAI = new GoogleGenerativeAI(apiKey);
 
+
+const GEMINI_MODEL = "gemini-2.0-flash";
+const SYSTEM_INSTRUCTION = `You are StyleGenie, an expert AI fashion stylist specializing in South Asian, Pakistani, and international fashion. 
+You have deep knowledge of fabrics like cotton, silk, chiffon, lawn, khaddar, and linen, as well as traditional garments like shalwar kameez, kurta, saree, and lehenga alongside modern western styles.
+Always provide practical, specific, and culturally-sensitive fashion advice. Return ONLY valid JSON as specified — no extra text.`;
+
+const model = genAI.getGenerativeModel({
+    model: GEMINI_MODEL,
+    systemInstruction: SYSTEM_INSTRUCTION,
+    generationConfig: {
+        temperature: 0.7,
+        topP: 0.9,
+        maxOutputTokens: 2048,
+    },
+});
+
+
 /**
  * POST /api/ai-stylist
  * Generate AI-powered outfit recommendations
@@ -60,19 +77,17 @@ async function aiStylistHandler(req) {
         throw new Error("AI service is not configured");
     }
 
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash-latest" });
-
     // Step 1: Generate outfit analysis prompt
     const analysisPrompt = `
-    You are a professional fashion stylist AI. Analyze the following user request and provide personalized outfit recommendations.
+    Analyze this fashion request and provide personalized outfit recommendations.
     
     User Context:
     - Event Type: ${eventType}
-    - Skin Tone: ${skinTone || "Not specified - analyze from context if possible"}
+    - Skin Tone: ${skinTone || "Not specified"}
     - Style Preferences: ${JSON.stringify(preferences)}
-    - Image URL: ${imageUrl}
+    - Reference Image URL: ${imageUrl}
     
-    Provide exactly 3 outfit color combinations and styles suitable for this person and event.
+    Provide exactly 3 distinct outfit color combinations and styles. Consider Pakistani/South Asian fashion preferences as well as modern trends.
     
     Return ONLY valid JSON in this exact format:
     {
@@ -90,15 +105,15 @@ async function aiStylistHandler(req) {
             "accent": "#HEX_COLOR"
           },
           "colorNames": ["Color 1", "Color 2", "Color 3"],
-          "style": "Traditional/Modern/Fusion etc",
-          "outfitType": "Saree/Suit/Dress etc",
+          "style": "Traditional/Modern/Fusion/Contemporary",
+          "outfitType": "Shalwar Kameez/Kurta/Suit/Dress/Saree etc",
           "description": "Brief description of the look",
-          "stylingTips": "Specific styling advice",
+          "stylingTips": "Specific and actionable styling advice",
           "accessories": ["Accessory 1", "Accessory 2"],
           "searchTags": ["tag1", "tag2", "tag3"]
         }
       ],
-      "generalTips": "Overall styling advice for this person"
+      "generalTips": "Overall styling advice for this person and event"
     }
   `;
 
@@ -187,8 +202,9 @@ async function aiStylistHandler(req) {
                     imageUrl
                 },
                 suggestedProducts: matchingProducts.map(p => p._id),
-                promptUsed: "AI Stylist v2",
-                modelVersion: "gemini-1.5-flash-latest"
+                promptUsed: "AI Stylist v3",
+                modelVersion: GEMINI_MODEL
+
             });
         } catch (logError) {
             logger.error("Failed to log recommendation", { error: logError.message });

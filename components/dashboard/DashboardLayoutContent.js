@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import { Menu, Bell, Search, ChevronDown, LogOut, User } from "lucide-react";
 import { usePathname } from "next/navigation";
@@ -20,17 +20,21 @@ export default function DashboardLayoutContent({ children, session, profileData 
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const pathname = usePathname();
 
-    // Get page title from pathname
+
+    useEffect(() => {
+        setIsSidebarOpen(false);
+    }, [pathname]);
+
     const getPageTitle = () => {
         const segments = pathname.split('/').filter(Boolean);
         const lastSegment = segments[segments.length - 1];
         if (segments.length <= 2) return "Overview"; // e.g. /dashboard/user
-        return lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1);
+        return lastSegment.charAt(0).toUpperCase() + lastSegment.slice(1).replace(/-/g, ' ');
     };
 
     return (
-        <div className="flex min-h-screen bg-gray-50/50 dark:bg-gray-950 font-sans">
-            {/* Mobile Sidebar Overlay */}
+        <div className="flex h-screen overflow-hidden bg-gray-50/50 dark:bg-gray-950 font-sans">
+
             <AnimatePresence>
                 {isSidebarOpen && (
                     <motion.div
@@ -43,18 +47,26 @@ export default function DashboardLayoutContent({ children, session, profileData 
                 )}
             </AnimatePresence>
 
-            {/* Sidebar */}
-            <div className={`fixed md:sticky top-0 h-screen z-50 md:z-0 transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}`}>
+            {/* Sidebar — fixed on mobile, sticky on desktop */}
+            <div
+                className={`
+                    fixed md:relative inset-y-0 left-0 z-50
+                    transition-transform duration-300 ease-in-out
+                    ${isSidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
+                    flex-shrink-0
+                `}
+            >
                 <Sidebar
                     role={session.user.role}
-                    isOpen={true} // Always open in this layout wrapper, controlled by CSS transform
+                    isOpen={true}
                     onClose={() => setIsSidebarOpen(false)}
                 />
             </div>
 
-            <div className="flex-1 flex flex-col min-h-screen relative overflow-hidden">
-                {/* Header */}
-                <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b border-gray-200/50 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl px-4 md:px-8">
+            {/* Right column: TopBar + scrollable content */}
+            <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+                {/* TopBar — sticky within the right column */}
+                <header className="sticky top-0 z-30 flex h-16 items-center justify-between gap-4 border-b border-gray-200/50 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl px-4 md:px-8 flex-shrink-0">
                     <div className="flex items-center gap-4">
                         <button
                             className="md:hidden p-2 -ml-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
@@ -114,9 +126,6 @@ export default function DashboardLayoutContent({ children, session, profileData 
                                 <DropdownMenuItem className="cursor-pointer">
                                     <User className="mr-2 h-4 w-4" /> Profile
                                 </DropdownMenuItem>
-                                <DropdownMenuItem className="cursor-pointer">
-                                    <Bell className="mr-2 h-4 w-4" /> Notifications
-                                </DropdownMenuItem>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuItem className="cursor-pointer text-red-600 dark:text-red-400 focus:text-red-600" onClick={() => signOut()}>
                                     <LogOut className="mr-2 h-4 w-4" /> Log out
@@ -126,7 +135,8 @@ export default function DashboardLayoutContent({ children, session, profileData 
                     </div>
                 </header>
 
-                <main className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
+                {/* Scrollable content area — only this panel scrolls */}
+                <main className="flex-1 overflow-y-auto overscroll-contain p-4 md:p-8 scroll-smooth">
                     <div className="max-w-7xl mx-auto w-full animate-in fade-in slide-in-from-bottom-4 duration-500 ease-out">
                         {children}
                     </div>
@@ -135,3 +145,4 @@ export default function DashboardLayoutContent({ children, session, profileData 
         </div>
     );
 }
+
