@@ -32,10 +32,12 @@ export default function ProductDetailPage() {
     const [liked, setLiked] = useState(false);
     const [selectedImage, setSelectedImage] = useState(0);
     const [addingToCart, setAddingToCart] = useState(false);
+    const [wishlistLoading, setWishlistLoading] = useState(false);
 
     useEffect(() => {
         if (params.id) {
             fetchProduct();
+            fetchWishlistStatus();
         }
     }, [params.id]);
 
@@ -50,6 +52,51 @@ export default function ProductDetailPage() {
             router.push("/dashboard/user/products");
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchWishlistStatus = async () => {
+        try {
+            const res = await axios.get("/api/wishlist");
+            const wishlistItems = res.data.data || [];
+            const isLiked = wishlistItems.some(item => 
+                (item.product?._id || item.product) === params.id
+            );
+            setLiked(isLiked);
+        } catch (error) {
+            console.error("Failed to fetch wishlist status:", error);
+        }
+    };
+
+    const handleToggleWishlist = async () => {
+        if (wishlistLoading) return;
+        
+        setWishlistLoading(true);
+        try {
+            if (liked) {
+                // Remove from wishlist
+                const res = await axios.delete(`/api/wishlist?productId=${params.id}`);
+                if (res.data.success) {
+                    setLiked(false);
+                    toast.success("Removed from wishlist");
+                }
+            } else {
+                // Add to wishlist
+                const res = await axios.post("/api/wishlist", { productId: params.id });
+                if (res.data.success) {
+                    setLiked(true);
+                    toast.success("Added to wishlist");
+                }
+            }
+        } catch (error) {
+            console.error("Wishlist error:", error);
+            if (error.response?.status === 401) {
+                toast.error("Please login to use wishlist");
+            } else {
+                toast.error(error.response?.data?.error || "Failed to update wishlist");
+            }
+        } finally {
+            setWishlistLoading(false);
         }
     };
 
@@ -185,9 +232,14 @@ export default function ProductDetailPage() {
                                     <Button
                                         variant="outline"
                                         size="icon"
-                                        onClick={() => setLiked(!liked)}
+                                        onClick={handleToggleWishlist}
+                                        disabled={wishlistLoading}
                                     >
-                                        <Heart className={`h-4 w-4 ${liked ? 'fill-red-500 text-red-500' : ''}`} />
+                                        {wishlistLoading ? (
+                                            <Loader2 className="h-4 w-4 animate-spin text-gray-400" />
+                                        ) : (
+                                            <Heart className={`h-4 w-4 ${liked ? 'fill-red-500 text-red-500' : ''}`} />
+                                        )}
                                     </Button>
                                     <Button variant="outline" size="icon">
                                         <Share2 className="h-4 w-4" />

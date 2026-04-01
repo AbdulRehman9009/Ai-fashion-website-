@@ -39,6 +39,7 @@ export default function CheckoutPage() {
         country: "Pakistan",
         notes: ""
     });
+    const [paymentMethod, setPaymentMethod] = useState("card"); // 'card' or 'cod'
 
     // Redirect if not authenticated
     useEffect(() => {
@@ -177,21 +178,28 @@ export default function CheckoutPage() {
                     fullName: shippingInfo.fullName,
                     notes: shippingInfo.notes,
                 },
+                paymentMethod: paymentMethod,
             });
 
             if (response.data.id) {
                 const orderId = response.data.id;
+                const checkoutUrl = response.data.checkoutUrl;
+
+                if (paymentMethod === "card" && checkoutUrl) {
+                    toast.success("Order placed! Redirecting to payment...");
+                    window.location.href = checkoutUrl;
+                    return;
+                }
+
                 setOrderCreated({
                     _id: orderId,
-                    paddleCheckoutUrl: response.data.checkoutUrl || null
+                    paddleCheckoutUrl: checkoutUrl || null
                 });
                 setStep(3);
 
-                // Don't auto-redirect - let user choose payment method
-                if (response.data.checkoutUrl) {
-                    toast.success("Order created! Choose your payment method.");
-                } else {
-                    toast.info("Order created. Payment on delivery available.");
+                if (paymentMethod === "cod") {
+                    toast.success("Order placed successfully! Pay on delivery.");
+                    clearCart();
                 }
             }
         } catch (error) {
@@ -503,11 +511,51 @@ export default function CheckoutPage() {
                                                 />
                                             </div>
 
-                                            <div className="flex gap-3 pt-4">
+                                            {/* Payment Method Selection */}
+                                            <div className="pt-4 border-t space-y-4">
+                                                <Label className="text-base font-semibold">Payment Method</Label>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                    <div
+                                                        onClick={() => setPaymentMethod("card")}
+                                                        className={`cursor-pointer p-4 rounded-xl border-2 transition-all flex items-start gap-3 ${paymentMethod === "card"
+                                                            ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 ring-1 ring-indigo-600"
+                                                            : "border-gray-200 dark:border-gray-800 hover:border-indigo-300"
+                                                            }`}
+                                                    >
+                                                        <div className={`p-2 rounded-lg ${paymentMethod === "card" ? "bg-indigo-600 text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-500"}`}>
+                                                            <CreditCard className="h-5 w-5" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-bold text-sm">Credit / Debit Card</p>
+                                                            <p className="text-xs text-gray-500 mt-1">Faster, secure checkout with Card</p>
+                                                        </div>
+                                                        {paymentMethod === "card" && <CheckCircle className="h-5 w-5 text-indigo-600 ml-auto" />}
+                                                    </div>
+
+                                                    <div
+                                                        onClick={() => setPaymentMethod("cod")}
+                                                        className={`cursor-pointer p-4 rounded-xl border-2 transition-all flex items-start gap-3 ${paymentMethod === "cod"
+                                                            ? "border-amber-600 bg-amber-50 dark:bg-amber-900/20 ring-1 ring-amber-600"
+                                                            : "border-gray-200 dark:border-gray-800 hover:border-amber-300"
+                                                            }`}
+                                                    >
+                                                        <div className={`p-2 rounded-lg ${paymentMethod === "cod" ? "bg-amber-600 text-white" : "bg-gray-100 dark:bg-gray-800 text-gray-500"}`}>
+                                                            <Truck className="h-5 w-5" />
+                                                        </div>
+                                                        <div>
+                                                            <p className="font-bold text-sm">Cash on Delivery</p>
+                                                            <p className="text-xs text-gray-500 mt-1">Pay when your package arrives</p>
+                                                        </div>
+                                                        {paymentMethod === "cod" && <CheckCircle className="h-5 w-5 text-amber-600 ml-auto" />}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex gap-3 pt-6">
                                                 <Button
                                                     variant="outline"
                                                     onClick={() => setStep(1)}
-                                                    className="flex-1"
+                                                    className="flex-1 h-12"
                                                 >
                                                     <ArrowLeft className="mr-2 h-4 w-4" />
                                                     Back
@@ -515,17 +563,29 @@ export default function CheckoutPage() {
                                                 <Button
                                                     onClick={handleCreateOrder}
                                                     disabled={loading}
-                                                    className="flex-1 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                                                    className={`flex-[2] h-12 text-lg shadow-lg transition-all ${paymentMethod === "card"
+                                                        ? "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
+                                                        : "bg-amber-600 hover:bg-amber-700"
+                                                        }`}
                                                 >
                                                     {loading ? (
                                                         <>
                                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                            Creating Order...
+                                                            {paymentMethod === "card" ? "Processing..." : "Creating Order..."}
                                                         </>
                                                     ) : (
                                                         <>
-                                                            Proceed to Payment
-                                                            <ChevronRight className="ml-2 h-4 w-4" />
+                                                            {paymentMethod === "card" ? (
+                                                                <>
+                                                                    <CreditCard className="mr-2 h-5 w-5" />
+                                                                    Pay & Place Order
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <Package className="mr-2 h-5 w-5" />
+                                                                    Confirm Order (COD)
+                                                                </>
+                                                            )}
                                                         </>
                                                     )}
                                                 </Button>
@@ -543,83 +603,68 @@ export default function CheckoutPage() {
                                     animate={{ opacity: 1, x: 0 }}
                                     exit={{ opacity: 0, x: 20 }}
                                 >
-                                    <Card className="border-0 shadow-lg">
-                                        <CardHeader className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/30 dark:to-emerald-900/30 border-b dark:border-gray-700">
-                                            <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-green-100 dark:bg-green-800/50 rounded-full">
-                                                    <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
+                                    <Card className="border-0 shadow-lg overflow-hidden">
+                                        <CardHeader className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-8">
+                                            <div className="flex flex-col items-center text-center space-y-4">
+                                                <div className="p-3 bg-white/20 rounded-full backdrop-blur-sm">
+                                                    <CheckCircle className="h-12 w-12 text-white" />
                                                 </div>
                                                 <div>
-                                                    <CardTitle>Order Created Successfully!</CardTitle>
-                                                    <CardDescription>
-                                                        Order ID: {orderCreated._id?.slice(-8).toUpperCase()}
+                                                    <CardTitle className="text-2xl sm:text-3xl font-bold">Order Confirmed!</CardTitle>
+                                                    <CardDescription className="text-green-50 opacity-90 mt-2">
+                                                        Thank you for your purchase. We've received your order.
                                                     </CardDescription>
                                                 </div>
                                             </div>
                                         </CardHeader>
-                                        <CardContent className="p-6 space-y-6">
-                                            {/* Payment Method Selection */}
-                                            <div className="space-y-4">
-                                                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Choose Payment Method</h3>
-
-                                                {/* Paddle Card Payment Option */}
-                                                {orderCreated?.paddleCheckoutUrl && (
-                                                    <div className="border border-indigo-200 dark:border-indigo-800 rounded-xl p-4 bg-indigo-50 dark:bg-indigo-900/30">
-                                                        <div className="flex items-center gap-2 text-indigo-700 dark:text-indigo-400 mb-2">
-                                                            <CreditCard className="h-5 w-5" />
-                                                            <span className="font-semibold">Pay with Card (Paddle)</span>
-                                                        </div>
-                                                        <p className="text-sm text-indigo-600 dark:text-indigo-300 mb-4">
-                                                            Secure payment via credit/debit card. Powered by Paddle.
-                                                        </p>
-                                                        <Button
-                                                            onClick={() => window.location.href = orderCreated.paddleCheckoutUrl}
-                                                            className="w-full h-12 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
-                                                        >
-                                                            <CreditCard className="mr-2 h-5 w-5" />
-                                                            Pay ${calculations.total.toFixed(2)} with Card
-                                                        </Button>
-                                                    </div>
-                                                )}
-
-                                                {/* COD Payment Option */}
-                                                <div className="border border-amber-200 dark:border-amber-800 rounded-xl p-4 bg-amber-50 dark:bg-amber-900/30">
-                                                    <div className="flex items-center gap-2 text-amber-700 dark:text-amber-400 mb-2">
-                                                        <Truck className="h-5 w-5" />
-                                                        <span className="font-semibold">Cash on Delivery (COD)</span>
-                                                    </div>
-                                                    <p className="text-sm text-amber-600 dark:text-amber-300 mb-4">
-                                                        Pay when your order arrives. No online payment required.
+                                        <CardContent className="p-8 space-y-8">
+                                            <div className="flex flex-col sm:flex-row items-center justify-between p-6 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
+                                                <div className="text-center sm:text-left mb-4 sm:mb-0">
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Order Number</p>
+                                                    <p className="text-xl font-mono font-bold text-gray-900 dark:text-white mt-1">
+                                                        #{orderCreated._id?.slice(-12).toUpperCase()}
                                                     </p>
-                                                    <Button
-                                                        onClick={handlePaymentSuccess}
-                                                        disabled={loading}
-                                                        variant="outline"
-                                                        className="w-full h-12 border-amber-600 dark:border-amber-500 text-amber-700 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/50"
-                                                    >
-                                                        {loading ? (
-                                                            <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                                                        ) : (
-                                                            <CheckCircle className="mr-2 h-5 w-5" />
-                                                        )}
-                                                        Confirm Order - Pay on Delivery
-                                                    </Button>
+                                                </div>
+                                                <div className="h-12 w-px bg-gray-200 dark:bg-gray-700 hidden sm:block"></div>
+                                                <div className="text-center sm:text-right">
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Payment Status</p>
+                                                    <p className={`text-xl font-bold mt-1 ${paymentMethod === 'cod' ? 'text-amber-600' : 'text-green-600'}`}>
+                                                        {paymentMethod === 'cod' ? 'Pay on Delivery' : 'Paid (Card)'}
+                                                    </p>
                                                 </div>
                                             </div>
 
-                                            <div className="flex items-center gap-2 justify-center text-xs text-gray-500 dark:text-gray-400 pt-2">
-                                                <ShieldCheck className="h-4 w-4 text-green-500" />
-                                                <span>Your order and payment are protected</span>
+                                            <div className="space-y-4">
+                                                <h3 className="font-semibold text-lg text-gray-900 dark:text-white">What's Next?</h3>
+                                                <div className="grid gap-4">
+                                                    <div className="flex items-start gap-3">
+                                                        <div className="mt-1 w-6 h-6 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center flex-shrink-0 text-indigo-600 dark:text-indigo-400 text-xs font-bold">1</div>
+                                                        <p className="text-sm text-gray-600 dark:text-gray-400">You will receive an order confirmation email shortly.</p>
+                                                    </div>
+                                                    <div className="flex items-start gap-3">
+                                                        <div className="mt-1 w-6 h-6 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center flex-shrink-0 text-indigo-600 dark:text-indigo-400 text-xs font-bold">2</div>
+                                                        <p className="text-sm text-gray-600 dark:text-gray-400">The shopkeeper will review and accept your order.</p>
+                                                    </div>
+                                                    <div className="flex items-start gap-3">
+                                                        <div className="mt-1 w-6 h-6 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center flex-shrink-0 text-indigo-600 dark:text-indigo-400 text-xs font-bold">3</div>
+                                                        <p className="text-sm text-gray-600 dark:text-gray-400">You can track your order progress in your dashboard.</p>
+                                                    </div>
+                                                </div>
                                             </div>
 
-                                            <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                                                <Button
-                                                    variant="outline"
-                                                    onClick={() => router.push("/dashboard/user?tab=orders")}
-                                                    className="w-full"
-                                                >
-                                                    View My Orders
-                                                </Button>
+                                            <div className="pt-6 grid sm:grid-cols-2 gap-4">
+                                                <Link href="/dashboard/user?tab=orders" className="w-full">
+                                                    <Button className="w-full h-12 bg-gray-900 hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-200">
+                                                        <Package className="mr-2 h-5 w-5" />
+                                                        View Orders
+                                                    </Button>
+                                                </Link>
+                                                <Link href="/shops" className="w-full">
+                                                    <Button variant="outline" className="w-full h-12">
+                                                        <ShoppingBag className="mr-2 h-5 w-5" />
+                                                        Continue Shopping
+                                                    </Button>
+                                                </Link>
                                             </div>
                                         </CardContent>
                                     </Card>

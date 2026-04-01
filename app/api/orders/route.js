@@ -55,7 +55,7 @@ export async function POST(req) {
     }, { status: 403 });
   }
 
-  const { items = [], shopId, tailoringRequests = [], urgent = false, deliveryZone = "standard", shippingAddress = {} } = body;
+  const { items = [], shopId, tailoringRequests = [], urgent = false, deliveryZone = "standard", shippingAddress = {}, paymentMethod = "card" } = body;
 
   if (!shopId || !Array.isArray(items) || items.length === 0) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
@@ -81,7 +81,8 @@ export async function POST(req) {
 
   const pricing = computePricing({ items: orderItems, tailoringRequests, urgent, deliveryZone });
 
-  // Create Order in "PaymentPending" state
+  // Create Order
+  const isCOD = paymentMethod === "cod";
   const order = await Order.create({
     user: token.sub,
     shop: shop._id,
@@ -89,11 +90,20 @@ export async function POST(req) {
     tailoringRequests,
     urgent,
     pricing,
-    status: "PaymentPending",
+    status: isCOD ? "OrderCreated" : "PaymentPending",
     paymentStatus: "PENDING",
     shippingAddress,
-    timeline: [{ byRole: "USER", event: "OrderCreated" }],
+    timeline: [{ byRole: "USER", event: "OrderCreated", notes: isCOD ? "Customer chose Cash on Delivery" : "Customer chose Card Payment" }],
   });
+
+  // If COD, return early without Paddle
+  if (isCOD) {
+    return NextResponse.json({
+      id: String(order._id),
+      paymentMethod: "COD",
+      message: "Order created successfully. Pay on delivery."
+    }, { status: 201 });
+  }
 
   // Generate Paddle Checkout Session using INLINE pricing
   // No paddlePriceId needed — we pass the order total directly
