@@ -34,7 +34,7 @@ export default function DeliveryTerms() {
                     <section>
                         <h2 className="text-xl font-bold text-gray-900 mb-4">4. Liability</h2>
                         <p>
-                            StyleGenie is not liable for any traffic violations or accidents that occur during delivery. Partners are independent contractors and must have their own insurance.
+                            Style Genie is not liable for any traffic violations or accidents that occur during delivery. Partners are independent contractors and must have their own insurance.
                         </p>
                     </section>
                 </div>

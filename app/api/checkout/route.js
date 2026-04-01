@@ -47,7 +47,7 @@ export async function POST(req) {
                     price: {
                         product: {
                             name: `Order #${order._id.toString().slice(-6)}`,
-                            description: `Order from ${order.shop?.name || "StyleGenie"}`,
+                            description: `Order from ${order.shop?.name || "Style Genie"}`,
                             tax_category: "standard"
                         },
                         unit_price: {

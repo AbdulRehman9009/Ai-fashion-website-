@@ -101,7 +101,7 @@ export async function POST(req) {
     const itemNames = products.map(p => p.title || p.name).join(", ");
     const checkoutSession = await createCheckoutSession({
       orderId: order._id.toString(),
-      orderName: `Order from ${shop.name || "StyleGenie"}`,
+      orderName: `Order from ${shop.name || "Style Genie"}`,
       orderDescription: itemNames.length > 200 ? itemNames.slice(0, 197) + "..." : itemNames,
       totalAmount: pricing.grandTotal,
       currency: pricing.currency || "USD",

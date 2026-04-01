@@ -176,7 +176,7 @@ export default function Home() {
             <div>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-100 text-purple-700 text-sm font-medium mb-4">
                 <Award className="h-4 w-4" />
-                Why Choose StyleGenie
+                Why Choose Style Genie
               </div>
               <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-6">
                 The Future of <span className="text-indigo-600 dark:text-indigo-400">Custom Fashion</span>
@@ -249,7 +249,7 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">Join Our Platform</h2>
-            <p className="text-slate-600 dark:text-gray-400 max-w-2xl mx-auto text-lg">Choose how you want to be part of the StyleGenie revolution.</p>
+            <p className="text-slate-600 dark:text-gray-400 max-w-2xl mx-auto text-lg">Choose how you want to be part of the Style Genie revolution.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 lg:gap-8">

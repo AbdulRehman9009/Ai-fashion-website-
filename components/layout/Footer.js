@@ -21,7 +21,7 @@ export default function Footer() {
                             <div className="h-8 w-8 rounded-lg bg-white flex items-center justify-center">
                                 <span className="text-lg font-bold text-slate-900 font-serif">S</span>
                             </div>
-                            <span className="text-xl font-bold text-white tracking-tight">StyleGenie</span>
+                            <span className="text-xl font-bold text-white tracking-tight">Style Genie</span>
                         </Link>
                         <p className="text-slate-400 text-sm leading-relaxed">
                             Revolutionizing fashion with AI-driven tailoring and measurements. Connect with expert tailors and shop premium fabrics.
@@ -77,7 +77,7 @@ export default function Footer() {
                 </div>
 
                 <div className="border-t border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center text-sm text-slate-500">
-                    <p>© {new Date().getFullYear()} StyleGenie Inc. All rights reserved.</p>
+                    <p>© {new Date().getFullYear()} Style Genie Inc. All rights reserved.</p>
                     <div className="flex space-x-6 mt-4 md:mt-0 items-center">
                         <span className="flex items-center gap-2"><Mail className="h-4 w-4" /> support@stylegenie.com</span>
                     </div>

@@ -9,7 +9,7 @@ export default function TailorTerms() {
                     <section>
                         <h2 className="text-xl font-bold text-gray-900 mb-4">1. Services and Quality</h2>
                         <ul className="list-disc pl-5 space-y-2">
-                            <li>Tailors must deliver high-quality workmanship consistent with the standards of StyleGenie.</li>
+                            <li>Tailors must deliver high-quality workmanship consistent with the standards of Style Genie.</li>
                             <li>All orders must be completed within the agreed-upon timeframe.</li>
                             <li>Detailed measurements provided by customers must be strictly followed.</li>
                         </ul>
@@ -20,7 +20,7 @@ export default function TailorTerms() {
                         <ul className="list-disc pl-5 space-y-2">
                             <li>Tailors earn a commission on each customized order as per the current rate card.</li>
                             <li>Payouts are processed weekly for all completed and accepted orders.</li>
-                            <li>StyleGenie reserves the right to withhold payment in cases of unresolved customer disputes or poor quality.</li>
+                            <li>Style Genie reserves the right to withhold payment in cases of unresolved customer disputes or poor quality.</li>
                         </ul>
                     </section>
 
@@ -34,7 +34,7 @@ export default function TailorTerms() {
                     <section>
                         <h2 className="text-xl font-bold text-gray-900 mb-4">4. Independent Contractor Status</h2>
                         <p>
-                            Tailors operate as independent contractors and are not employees of StyleGenie. You are responsible for your own taxes and insurance.
+                            Tailors operate as independent contractors and are not employees of Style Genie. You are responsible for your own taxes and insurance.
                         </p>
                     </section>
                 </div>

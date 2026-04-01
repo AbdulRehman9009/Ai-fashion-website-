@@ -130,7 +130,7 @@ export default function ShopkeeperProfileForm({ onComplete }) {
                     <h1 className="text-2xl font-bold tracking-tight">Shop Profile Setup</h1>
                     <p className="text-muted-foreground">Set up your digital shop front and payout details.</p>
                 </div>
-                <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground bg-secondary/50 px-3 py-1 rounded-full">
+                <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground bg-secondary/50 dark:bg-slate-800/50 px-3 py-1 rounded-full border dark:border-slate-700">
                     <Store className="h-4 w-4" />
                     <span>Business Owner</span>
                 </div>
@@ -229,13 +229,13 @@ export default function ShopkeeperProfileForm({ onComplete }) {
 
                     {/* Right Column: Bank & Terms */}
                     <div className="space-y-6">
-                        <Card className="border-blue-100 bg-blue-50/30">
+                        <Card className="border-blue-100 dark:border-blue-900/40 bg-blue-50/30 dark:bg-blue-900/10">
                             <CardHeader>
-                                <CardTitle className="text-lg flex items-center gap-2 text-blue-900">
+                                <CardTitle className="text-lg flex items-center gap-2 text-blue-900 dark:text-blue-400">
                                     <CreditCard className="h-5 w-5" />
                                     Payout Information
                                 </CardTitle>
-                                <CardDescription className="text-blue-700/80">
+                                <CardDescription className="text-blue-700/80 dark:text-blue-400/70">
                                     Bank details for recieving sales revenue.
                                 </CardDescription>
                             </CardHeader>
@@ -280,7 +280,7 @@ export default function ShopkeeperProfileForm({ onComplete }) {
                                         name="iban"
                                         value={formData.iban}
                                         onChange={handleChange}
-                                        className="bg-white"
+                                        className="bg-white dark:bg-slate-950"
                                     />
                                 </div>
                             </CardContent>

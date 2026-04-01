@@ -101,7 +101,7 @@ export default function Sidebar({ role, isOpen, onClose }) {
               <div className="absolute inset-0 bg-white/20 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
             <div className="flex flex-col">
-              <span className="font-bold text-slate-900 dark:text-white leading-none tracking-tight">StyleGenie</span>
+              <span className="font-bold text-slate-900 dark:text-white leading-none tracking-tight">Style Genie</span>
               <span className="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">{role}</span>
             </div>
           </Link>

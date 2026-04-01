@@ -49,7 +49,7 @@ export default function CustomerProfilePage() {
                 </Alert>
             )}
 
-            <UserProfileForm />
+            <UserProfileForm onComplete={fetchProfileStatus} />
         </div>
     );
 }

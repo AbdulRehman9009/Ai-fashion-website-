@@ -17,11 +17,11 @@ import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
 
 export const metadata = {
-  title: "StyleGenie - AI-Powered Custom Fashion",
+  title: "Style Genie - AI-Powered Custom Fashion",
   description: "Get personalized outfit recommendations powered by AI. Custom tailoring delivered to your doorstep by expert local tailors.",
   keywords: ["AI fashion", "custom tailoring", "outfit recommendations", "online tailor", "bespoke clothing"],
   openGraph: {
-    title: "StyleGenie - AI-Powered Custom Fashion",
+    title: "Style Genie - AI-Powered Custom Fashion",
     description: "Get personalized outfit recommendations powered by AI. Custom tailoring delivered to your doorstep.",
     type: "website",
   },

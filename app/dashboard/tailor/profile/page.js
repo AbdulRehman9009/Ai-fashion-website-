@@ -49,7 +49,7 @@ export default function TailorProfilePage() {
                 </Alert>
             )}
 
-            <TailorProfileForm />
+            <TailorProfileForm onComplete={fetchProfileStatus} />
         </div>
     );
 }

@@ -117,7 +117,7 @@ export default function Navbar() {
                                 <span className="text-xl font-bold font-serif">S</span>
                             </div>
                             <span className="text-xl font-bold text-slate-900 dark:text-white tracking-tight">
-                                StyleGenie
+                                Style Genie
                             </span>
                         </Link>
 

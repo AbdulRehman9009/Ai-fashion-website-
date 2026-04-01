@@ -51,7 +51,7 @@ export default function FeaturesPage() {
                         <Sparkles className="h-4 w-4" />
                         Platform Features
                     </div>
-                    <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">Why Choose StyleGenie?</h1>
+                    <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">Why Choose Style Genie?</h1>
                     <p className="text-lg text-slate-600 max-w-2xl mx-auto">
                         Experience the future of fashion with features designed to make custom tailoring effortless and accessible.
                     </p>

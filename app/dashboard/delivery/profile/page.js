@@ -49,7 +49,7 @@ export default function DeliveryProfilePage() {
                 </Alert>
             )}
 
-            <DeliveryProfileForm />
+            <DeliveryProfileForm onComplete={fetchProfileStatus} />
         </div>
     );
 }

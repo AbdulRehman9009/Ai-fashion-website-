@@ -177,7 +177,7 @@ export default function TailorProfileForm({ onComplete }) {
                     <h1 className="text-2xl font-bold tracking-tight">Tailor Profile Setup</h1>
                     <p className="text-muted-foreground">Complete your professional profile to start receiving orders.</p>
                 </div>
-                <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground bg-secondary/50 px-3 py-1 rounded-full">
+                <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground bg-secondary/50 dark:bg-slate-800/50 px-3 py-1 rounded-full border dark:border-slate-700">
                     <Scissors className="h-4 w-4" />
                     <span>Professional Tailor</span>
                 </div>
@@ -287,7 +287,7 @@ export default function TailorProfileForm({ onComplete }) {
                                             key={spec}
                                             className={`
                                                 flex items-center gap-2 p-3 rounded-md border cursor-pointer transition-all hover:bg-accent
-                                                ${formData.specialization.includes(spec) ? "border-primary bg-primary/5 ring-1 ring-primary" : "border-input"}
+                                                ${formData.specialization.includes(spec) ? "border-primary bg-primary/5 dark:bg-primary/10 ring-1 ring-primary" : "border-input"}
                                             `}
                                         >
                                             <input
@@ -332,7 +332,7 @@ export default function TailorProfileForm({ onComplete }) {
                                         <div
                                             className={`
                                                 flex flex-col items-center justify-center p-4 rounded-lg border-2 cursor-pointer transition-all
-                                                ${formData.pricingType === "perJob" ? "border-primary bg-primary/5" : "border-muted hover:border-gray-300"}
+                                                ${formData.pricingType === "perJob" ? "border-primary bg-primary/5 dark:bg-primary/10" : "border-muted hover:border-gray-300 dark:hover:border-slate-700"}
                                             `}
                                             onClick={() => setFormData(prev => ({ ...prev, pricingType: "perJob" }))}
                                         >
@@ -342,7 +342,7 @@ export default function TailorProfileForm({ onComplete }) {
                                         <div
                                             className={`
                                                 flex flex-col items-center justify-center p-4 rounded-lg border-2 cursor-pointer transition-all
-                                                ${formData.pricingType === "commission" ? "border-primary bg-primary/5" : "border-muted hover:border-gray-300"}
+                                                ${formData.pricingType === "commission" ? "border-primary bg-primary/5 dark:bg-primary/10" : "border-muted hover:border-gray-300 dark:hover:border-slate-700"}
                                             `}
                                             onClick={() => setFormData(prev => ({ ...prev, pricingType: "commission" }))}
                                         >
@@ -392,13 +392,13 @@ export default function TailorProfileForm({ onComplete }) {
                             </CardContent>
                         </Card>
 
-                        <Card className="border-blue-100 bg-blue-50/30">
+                        <Card className="border-blue-100 dark:border-blue-900/40 bg-blue-50/30 dark:bg-blue-900/10">
                             <CardHeader>
-                                <CardTitle className="text-lg flex items-center gap-2 text-blue-900">
+                                <CardTitle className="text-lg flex items-center gap-2 text-blue-900 dark:text-blue-400">
                                     <CreditCard className="h-5 w-5" />
                                     Payout Information
                                 </CardTitle>
-                                <CardDescription className="text-blue-700/80">
+                                <CardDescription className="text-blue-700/80 dark:text-blue-400/70">
                                     Bank details for weekly earnings transfer
                                 </CardDescription>
                             </CardHeader>
@@ -446,7 +446,7 @@ export default function TailorProfileForm({ onComplete }) {
                                         name="iban"
                                         value={formData.iban}
                                         onChange={handleChange}
-                                        className="bg-white"
+                                        className="bg-white dark:bg-slate-950"
                                         placeholder="US123456..."
                                     />
                                 </div>

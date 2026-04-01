@@ -18,7 +18,7 @@ export default function ShopkeeperTerms() {
                     <section>
                         <h2 className="text-xl font-bold text-gray-900 mb-4">2. Commission and Fees</h2>
                         <ul className="list-disc pl-5 space-y-2">
-                            <li>StyleGenie charges a platform fee on each sale. The current fee structure is available in your dashboard.</li>
+                            <li>Style Genie charges a platform fee on each sale. The current fee structure is available in your dashboard.</li>
                             <li>Earnings are transferred to your registered bank account after the return period has passed.</li>
                         </ul>
                     </section>
@@ -33,7 +33,7 @@ export default function ShopkeeperTerms() {
                     <section>
                         <h2 className="text-xl font-bold text-gray-900 mb-4">4. Shop Management</h2>
                         <p>
-                            You have the autonomy to manage your shop's branding and inventory, provided it aligns with StyleGenie's community guidelines. We reserve the right to suspend shops that violate our policies.
+                            You have the autonomy to manage your shop's branding and inventory, provided it aligns with Style Genie's community guidelines. We reserve the right to suspend shops that violate our policies.
                         </p>
                     </section>
                 </div>

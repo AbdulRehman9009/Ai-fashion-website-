@@ -43,7 +43,7 @@ export default function TermsOfService() {
                 <div className="text-center mb-16">
                     <h1 className="text-4xl font-bold text-gray-900 mb-4">Terms of Service</h1>
                     <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                        Please review the terms and conditions specific to your role on StyleGenie.
+                        Please review the terms and conditions specific to your role on Style Genie.
                     </p>
                 </div>
 
@@ -75,7 +75,7 @@ export default function TermsOfService() {
                     <h2 className="text-2xl font-bold text-gray-900 mb-6">General Terms</h2>
                     <div className="space-y-4 text-gray-600">
                         <p>
-                            <strong>Acceptance of Terms:</strong> By accessing StyleGenie, you agree to be bound by these terms.
+                            <strong>Acceptance of Terms:</strong> By accessing Style Genie, you agree to be bound by these terms.
                         </p>
                         <p>
                             <strong>Privacy Policy:</strong> Your use of the service is also governed by our Privacy Policy.

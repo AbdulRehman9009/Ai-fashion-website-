@@ -1,4 +1,4 @@
-# AI Fashion Website - StyleGenie
+# Style Genie
 
 > **AI-Powered Fashion Marketplace** connecting customers with local tailors, shops, and delivery services for personalized outfit recommendations and custom clothing.
 

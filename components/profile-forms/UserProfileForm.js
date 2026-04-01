@@ -21,13 +21,11 @@ export default function UserProfileForm({ onComplete }) {
         city: "",
         state: "",
         zipCode: "",
-        // Measurements
         height: "",
         weight: "",
         shirtSize: "",
         pantSize: "",
         shoeSize: "",
-        // Preferences
         preferredStyle: "Casual",
         newsletter: true
     });
@@ -43,10 +41,7 @@ export default function UserProfileForm({ onComplete }) {
             const res = await fetch("/api/profile/customer");
             if (res.ok) {
                 const data = await res.json();
-                const profile = data.user?.customerProfile || data.customerProfile || {}; // Safe navigation to prevent undefined error
-                // If API returns flat structure, adjust accordingly. 
-                // Based on `app/api/profile/customer/route.js` (viewed earlier), it updates user root fields and maybe profile.
-
+                const profile = data.user?.customerProfile || data.customerProfile || {};
                 setFormData({
                     name: data.name || data.user?.name || "",
                     phone: profile.phone || "",
@@ -140,7 +135,7 @@ export default function UserProfileForm({ onComplete }) {
                     <h1 className="text-2xl font-bold tracking-tight">My Profile</h1>
                     <p className="text-muted-foreground">Manage your personal information and measurements for better fitting.</p>
                 </div>
-                <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground bg-blue-50 px-3 py-1 rounded-full text-blue-700">
+                <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground bg-blue-50 dark:bg-blue-900/30 px-3 py-1 rounded-full text-blue-700 dark:text-blue-400">
                     <User className="h-4 w-4" />
                     <span>Valued Customer</span>
                 </div>
@@ -153,7 +148,7 @@ export default function UserProfileForm({ onComplete }) {
                         <Card>
                             <CardHeader>
                                 <CardTitle className="text-lg flex items-center gap-2">
-                                    <User className="h-5 w-5 text-gray-500" />
+                                    <User className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                                     Personal Details
                                 </CardTitle>
                                 <CardDescription>Your contact information for orders</CardDescription>
@@ -166,7 +161,7 @@ export default function UserProfileForm({ onComplete }) {
                                 <div className="space-y-2">
                                     <Label htmlFor="phone">Phone Number</Label>
                                     <div className="relative">
-                                        <Phone className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+                                        <Phone className="absolute left-3 top-2.5 h-4 w-4 text-gray-500 dark:text-gray-400" />
                                         <Input id="phone" name="phone" className="pl-9" value={formData.phone} onChange={handleChange} placeholder="+1234567890" />
                                     </div>
                                 </div>
@@ -176,7 +171,7 @@ export default function UserProfileForm({ onComplete }) {
                         <Card>
                             <CardHeader>
                                 <CardTitle className="text-lg flex items-center gap-2">
-                                    <MapPin className="h-5 w-5 text-gray-500" />
+                                    <MapPin className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                                     Shipping Address
                                 </CardTitle>
                                 <CardDescription>Default address for deliveries</CardDescription>
@@ -206,13 +201,13 @@ export default function UserProfileForm({ onComplete }) {
 
                     {/* Right Col: Measurements */}
                     <div className="space-y-6">
-                        <Card className="border-purple-100 bg-purple-50/20">
+                        <Card className="border-purple-100 dark:border-purple-900/40 bg-purple-50/20 dark:bg-purple-900/10">
                             <CardHeader>
-                                <CardTitle className="text-lg flex items-center gap-2 text-purple-900">
+                                <CardTitle className="text-lg flex items-center gap-2 text-purple-900 dark:text-purple-400">
                                     <Ruler className="h-5 w-5" />
                                     Body Measurements
                                 </CardTitle>
-                                <CardDescription className="text-purple-700/80">
+                                <CardDescription className="text-purple-700/80 dark:text-purple-400/70">
                                     Help us find the perfect fit for you (Optional)
                                 </CardDescription>
                             </CardHeader>
@@ -261,7 +256,7 @@ export default function UserProfileForm({ onComplete }) {
                         <Card>
                             <CardHeader>
                                 <CardTitle className="text-lg flex items-center gap-2">
-                                    <Shirt className="h-5 w-5 text-gray-500" />
+                                    <Shirt className="h-5 w-5 text-gray-500 dark:text-gray-400" />
                                     Style Preferences
                                 </CardTitle>
                             </CardHeader>

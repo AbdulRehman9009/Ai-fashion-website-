@@ -29,9 +29,7 @@ const CartSchema = new mongoose.Schema(
         user: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "User",
-            required: true,
-            unique: true,
-            index: true
+            required: true
         },
         // Denormalized shop reference — enables O(1) multi-shop conflict check
         // without populating all cart items every request.
