@@ -4,10 +4,8 @@ import { Button } from "@/components/ui/button";
 
 export default function AboutPage() {
     return (
-        <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50">
-            {/* Hero Section */}
+        <main className="min-h-screen bg-slate-50 dark:bg-slate-950">
             <section className="relative py-20 lg:py-28 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden">
-                {/* Decorative background */}
                 <div className="absolute inset-0 z-0">
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-600/30 via-transparent to-transparent" />
                     <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:50px_50px]" />
@@ -28,13 +26,13 @@ export default function AboutPage() {
             <section className="py-16 lg:py-24">
                 <div className="container mx-auto px-4 sm:px-6 grid md:grid-cols-2 gap-12 items-center">
                     <div className="space-y-6">
-                        <h2 className="text-3xl lg:text-4xl font-bold text-slate-900">Our Mission</h2>
-                        <p className="text-lg text-slate-600 leading-relaxed">
+                        <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white">Our Mission</h2>
+                        <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
                             We believe that everyone deserves clothes that fit perfectly and express their unique style.
                             By bridging the gap between traditional craftsmanship and modern AI technology, we are
                             democratizing custom fashion.
                         </p>
-                        <p className="text-lg text-slate-600 leading-relaxed">
+                        <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
                             Our platform empowers local tailors by connecting them with a broader audience, while
                             providing customers with a seamless, personalized shopping experience.
                         </p>
@@ -45,16 +43,16 @@ export default function AboutPage() {
                         </Link>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
-                        <div className="aspect-square rounded-2xl bg-gradient-to-br from-indigo-100 to-indigo-200 flex items-center justify-center">
+                        <div className="aspect-square rounded-2xl bg-gradient-to-br from-indigo-100 dark:from-indigo-900/30 to-indigo-200 dark:to-indigo-800/30 flex items-center justify-center">
                             <div className="text-center">
                                 <div className="text-4xl mb-2">✂️</div>
-                                <div className="text-indigo-700 font-medium">Expert Tailors</div>
+                                <div className="text-indigo-700 dark:text-indigo-300 font-medium">Expert Tailors</div>
                             </div>
                         </div>
-                        <div className="aspect-square rounded-2xl bg-gradient-to-br from-purple-100 to-purple-200 flex items-center justify-center mt-8">
+                        <div className="aspect-square rounded-2xl bg-gradient-to-br from-purple-100 dark:from-purple-900/30 to-purple-200 dark:to-purple-800/30 flex items-center justify-center mt-8">
                             <div className="text-center">
                                 <div className="text-4xl mb-2">🤖</div>
-                                <div className="text-purple-700 font-medium">AI Styling</div>
+                                <div className="text-purple-700 dark:text-purple-300 font-medium">AI Styling</div>
                             </div>
                         </div>
                     </div>
@@ -62,7 +60,7 @@ export default function AboutPage() {
             </section>
 
             {/* Stats Section */}
-            <section className="py-16 bg-white border-y border-slate-100">
+            <section className="py-16 bg-white dark:bg-slate-900/50 border-y border-slate-100 dark:border-slate-800">
                 <div className="container mx-auto px-4 sm:px-6">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-8">
                         {[
@@ -71,14 +69,14 @@ export default function AboutPage() {
                             { icon: Building, label: "Expert Tailors", value: "500+", color: "emerald" },
                             { icon: Award, label: "Designs Created", value: "1M+", color: "amber" },
                         ].map((stat, idx) => (
-                            <div key={idx} className="text-center p-6 bg-slate-50 rounded-xl hover:shadow-md transition-shadow">
-                                <stat.icon className={`h-8 w-8 mx-auto mb-4 ${stat.color === "indigo" ? "text-indigo-600" :
-                                        stat.color === "purple" ? "text-purple-600" :
-                                            stat.color === "emerald" ? "text-emerald-600" :
-                                                "text-amber-600"
+                            <div key={idx} className="text-center p-6 bg-slate-50 dark:bg-slate-800/50 rounded-xl hover:shadow-md transition-shadow border border-transparent dark:border-slate-800">
+                                <stat.icon className={`h-8 w-8 mx-auto mb-4 ${stat.color === "indigo" ? "text-indigo-600 dark:text-indigo-400" :
+                                        stat.color === "purple" ? "text-purple-600 dark:text-purple-400" :
+                                            stat.color === "emerald" ? "text-emerald-600 dark:text-emerald-400" :
+                                                "text-amber-600 dark:text-amber-400"
                                     }`} />
-                                <div className="text-3xl lg:text-4xl font-bold text-slate-900 mb-1">{stat.value}</div>
-                                <div className="text-slate-500 font-medium">{stat.label}</div>
+                                <div className="text-3xl lg:text-4xl font-bold text-slate-900 dark:text-white mb-1">{stat.value}</div>
+                                <div className="text-slate-500 dark:text-slate-400 font-medium">{stat.label}</div>
                             </div>
                         ))}
                     </div>
@@ -96,7 +94,7 @@ export default function AboutPage() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link href="/auth/user/register">
-                            <Button size="lg" className="bg-white text-indigo-600 hover:bg-indigo-50 h-14 px-8 text-base font-semibold shadow-lg">
+                            <Button size="lg" className="bg-white dark:bg-slate-100 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-white h-14 px-8 text-base font-semibold shadow-lg">
                                 Get Started Free
                             </Button>
                         </Link>

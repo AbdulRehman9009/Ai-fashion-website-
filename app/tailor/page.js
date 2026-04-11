@@ -5,7 +5,7 @@ import { Scissors, Star, Clock, Award, DollarSign, TrendingUp } from "lucide-rea
 
 export default function TailorLandingPage() {
     return (
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950">
             {/* Hero Section */}
             <section className="relative bg-gradient-to-br from-purple-900 via-purple-800 to-indigo-900 text-white overflow-hidden py-24 lg:py-32">
                 <div className="absolute inset-0 z-0 opacity-20">
@@ -49,11 +49,11 @@ export default function TailorLandingPage() {
             </section>
 
             {/* Benefits Section */}
-            <section className="py-20 bg-white">
+            <section className="py-20 bg-white dark:bg-slate-900 border-y border-transparent dark:border-slate-800">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Join Our Platform?</h2>
-                        <p className="text-gray-600 max-w-2xl mx-auto">Grow your business with steady orders and modern tools</p>
+                        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Why Join Our Platform?</h2>
+                        <p className="text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">Grow your business with steady orders and modern tools</p>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-8">
@@ -95,12 +95,12 @@ export default function TailorLandingPage() {
                                 color: "text-indigo-600 bg-indigo-100"
                             }
                         ].map((benefit, idx) => (
-                            <div key={idx} className="p-8 rounded-2xl bg-gray-50 border border-gray-100 hover:border-purple-200 hover:shadow-lg transition-all">
-                                <div className={`h-14 w-14 ${benefit.color} rounded-xl flex items-center justify-center mb-6`}>
+                            <div key={idx} className="p-8 rounded-2xl bg-gray-50 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 hover:border-purple-200 dark:hover:border-purple-500/50 hover:shadow-lg transition-all">
+                                <div className={`h-14 w-14 ${benefit.color.replace(' bg-', ' dark:bg-opacity-20 bg-')} rounded-xl flex items-center justify-center mb-6`}>
                                     <benefit.icon className="h-7 w-7" />
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-3">{benefit.title}</h3>
-                                <p className="text-gray-600 leading-relaxed">{benefit.desc}</p>
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{benefit.title}</h3>
+                                <p className="text-gray-600 dark:text-slate-400 leading-relaxed">{benefit.desc}</p>
                             </div>
                         ))}
                     </div>
@@ -108,11 +108,11 @@ export default function TailorLandingPage() {
             </section>
 
             {/* How It Works */}
-            <section className="py-20 bg-gradient-to-br from-purple-50 to-indigo-50">
+            <section className="py-20 bg-gradient-to-br from-purple-50 dark:from-slate-900 to-indigo-50 dark:to-slate-950">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
-                        <p className="text-gray-600 max-w-2xl mx-auto">Three simple steps to start earning</p>
+                        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">How It Works</h2>
+                        <p className="text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">Three simple steps to start earning</p>
                     </div>
 
                     <div className="max-w-4xl mx-auto grid md:grid-cols-3 gap-8">
@@ -125,8 +125,8 @@ export default function TailorLandingPage() {
                                 <div className="h-16 w-16 bg-purple-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-4 mx-auto shadow-lg">
                                     {item.step}
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
-                                <p className="text-gray-600">{item.desc}</p>
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{item.title}</h3>
+                                <p className="text-gray-600 dark:text-slate-400">{item.desc}</p>
                             </div>
                         ))}
                     </div>
@@ -135,7 +135,7 @@ export default function TailorLandingPage() {
 
             {/* CTA Section */}
             <section className="py-24 bg-purple-600 relative overflow-hidden">
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10"></div>
+                <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
                 <div className="container mx-auto px-4 text-center relative z-10">
                     <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">Ready to Transform Your Tailoring Career?</h2>
                     <p className="text-xl text-purple-100 mb-10 max-w-2xl mx-auto">

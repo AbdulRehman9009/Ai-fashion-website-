@@ -38,11 +38,11 @@ export default function TermsOfService() {
     ];
 
     return (
-        <div className="min-h-screen bg-gray-50 py-16">
+        <div className="min-h-screen bg-gray-50 dark:bg-slate-950 py-16">
             <div className="container mx-auto px-4 max-w-5xl">
                 <div className="text-center mb-16">
-                    <h1 className="text-4xl font-bold text-gray-900 mb-4">Terms of Service</h1>
-                    <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+                    <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">Terms of Service</h1>
+                    <p className="text-xl text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">
                         Please review the terms and conditions specific to your role on Style Genie.
                     </p>
                 </div>
@@ -52,17 +52,17 @@ export default function TermsOfService() {
                         const Icon = role.icon;
                         return (
                             <Link href={role.href} key={role.href} className="group block">
-                                <div className="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow relative overflow-hidden">
+                                <div className="bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800 hover:shadow-md transition-shadow relative overflow-hidden">
                                     <div className="flex items-start gap-4">
-                                        <div className={`p-3 rounded-lg ${role.bgColor} ${role.color}`}>
+                                        <div className={`p-3 rounded-lg ${role.bgColor} dark:bg-slate-800/50 ${role.color}`}>
                                             <Icon className="h-6 w-6" />
                                         </div>
                                         <div className="flex-1">
-                                            <h2 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
+                                            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-2 flex items-center gap-2">
                                                 {role.title}
                                                 <ArrowRight className="h-4 w-4 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300 text-gray-400" />
                                             </h2>
-                                            <p className="text-gray-500">{role.description}</p>
+                                            <p className="text-gray-500 dark:text-slate-400">{role.description}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -71,9 +71,9 @@ export default function TermsOfService() {
                     })}
                 </div>
 
-                <div className="mt-16 bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-6">General Terms</h2>
-                    <div className="space-y-4 text-gray-600">
+                <div className="mt-16 bg-white dark:bg-slate-900 p-8 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-800">
+                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">General Terms</h2>
+                    <div className="space-y-4 text-gray-600 dark:text-slate-400">
                         <p>
                             <strong>Acceptance of Terms:</strong> By accessing Style Genie, you agree to be bound by these terms.
                         </p>
@@ -84,7 +84,7 @@ export default function TermsOfService() {
                             <strong>Changes to Terms:</strong> We may update these terms from time to time. Continued use of the service implies acceptance of the new terms.
                         </p>
                     </div>
-                    <div className="mt-6 pt-6 border-t border-gray-100 text-sm text-gray-400">
+                    <div className="mt-6 pt-6 border-t border-gray-100 dark:border-slate-800 text-sm text-gray-400">
                         Last updated: January 2026
                     </div>
                 </div>
@@ -92,4 +92,3 @@ export default function TermsOfService() {
         </div>
     );
 }
-

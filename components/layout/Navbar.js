@@ -24,7 +24,6 @@ export default function Navbar() {
 
     const isDashboard = pathname?.startsWith("/dashboard");
     const isAuth = pathname?.startsWith("/auth");
-    if (isDashboard || isAuth) return null;
     const currentRole = useMemo(() => {
         if (!pathname) return null;
         if (pathname.startsWith("/tailor") || pathname.startsWith("/auth/tailor") || pathname.startsWith("/dashboard/tailor")) return "tailor";
@@ -33,6 +32,9 @@ export default function Navbar() {
         if (pathname.startsWith("/customer") || pathname.startsWith("/auth/user") || pathname.startsWith("/dashboard/user")) return "user";
         return null;
     }, [pathname]);
+
+    // Return null for dashboard and auth pages AFTER all hooks
+    if (isDashboard || isAuth) return null;
 
     const roleLinks = [
         { href: "/customer", label: "Customer", icon: User, role: "user" },
@@ -272,21 +274,22 @@ export default function Navbar() {
 
                         {/* Mobile Menu Button & Cart */}
                         <div className="flex items-center gap-2 md:hidden">
+                            <ThemeToggle />
                             {session?.user?.role === 'USER' && (
                                 <button
                                     onClick={() => setCartOpen(true)}
-                                    className="relative p-2 text-slate-600 hover:bg-slate-100 rounded-md"
+                                    className="relative p-2 text-slate-600 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-gray-800 rounded-md"
                                 >
                                     <ShoppingCart className="h-6 w-6" />
                                     {cartCount > 0 && (
-                                        <span className="absolute -top-1 -right-1 h-4 w-4 bg-slate-900 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                                        <span className="absolute -top-1 -right-1 h-4 w-4 bg-slate-900 dark:bg-indigo-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                                             {cartCount > 9 ? '9+' : cartCount}
                                         </span>
                                     )}
                                 </button>
                             )}
                             <button
-                                className="p-2 text-slate-600 hover:bg-slate-100 rounded-md"
+                                className="p-2 text-slate-600 dark:text-gray-400 hover:bg-slate-100 dark:hover:bg-gray-800 rounded-md"
                                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                             >
                                 {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}

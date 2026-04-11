@@ -84,8 +84,8 @@ export default function RecommendationForm({ onProductSelect }) {
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
-      <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-800 overflow-hidden">
-        <CardHeader className="bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 pb-8">
+      <Card className="border-0 shadow-xl bg-gradient-to-br from-white to-slate-50 dark:from-slate-900 dark:to-slate-800 overflow-hidden">
+        <CardHeader className="bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 pb-8">
           <div className="flex items-center gap-3 mb-2">
             <div className="bg-purple-100 dark:bg-purple-900/30 p-2 rounded-lg">
               <Sparkles className="h-6 w-6 text-purple-600 dark:text-purple-400" />
@@ -102,7 +102,7 @@ export default function RecommendationForm({ onProductSelect }) {
             <div className="space-y-4">
               <Label className="text-lg font-medium">1. Upload Your Photo</Label>
               <div
-                className={`relative border-2 border-dashed rounded-2xl p-8 text-center transition-all ${preview ? 'border-purple-500 dark:border-purple-400' : 'border-gray-300 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800/50'}`}
+                className={`relative border-2 border-dashed rounded-2xl p-8 text-center transition-all ${preview ? 'border-purple-500 dark:border-purple-400' : 'border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800/50'}`}
               >
                 <Input
                   ref={fileInputRef}
@@ -129,12 +129,12 @@ export default function RecommendationForm({ onProductSelect }) {
                     onClick={() => fileInputRef.current?.click()}
                     className="cursor-pointer space-y-4 py-8"
                   >
-                    <div className="bg-gray-100 dark:bg-gray-800 h-16 w-16 mx-auto rounded-full flex items-center justify-center">
-                      <Camera className="h-8 w-8 text-gray-500 dark:text-gray-400" />
+                    <div className="bg-slate-100 dark:bg-slate-800 h-16 w-16 mx-auto rounded-full flex items-center justify-center">
+                      <Camera className="h-8 w-8 text-slate-500 dark:text-slate-400" />
                     </div>
                     <div>
-                      <p className="font-semibold text-gray-700 dark:text-gray-300">Click to upload or drag and drop</p>
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">SVG, PNG, JPG or GIF (max. 5MB)</p>
+                      <p className="font-semibold text-slate-700 dark:text-slate-300">Click to upload or drag and drop</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">SVG, PNG, JPG or GIF (max. 5MB)</p>
                     </div>
                   </div>
                 )}
@@ -148,7 +148,7 @@ export default function RecommendationForm({ onProductSelect }) {
                   id="occasion"
                   value={eventType}
                   onChange={(e) => setEventType(e.target.value)}
-                  className="flex h-12 w-full rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 px-4 text-base shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 dark:focus-visible:ring-purple-400"
+                  className="flex h-12 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-4 text-base shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 dark:focus-visible:ring-purple-400"
                 >
                   {["Casual", "Party", "Wedding", "Formal", "Date Night", "Office", "Vacation"].map(opt => (
                     <option key={opt} value={opt}>{opt}</option>
@@ -157,7 +157,7 @@ export default function RecommendationForm({ onProductSelect }) {
               </div>
 
               <div className="space-y-4">
-                <Label htmlFor="prefs" className="text-lg font-medium">3. Style Preferences <span className="text-sm font-normal text-gray-500 dark:text-gray-400">(Optional)</span></Label>
+                <Label htmlFor="prefs" className="text-lg font-medium">3. Style Preferences <span className="text-sm font-normal text-slate-500 dark:text-slate-400">(Optional)</span></Label>
                 <Input
                   id="prefs"
                   value={prefs}
@@ -225,7 +225,7 @@ export default function RecommendationForm({ onProductSelect }) {
             </Card>
 
             {/* Recommendations Grid */}
-            <h3 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Curated For You</h3>
+            <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Curated For You</h3>
             <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {results.recommendations.map((rec, i) => (
                 <motion.div
@@ -233,9 +233,9 @@ export default function RecommendationForm({ onProductSelect }) {
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: i * 0.1 }}
-                  className="group relative bg-white rounded-3xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-2xl transition-all duration-300"
+                  className="group relative bg-white dark:bg-slate-900 rounded-3xl shadow-lg border border-slate-100 dark:border-slate-800 overflow-hidden hover:shadow-2xl transition-all duration-300"
                 >
-                  <div className="aspect-[3/4] overflow-hidden bg-gray-200 relative">
+                  <div className="aspect-[3/4] overflow-hidden bg-slate-200 dark:bg-slate-800 relative">
                     <img
                       src={rec.product.imageUrl || "/placeholder-outfit.jpg"}
                       alt={rec.product.name}
@@ -247,8 +247,8 @@ export default function RecommendationForm({ onProductSelect }) {
                   </div>
                   <div className="p-6 space-y-4">
                     <div>
-                      <h4 className="font-bold text-xl text-gray-900 dark:text-gray-100 line-clamp-1">{rec.product.name}</h4>
-                      <p className="text-gray-500 dark:text-gray-400 text-sm mt-1 line-clamp-2">{rec.reason}</p>
+                      <h4 className="font-bold text-xl text-slate-900 dark:text-slate-100 line-clamp-1">{rec.product.name}</h4>
+                      <p className="text-slate-500 dark:text-slate-400 text-sm mt-1 line-clamp-2">{rec.reason}</p>
                     </div>
 
                     <div className="flex items-center justify-between pt-2">
@@ -261,7 +261,7 @@ export default function RecommendationForm({ onProductSelect }) {
 
                     <Button
                       onClick={() => onProductSelect && onProductSelect(rec.product)}
-                      className="w-full bg-gray-900 hover:bg-black text-white rounded-xl h-11"
+                      className="w-full bg-slate-900 hover:bg-black dark:bg-white dark:hover:bg-slate-200 dark:text-black text-white rounded-xl h-11"
                     >
                       <Ruler className="mr-2 h-4 w-4" /> Customize & Buy
                     </Button>

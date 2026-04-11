@@ -43,16 +43,16 @@ export default function FeaturesPage() {
     ];
 
     return (
-        <main className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50">
+        <main className="min-h-screen bg-slate-50 dark:bg-slate-950">
             {/* Hero Section */}
             <section className="py-16 lg:py-24">
                 <div className="container mx-auto px-4 sm:px-6 text-center">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-100 text-indigo-700 text-sm font-medium mb-6">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 text-sm font-medium mb-6">
                         <Sparkles className="h-4 w-4" />
                         Platform Features
                     </div>
-                    <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">Why Choose Style Genie?</h1>
-                    <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+                    <h1 className="text-4xl sm:text-5xl font-bold text-slate-900 dark:text-white mb-4">Why Choose Style Genie?</h1>
+                    <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
                         Experience the future of fashion with features designed to make custom tailoring effortless and accessible.
                     </p>
                 </div>
@@ -65,19 +65,19 @@ export default function FeaturesPage() {
                         {features.map((feature, idx) => (
                             <div
                                 key={idx}
-                                className="bg-white p-6 lg:p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 border border-slate-100 group"
+                                className="bg-white dark:bg-slate-900 p-6 lg:p-8 rounded-2xl shadow-sm hover:shadow-xl dark:hover:shadow-indigo-500/10 transition-all duration-300 border border-slate-100 dark:border-slate-800 group"
                             >
-                                <div className={`h-14 w-14 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform ${feature.color === "indigo" ? "bg-indigo-100 text-indigo-600" :
-                                        feature.color === "purple" ? "bg-purple-100 text-purple-600" :
-                                            feature.color === "emerald" ? "bg-emerald-100 text-emerald-600" :
-                                                feature.color === "blue" ? "bg-blue-100 text-blue-600" :
-                                                    feature.color === "amber" ? "bg-amber-100 text-amber-600" :
-                                                        "bg-rose-100 text-rose-600"
+                                <div className={`h-14 w-14 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform ${feature.color === "indigo" ? "bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400" :
+                                        feature.color === "purple" ? "bg-purple-100 dark:bg-purple-900/40 text-purple-600 dark:text-purple-400" :
+                                            feature.color === "emerald" ? "bg-emerald-100 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400" :
+                                                feature.color === "blue" ? "bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400" :
+                                                    feature.color === "amber" ? "bg-amber-100 dark:bg-amber-900/40 text-amber-600 dark:text-amber-400" :
+                                                        "bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400"
                                     }`}>
                                     <feature.icon className="h-7 w-7" />
                                 </div>
-                                <h3 className="text-xl font-bold text-slate-900 mb-3">{feature.title}</h3>
-                                <p className="text-slate-600 leading-relaxed">
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{feature.title}</h3>
+                                <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
                                     {feature.description}
                                 </p>
                             </div>
@@ -97,13 +97,13 @@ export default function FeaturesPage() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link href="/auth/user/register">
-                            <Button size="lg" className="bg-white text-indigo-600 hover:bg-indigo-50 h-14 px-8 text-base font-semibold shadow-lg">
+                            <Button size="lg" className="bg-white dark:bg-slate-100 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-white h-14 px-8 text-base font-semibold shadow-lg">
                                 Get Started Free
                             </Button>
                         </Link>
-                        <Link href="/pricing">
+                        <Link href="/about">
                             <Button size="lg" variant="outline" className="border-2 border-white/50 text-white hover:bg-white/10 h-14 px-8 text-base">
-                                View Pricing
+                                Learn More
                             </Button>
                         </Link>
                     </div>

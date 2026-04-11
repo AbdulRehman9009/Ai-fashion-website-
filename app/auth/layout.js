@@ -72,7 +72,7 @@ export default function AuthLayout({ children }) {
         {/* Footer Links */}
         <div className="relative z-20 flex gap-6 text-sm text-white/60">
           <Link href="/about" className="hover:text-white transition-colors">About Us</Link>
-          <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+          <Link href="/legal/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
         </div>
       </div>
 

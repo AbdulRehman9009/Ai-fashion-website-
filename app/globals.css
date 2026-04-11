@@ -129,6 +129,21 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Branded text selection */
+::selection {
+  background-color: rgba(99, 102, 241, 0.2);
+  color: inherit;
+}
+
+/* Better focus-visible for all interactive elements */
+a:focus-visible,
+button:focus-visible,
+[role="button"]:focus-visible {
+  outline: 2px solid rgba(99, 102, 241, 0.7);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 /* Prevent body scroll when modal/sidebar is open */
 body.no-scroll {
   overflow: hidden;

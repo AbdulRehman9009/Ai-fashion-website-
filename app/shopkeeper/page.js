@@ -5,7 +5,7 @@ import { Store, ShoppingBag, BarChart3, Users, Zap, Shield } from "lucide-react"
 
 export default function ShopkeeperLandingPage() {
     return (
-        <div className="flex flex-col min-h-screen">
+        <div className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950">
             {/* Hero Section */}
             <section className="relative bg-gradient-to-br from-orange-900 via-orange-800 to-red-900 text-white overflow-hidden py-24 lg:py-32">
                 <div className="absolute inset-0 z-0 opacity-20">
@@ -49,11 +49,11 @@ export default function ShopkeeperLandingPage() {
             </section>
 
             {/* Benefits Section */}
-            <section className="py-20 bg-white">
+            <section className="py-20 bg-white dark:bg-slate-900 border-y border-transparent dark:border-slate-800">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Partner With Us?</h2>
-                        <p className="text-gray-600 max-w-2xl mx-auto">Take your fashion business to the next level</p>
+                        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Why Partner With Us?</h2>
+                        <p className="text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">Take your fashion business to the next level</p>
                     </div>
 
                     <div className="grid md:grid-cols-3 gap-8">
@@ -95,12 +95,12 @@ export default function ShopkeeperLandingPage() {
                                 color: "text-indigo-600 bg-indigo-100"
                             }
                         ].map((benefit, idx) => (
-                            <div key={idx} className="p-8 rounded-2xl bg-gray-50 border border-gray-100 hover:border-orange-200 hover:shadow-lg transition-all">
-                                <div className={`h-14 w-14 ${benefit.color} rounded-xl flex items-center justify-center mb-6`}>
+                            <div key={idx} className="p-8 rounded-2xl bg-gray-50 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 hover:border-orange-200 dark:hover:border-orange-500/50 hover:shadow-lg transition-all">
+                                <div className={`h-14 w-14 ${benefit.color.replace(' bg-', ' dark:bg-opacity-20 bg-')} rounded-xl flex items-center justify-center mb-6`}>
                                     <benefit.icon className="h-7 w-7" />
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-3">{benefit.title}</h3>
-                                <p className="text-gray-600 leading-relaxed">{benefit.desc}</p>
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{benefit.title}</h3>
+                                <p className="text-gray-600 dark:text-slate-400 leading-relaxed">{benefit.desc}</p>
                             </div>
                         ))}
                     </div>
@@ -108,11 +108,11 @@ export default function ShopkeeperLandingPage() {
             </section>
 
             {/* How It Works */}
-            <section className="py-20 bg-gradient-to-br from-orange-50 to-red-50">
+            <section className="py-20 bg-gradient-to-br from-orange-50 dark:from-slate-900 to-red-50 dark:to-slate-950">
                 <div className="container mx-auto px-4">
                     <div className="text-center mb-16">
-                        <h2 className="text-3xl font-bold text-gray-900 mb-4">Get Started in Minutes</h2>
-                        <p className="text-gray-600 max-w-2xl mx-auto">Simple onboarding process for shop owners</p>
+                        <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Get Started in Minutes</h2>
+                        <p className="text-gray-600 dark:text-slate-400 max-w-2xl mx-auto">Simple onboarding process for shop owners</p>
                     </div>
 
                     <div className="max-w-4xl mx-auto grid md:grid-cols-3 gap-8">
@@ -125,8 +125,8 @@ export default function ShopkeeperLandingPage() {
                                 <div className="h-16 w-16 bg-orange-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-4 mx-auto shadow-lg">
                                     {item.step}
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-3">{item.title}</h3>
-                                <p className="text-gray-600">{item.desc}</p>
+                                <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-3">{item.title}</h3>
+                                <p className="text-gray-600 dark:text-slate-400">{item.desc}</p>
                             </div>
                         ))}
                     </div>

@@ -5,10 +5,10 @@ import { Button } from "@/components/ui/button";
 
 export default function Home() {
   return (
-    <main className="flex flex-col min-h-screen bg-white dark:bg-gray-950">
+    <main className="flex flex-col min-h-screen bg-slate-50 dark:bg-slate-950">
 
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden py-20 lg:py-32">
+      <section className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white overflow-hidden py-16 lg:py-24">
         {/* Decorative Background */}
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-600/30 via-transparent to-transparent" />
@@ -115,7 +115,7 @@ export default function Home() {
               Simple 3-Step Process
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">How It Works</h2>
-            <p className="text-slate-600 dark:text-gray-400 max-w-2xl mx-auto text-lg">From AI recommendations to doorstep delivery, we've made custom fashion effortless.</p>
+            <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-lg">From AI recommendations to doorstep delivery, we've made custom fashion effortless.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
@@ -156,12 +156,12 @@ export default function Home() {
                     <step.icon className="h-7 w-7" />
                   </div>
                   <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">{step.title}</h3>
-                  <p className="text-slate-600 dark:text-gray-400 leading-relaxed text-sm lg:text-base">{step.desc}</p>
+                  <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm lg:text-base">{step.desc}</p>
                 </div>
 
                 {/* Connector Line */}
                 {idx < 2 && (
-                  <div className="hidden md:block absolute top-1/2 -right-3 lg:-right-4 w-6 lg:w-8 border-t-2 border-dashed border-slate-200" />
+                  <div className="hidden md:block absolute top-1/2 -right-3 lg:-right-4 w-6 lg:w-8 border-t-[3px] border-dashed border-slate-300 dark:border-slate-600" />
                 )}
               </div>
             ))}
@@ -232,13 +232,6 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-              {/* Decorative Elements */}
-              <div className="absolute -bottom-6 -left-6 p-6 rounded-2xl bg-white shadow-xl border border-slate-100">
-                <div className="flex items-center gap-4">
-                  <div className="text-3xl lg:text-4xl font-bold text-indigo-600">98%</div>
-                  <div className="text-sm text-slate-600">Customer<br />Satisfaction</div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
@@ -249,7 +242,7 @@ export default function Home() {
         <div className="container mx-auto px-4 sm:px-6">
           <div className="text-center mb-16">
             <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">Join Our Platform</h2>
-            <p className="text-slate-600 dark:text-gray-400 max-w-2xl mx-auto text-lg">Choose how you want to be part of the Style Genie revolution.</p>
+            <p className="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto text-lg">Choose how you want to be part of the Style Genie revolution.</p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
@@ -283,7 +276,7 @@ export default function Home() {
                   }`}>
                   <div className="text-4xl mb-4">{role.icon}</div>
                   <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{role.title}</h3>
-                  <p className="text-slate-600 dark:text-gray-400 mb-4 text-sm lg:text-base">{role.desc}</p>
+                  <p className="text-slate-600 dark:text-slate-400 mb-4 text-sm lg:text-base">{role.desc}</p>
                   <div className={`inline-flex items-center gap-1 font-medium ${role.color === "indigo" ? "text-indigo-600 dark:text-indigo-400" :
                     role.color === "purple" ? "text-purple-600 dark:text-purple-400" :
                       "text-amber-600 dark:text-amber-400"

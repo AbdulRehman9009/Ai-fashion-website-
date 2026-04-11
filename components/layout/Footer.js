@@ -27,16 +27,16 @@ export default function Footer() {
                             Revolutionizing fashion with AI-driven tailoring and measurements. Connect with expert tailors and shop premium fabrics.
                         </p>
                         <div className="flex space-x-4 pt-2">
-                            <a href="#" className="text-slate-400 hover:text-white transition-colors"><Twitter className="h-5 w-5" /></a>
-                            <a href="#" className="text-slate-400 hover:text-white transition-colors"><Instagram className="h-5 w-5" /></a>
-                            <a href="#" className="text-slate-400 hover:text-white transition-colors"><Linkedin className="h-5 w-5" /></a>
+                            <a href="https://twitter.com/stylegenie" target="_blank" rel="noopener noreferrer" aria-label="Twitter" className="text-slate-400 hover:text-white transition-colors p-1"><Twitter className="h-5 w-5" /></a>
+                            <a href="https://instagram.com/stylegenie" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-slate-400 hover:text-white transition-colors p-1"><Instagram className="h-5 w-5" /></a>
+                            <a href="https://linkedin.com/company/stylegenie" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" className="text-slate-400 hover:text-white transition-colors p-1"><Linkedin className="h-5 w-5" /></a>
                         </div>
                     </div>
 
                     {/* Company */}
                     <div>
                         <h3 className="font-semibold text-white mb-4 uppercase text-xs tracking-wider">Company</h3>
-                        <ul className="space-y-3 text-sm text-slate-400">
+                        <ul className="space-y-3 text-sm text-slate-300">
                             <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
                             <li><Link href="/features" className="hover:text-white transition-colors">Features</Link></li>
                             <li><Link href="/careers" className="hover:text-white transition-colors">Careers</Link></li>
@@ -47,7 +47,7 @@ export default function Footer() {
                     {/* Resources */}
                     <div>
                         <h3 className="font-semibold text-white mb-4 uppercase text-xs tracking-wider">Resources</h3>
-                        <ul className="space-y-3 text-sm text-slate-400">
+                        <ul className="space-y-3 text-sm text-slate-300">
                             <li><Link href="/blog" className="hover:text-white transition-colors">Blog</Link></li>
                             <li><Link href="/help" className="hover:text-white transition-colors">Help Center</Link></li>
                             <li><Link href="/guides" className="hover:text-white transition-colors">Measurement Guides</Link></li>
@@ -58,7 +58,7 @@ export default function Footer() {
                     {/* Legal */}
                     <div>
                         <h3 className="font-semibold text-white mb-4 uppercase text-xs tracking-wider">Legal</h3>
-                        <ul className="space-y-3 text-sm text-slate-400">
+                        <ul className="space-y-3 text-sm text-slate-300">
                             <li><Link href="/legal/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
                             <li><Link href="/legal/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
                             <li><Link href="/legal/cookies" className="hover:text-white transition-colors">Cookie Policy</Link></li>
@@ -67,10 +67,10 @@ export default function Footer() {
                         <div className="mt-6 pt-6 border-t border-slate-800">
                             <p className="text-xs text-slate-500 mb-2">Role Specific Terms:</p>
                             <div className="flex flex-wrap gap-x-4 gap-y-2 text-xs text-slate-400">
-                                <Link href="/legal/terms/customer" className="hover:text-white transition-colors">Customer</Link>
-                                <Link href="/legal/terms/tailor" className="hover:text-white transition-colors">Tailor</Link>
-                                <Link href="/legal/terms/shopkeeper" className="hover:text-white transition-colors">Shop</Link>
-                                <Link href="/legal/terms/delivery" className="hover:text-white transition-colors">Delivery</Link>
+                                <Link href="/legal/terms/customer" className="hover:text-white transition-colors py-1 px-1">Customer</Link>
+                                <Link href="/legal/terms/tailor" className="hover:text-white transition-colors py-1 px-1">Tailor</Link>
+                                <Link href="/legal/terms/shopkeeper" className="hover:text-white transition-colors py-1 px-1">Shop</Link>
+                                <Link href="/legal/terms/delivery" className="hover:text-white transition-colors py-1 px-1">Delivery</Link>
                             </div>
                         </div>
                     </div>

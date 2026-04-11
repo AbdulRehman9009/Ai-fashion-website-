@@ -28,7 +28,7 @@ export default function NotFound() {
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                     <Link href="/">
-                        <Button className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-pink-500 hover:from-orange-600 hover:to-pink-600">
+                        <Button className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700">
                             <Home className="w-4 h-4 mr-2" />
                             Back to Home
                         </Button>
