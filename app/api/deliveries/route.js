@@ -27,7 +27,7 @@ export async function GET(req) {
                     { path: "shop", select: "name logo" },
                     {
                         path: "items.product",
-                        select: "name imageUrl"
+                        select: "title images basePrice"
                     }
                 ]
             })
@@ -41,7 +41,7 @@ export async function GET(req) {
                 ...delivery,
                 customer: order?.user,
                 shop: order?.shop,
-                outfitImage: order?.items?.[0]?.product?.imageUrl,
+                outfitImage: order?.items?.[0]?.product?.images?.[0],
                 deliveryAddress: order?.shippingAddress,
                 urgent: order?.urgent || false,
                 orderStatus: order?.status,

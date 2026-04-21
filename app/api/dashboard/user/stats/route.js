@@ -15,10 +15,12 @@ export async function GET(req) {
 
         // Run all stats counts in parallel
         const ACTIVE_STATUSES = [
-            "OrderCreated", "PaymentConfirmed", "TailoringPending",
+            "OrderCreated", "PaymentPending", "PaymentConfirmed", "TailoringPending",
             "TailoringInProgress", "TailoringCompleted", "DeliveryPending",
             "OutForPickup", "PickedUp", "OutForDelivery"
         ];
+
+        const COMPLETED_STATUSES = ["Delivered", "Completed"];
 
         const [activeOrders, completedOrders, pendingPayments] = await Promise.all([
             Order.countDocuments({
@@ -27,7 +29,7 @@ export async function GET(req) {
             }),
             Order.countDocuments({
                 user: userId,
-                status: "Delivered"
+                status: { $in: COMPLETED_STATUSES }
             }),
             Order.countDocuments({
                 user: userId,

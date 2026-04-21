@@ -131,7 +131,7 @@ export default function CustomerAnalyticsPage() {
                                         </p>
                                     </div>
                                     <div className="text-right">
-                                        <p className="font-medium">${order.grandTotal?.toFixed(2)}</p>
+                                        <p className="font-medium">${order.pricing?.grandTotal?.toFixed(2) || "0.00"}</p>
                                         <p className="text-sm text-muted-foreground">
                                             {order.paymentStatus}
                                         </p>

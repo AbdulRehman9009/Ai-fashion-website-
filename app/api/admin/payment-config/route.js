@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getPaymentConfig, updatePaymentConfig } from "@/lib/paymentDistribution";
+import { getPaymentConfig, updatePaymentConfig } from "@/lib/payment-distribution";
 
 export async function GET() {
     try {

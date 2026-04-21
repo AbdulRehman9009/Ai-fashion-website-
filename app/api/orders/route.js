@@ -28,7 +28,11 @@ export async function GET(req) {
       .populate("shop")
       .lean();
   } else if (role === "TAILOR") {
-    orders = await Order.find({ status: { $in: ["TailoringPending", "TailoringInProgress"] } })
+    // FIXED: Only show orders assigned to this tailor, not ALL tailoring orders site-wide
+    orders = await Order.find({
+      assignedTailor: token.sub,
+      status: { $in: ["TailoringPending", "TailoringInProgress", "TailoringCompleted"] }
+    })
       .sort({ createdAt: -1 })
       .populate("shop")
       .lean();
@@ -120,7 +124,7 @@ export async function POST(req) {
       cancelUrl: `${process.env.NEXTAUTH_URL}/checkout`
     });
 
-    if (checkoutSession && checkoutSession.url) {
+    if (checkoutSession && checkoutSession.success && checkoutSession.url) {
       // Update order with checkout ID for tracking
       order.paddleCheckoutId = checkoutSession.id;
       await order.save();

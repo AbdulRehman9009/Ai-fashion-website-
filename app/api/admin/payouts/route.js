@@ -6,7 +6,6 @@ import User from "@/models/User";
 import Earning from "@/models/Earning";
 import Payout from "@/models/Payout";
 import Order from "@/models/Order";
-import { processPayoutBatch } from "@/lib/paddle/paddlePayout";
 
 // GET: Fetch pending payouts for admin dashboard
 export async function GET(req) {
@@ -73,7 +72,7 @@ export async function GET(req) {
     }
 }
 
-// POST: Process payout for specific users
+// POST: Process payout for specific users via Earning system
 export async function POST(req) {
     try {
         const session = await getServerSession(authOptions);
@@ -81,18 +80,38 @@ export async function POST(req) {
             return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
-        const { userIds, reference } = await req.json();
-
-        if (!userIds || !Array.isArray(userIds) || userIds.length === 0) {
-            return NextResponse.json({ error: "Invalid user IDs" }, { status: 400 });
-        }
+        const body = await req.json();
+        const { userId, earningIds, payoutIds, reference } = body;
 
         await connectDB();
 
-        // Process payouts using our library
-        const result = await processPayoutBatch(userIds, session.user.id, reference);
+        // Option 1: Process via Earning IDs (legacy system)
+        if (userId && earningIds && Array.isArray(earningIds) && earningIds.length > 0) {
+            // FIXED: processPayoutBatch expects (userId, earningIds) — was called with 3 args
+            const { processPayoutBatch } = await import("@/lib/paddle/paddlePayout");
+            const result = await processPayoutBatch(userId, earningIds);
+            return NextResponse.json(result);
+        }
 
-        return NextResponse.json(result);
+        // Option 2: Process via Payout IDs (new ledger system)
+        if (payoutIds && Array.isArray(payoutIds) && payoutIds.length > 0) {
+            const result = await Payout.updateMany(
+                { _id: { $in: payoutIds }, status: "pending" },
+                {
+                    status: "paid_by_admin",
+                    paidAt: new Date(),
+                    paidBy: session.user.id,
+                    notes: reference || ""
+                }
+            );
+
+            return NextResponse.json({
+                success: true,
+                updated: result.modifiedCount
+            });
+        }
+
+        return NextResponse.json({ error: "Provide either {userId, earningIds} or {payoutIds}" }, { status: 400 });
     } catch (error) {
         console.error("Error processing payouts:", error);
         return NextResponse.json({ error: "Server error" }, { status: 500 });
@@ -136,4 +155,3 @@ export async function PATCH(req) {
         return NextResponse.json({ error: "Failed to update payouts" }, { status: 500 });
     }
 }
-

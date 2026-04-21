@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { headers } from "next/headers";
 import { connectDB } from "@/lib/db";
 import Order from "@/models/Order";
+import Payment from "@/models/Payment";
 import { verifyPaddleSignature, parsePaddleEvent, extractOrderId } from "@/lib/paddle/paddleWebhook";
 import { markEarningsAsAvailable, createEarningsForOrder } from "@/lib/paddle/paddlePayout";
 import { logger } from "@/lib/logger";
@@ -9,7 +10,7 @@ import { logger } from "@/lib/logger";
 export async function POST(req) {
     try {
         const body = await req.text();
-        const headersList = headers();
+        const headersList = await headers();
         const signature = headersList.get("paddle-signature");
 
         // Verify webhook signature
@@ -71,7 +72,8 @@ async function handleTransactionCompleted(event) {
     }
 
     try {
-        const order = await Order.findById(orderId).populate("shop assignedTailor assignedDelivery");
+        // FIXED: populate 'delivery' instead of non-existent 'assignedDelivery'
+        const order = await Order.findById(orderId).populate("shop assignedTailor delivery");
         if (!order) {
             logger.error(`Order not found for Paddle payment: ${orderId}`);
             return;
@@ -95,7 +97,24 @@ async function handleTransactionCompleted(event) {
         });
         await order.save();
 
-        // Create earnings for all parties (legacy system)
+        // Create a Payment record for audit trail
+        try {
+            await Payment.create({
+                order: order._id,
+                amount: order.pricing.grandTotal,
+                currency: order.pricing.currency || "USD",
+                method: "PADDLE",
+                status: "PAID",
+                paddleTransactionId: data.id,
+                transactionId: `paddle_${data.id}`,
+                providerData: data,
+            });
+        } catch (paymentRecordError) {
+            // Don't fail the webhook if payment record creation fails (e.g., duplicate transactionId)
+            logger.error("Error creating Payment record", { orderId, error: paymentRecordError.message });
+        }
+
+        // Create earnings for all parties
         await createEarningsForOrder(order);
 
         // Mark earnings as available (since Paddle pays platform first)
@@ -128,6 +147,7 @@ async function handlePaymentFailed(event) {
     }
 
     try {
+        // FIXED: "FAILED" is now a valid enum value on the Order model
         await Order.findByIdAndUpdate(orderId, {
             paymentStatus: "FAILED",
             paddlePaymentId: data.id,
@@ -151,10 +171,20 @@ async function handleRefund(event) {
     }
 
     try {
+        // Update order status
         await Order.findByIdAndUpdate(orderId, {
             paymentStatus: "REFUNDED",
-            refundedAt: new Date(),
         });
+
+        // FIXED: Update refundedAt on the Payment record (not Order — Order has no such field)
+        await Payment.findOneAndUpdate(
+            { order: orderId, status: "PAID" },
+            {
+                status: "REFUNDED",
+                refundedAt: new Date(),
+                refundReason: "Paddle refund webhook",
+            }
+        );
 
         // Reverse earnings
         const Earning = (await import("@/models/Earning")).default;

@@ -13,18 +13,20 @@ export async function GET(req) {
 
         await connectDB();
 
-        // Get all orders for the user
-        const orders = await Order.find({ customer: session.user.id })
+        // FIXED: Order schema field is "user", not "customer"
+        const orders = await Order.find({ user: session.user.id })
             .populate("shop", "name")
             .sort({ createdAt: -1 })
             .lean();
 
         // Calculate analytics
         const totalOrders = orders.length;
-        const totalSpent = orders.reduce((sum, order) => sum + (order.grandTotal || 0), 0);
+        // FIXED: grandTotal is under pricing.grandTotal, not order.grandTotal
+        const totalSpent = orders.reduce((sum, order) => sum + (order.pricing?.grandTotal || 0), 0);
         const averageOrder = totalOrders > 0 ? totalSpent / totalOrders : 0;
+        // FIXED: Use correct enum values (PascalCase, "Canceled" not "CANCELLED")
         const activeOrders = orders.filter(
-            (o) => !["COMPLETED", "CANCELLED", "REFUNDED"].includes(o.status)
+            (o) => !["Completed", "Canceled"].includes(o.status)
         ).length;
 
         // Get recent orders (last 5)
@@ -44,7 +46,8 @@ export async function GET(req) {
                     };
                 }
                 shopStats[shopId].orderCount++;
-                shopStats[shopId].totalSpent += order.grandTotal || 0;
+                // FIXED: use pricing.grandTotal
+                shopStats[shopId].totalSpent += order.pricing?.grandTotal || 0;
             }
         });
 
