@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "react-toastify";
 import { User, MapPin, Phone, Mail, Check, Loader2 } from "lucide-react";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export default function CustomerProfileForm({ onComplete }) {
     const { data: session, update } = useSession();
@@ -125,6 +126,9 @@ export default function CustomerProfileForm({ onComplete }) {
                     Please fill out all required fields to start shopping
                 </CardDescription>
             </CardHeader>
+            <div className="p-2 flex justify-end">
+                <ThemeToggle />
+            </div>
             <CardContent>
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Personal Information */}

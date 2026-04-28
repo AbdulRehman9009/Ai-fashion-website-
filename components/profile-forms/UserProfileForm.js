@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "react-toastify";
 import { User, Ruler, Shirt, Check, Loader2, MapPin, Phone } from "lucide-react";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export default function UserProfileForm({ onComplete }) {
     const { data: session, update } = useSession();
@@ -136,6 +137,9 @@ export default function UserProfileForm({ onComplete }) {
                     <p className="text-muted-foreground">Manage your personal information and measurements for better fitting.</p>
                 </div>
                 <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground bg-blue-50 dark:bg-blue-900/30 px-3 py-1 rounded-full text-blue-700 dark:text-blue-400">
+                    <div className="flex items-center gap-2">
+                        <ThemeToggle />
+                    </div>
                     <User className="h-4 w-4" />
                     <span>Valued Customer</span>
                 </div>

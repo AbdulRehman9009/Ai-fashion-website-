@@ -8,6 +8,7 @@ import TailorProfileForm from "@/components/profile-forms/TailorProfileForm";
 import ShopkeeperProfileForm from "@/components/profile-forms/ShopkeeperProfileForm";
 import DeliveryProfileForm from "@/components/profile-forms/DeliveryProfileForm";
 import ProgressIndicator from "@/components/ui/ProgressIndicator";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 import { Loader2, CheckCircle2, AlertCircle, Info, ChevronRight } from "lucide-react";
 
 // Human-readable field labels
@@ -123,11 +124,16 @@ export default function CompleteProfilePage() {
             {/* Header */}
             <header className={`bg-gradient-to-r ${colors.gradient} py-8 shadow-lg`}>
                 <div className="container mx-auto px-4">
-                    <div className="flex items-center gap-3 mb-2">
-                        <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
-                            <Info className="h-6 w-6 text-white" />
+                    <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-3">
+                            <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
+                                <Info className="h-6 w-6 text-white" />
+                            </div>
+                            <h1 className="text-3xl font-bold text-white">Complete Your {roleName} Profile</h1>
                         </div>
-                        <h1 className="text-3xl font-bold text-white">Complete Your {roleName} Profile</h1>
+                        <div>
+                            <ThemeToggle />
+                        </div>
                     </div>
                     <p className="text-white/90 max-w-2xl">
                         Please fill in all required information to start using the platform. Your data is secure and will only be used for order processing.

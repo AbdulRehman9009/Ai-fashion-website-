@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "react-toastify";
 import { Truck, CreditCard, Check, Loader2 } from "lucide-react";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export default function DeliveryProfileForm({ onComplete }) {
     const { data: session, update } = useSession();
@@ -139,6 +140,9 @@ export default function DeliveryProfileForm({ onComplete }) {
                     <p className="text-muted-foreground">Manage your delivery settings and payout preferences.</p>
                 </div>
                 <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground bg-secondary/50 dark:bg-slate-800/50 px-3 py-1 rounded-full border dark:border-slate-700">
+                    <div className="flex items-center gap-2">
+                        <ThemeToggle />
+                    </div>
                     <Truck className="h-4 w-4" />
                     <span>Delivery Partner</span>
                 </div>

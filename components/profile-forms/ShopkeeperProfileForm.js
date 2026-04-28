@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "react-toastify";
 import { Store, MapPin, CreditCard, Check, Loader2 } from "lucide-react";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 
 export default function ShopkeeperProfileForm({ onComplete }) {
     const { data: session, update } = useSession();
@@ -131,6 +132,9 @@ export default function ShopkeeperProfileForm({ onComplete }) {
                     <p className="text-muted-foreground">Set up your digital shop front and payout details.</p>
                 </div>
                 <div className="hidden md:flex items-center gap-2 text-sm text-muted-foreground bg-secondary/50 dark:bg-slate-800/50 px-3 py-1 rounded-full border dark:border-slate-700">
+                    <div className="flex items-center gap-2">
+                        <ThemeToggle />
+                    </div>
                     <Store className="h-4 w-4" />
                     <span>Business Owner</span>
                 </div>

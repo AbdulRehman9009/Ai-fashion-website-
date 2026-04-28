@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import TailorProfileForm from "@/components/profile-forms/TailorProfileForm";
+import ThemeToggle from "@/components/ui/ThemeToggle";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, CheckCircle } from "lucide-react";
 
@@ -28,6 +29,9 @@ export default function TailorProfilePage() {
 
     return (
         <div className="space-y-6">
+            <div className="flex justify-end">
+                <ThemeToggle />
+            </div>
             {isRequired && profileStatus && !profileStatus.isComplete && (
                 <Alert variant="destructive">
                     <AlertCircle className="h-4 w-4" />
