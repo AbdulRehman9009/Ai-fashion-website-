@@ -7,12 +7,15 @@ import { ShoppingCart } from "lucide-react";
 import { toast } from "react-toastify";
 
 export default function ProductCard({ product, onAddToCart, onBuyNow }) {
+  const imageSrc = product.imageUrl || (product.images && product.images[0]) || "";
+  const tags = Array.isArray(product.tags) ? product.tags.slice(0, 3) : [];
+
   return (
     <Card className="flex flex-col h-full overflow-hidden hover:shadow-lg transition-shadow">
       <div className="relative aspect-[4/5] bg-gray-100 dark:bg-gray-800 overflow-hidden">
-        {product.imageUrl ? (
+        {imageSrc ? (
           <img
-            src={product.imageUrl}
+            src={imageSrc}
             alt={product.title}
             className="object-cover w-full h-full hover:scale-105 transition-transform duration-500"
           />
@@ -35,22 +38,17 @@ export default function ProductCard({ product, onAddToCart, onBuyNow }) {
       <CardContent className="p-4 pt-0 flex-1">
         <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">{product.description}</p>
         <div className="flex flex-wrap gap-1 mt-2">
-          {product.tags.slice(0, 3).map(tag => (
+          {tags.map((tag) => (
             <span key={tag} className="text-xs bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full text-gray-600 dark:text-gray-400">{tag}</span>
           ))}
         </div>
       </CardContent>
       <CardFooter className="p-4 border-t dark:border-gray-700 gap-2">
-        <Button className="flex-1 gap-2" variant="outline" onClick={() => onAddToCart(product)}>
-          <ShoppingCart className="h-4 w-4" /> Add
+        <Button className="flex-1 gap-2" variant="outline" onClick={() => onAddToCart && onAddToCart(product)}>
+          <ShoppingCart className="h-4 w-4" /> Add to cart
         </Button>
         <Button className="flex-1 gap-2 bg-indigo-600 hover:bg-indigo-700 text-white" onClick={() => {
-          onAddToCart(product);
-          // We need to wait for cart update? 
-          // The onAddToCart prop likely handles the async, but we can't await it unless it returns a promise.
-          // Let's assume user clicks and we redirect. 
-          // Ideally, we pass a callback or handle locally.
-          // Since onAddToCart is passed from parent, I'll modify parent.
+          if (onAddToCart) onAddToCart(product);
           if (onBuyNow) onBuyNow(product);
         }}>
           Buy Now

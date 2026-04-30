@@ -115,6 +115,12 @@ export default function CheckoutDialog({ open, onOpenChange, product, onSuccess 
           paymentMethod: data.paymentMethod || "COD"
         });
 
+        // If user selected card but server indicates COD (fallback), show error
+        if (paymentMethod === "card" && data.paymentMethod === "COD") {
+          toast.error("Payment gateway unavailable. Please try again later.");
+          return;
+        }
+
         // For card payments with Paddle checkout URL
         if (paymentMethod === "card" && data.checkoutUrl) {
           toast.success("Order created! Redirecting to secure payment...");
@@ -125,10 +131,12 @@ export default function CheckoutDialog({ open, onOpenChange, product, onSuccess 
           return;
         }
 
-        // For COD or when card checkout URL not available
-        toast.success("Order placed successfully! Pay on delivery.");
-        onSuccess?.();
-        onOpenChange(false);
+        // For COD or explicit COD response
+        if (data.paymentMethod === "COD" || paymentMethod === "cod") {
+          toast.success("Order placed successfully! Pay on delivery.");
+          onSuccess?.();
+          onOpenChange(false);
+        }
       }
     } catch (error) {
       console.error("Order error:", error);

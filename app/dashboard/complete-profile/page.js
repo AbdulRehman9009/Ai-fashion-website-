@@ -86,10 +86,10 @@ export default function CompleteProfilePage() {
 
     if (status === "loading" || loading) {
         return (
-            <div className="flex min-h-screen items-center justify-center bg-gray-50">
+            <div className="flex min-h-screen items-center justify-center bg-gray-50 dark:bg-gray-900">
                 <div className="text-center space-y-4">
                     <Loader2 className="h-10 w-10 animate-spin text-blue-600 mx-auto" />
-                    <p className="text-gray-600">Loading your profile...</p>
+                    <p className="text-gray-600 dark:text-gray-300">Loading your profile...</p>
                 </div>
             </div>
         );
@@ -101,11 +101,11 @@ export default function CompleteProfilePage() {
     }
 
     const roleColorMap = {
-        USER: { gradient: "from-blue-500 to-blue-600", bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200" },
-        TAILOR: { gradient: "from-purple-500 to-purple-600", bg: "bg-purple-50", text: "text-purple-700", border: "border-purple-200" },
-        SHOPKEEPER: { gradient: "from-orange-500 to-orange-600", bg: "bg-orange-50", text: "text-orange-700", border: "border-orange-200" },
-        DELIVERY: { gradient: "from-green-500 to-green-600", bg: "bg-green-50", text: "text-green-700", border: "border-green-200" },
-        ADMIN: { gradient: "from-red-600 to-red-700", bg: "bg-red-50", text: "text-red-700", border: "border-red-200" },
+        USER: { gradient: "from-blue-500 to-blue-600", bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200", darkBg: "bg-blue-900", darkText: "text-blue-100", darkBorder: "border-blue-800" },
+        TAILOR: { gradient: "from-purple-500 to-purple-600", bg: "bg-purple-50", text: "text-purple-700", border: "border-purple-200", darkBg: "bg-purple-900", darkText: "text-purple-100", darkBorder: "border-purple-800" },
+        SHOPKEEPER: { gradient: "from-orange-500 to-orange-600", bg: "bg-orange-50", text: "text-orange-700", border: "border-orange-200", darkBg: "bg-orange-900", darkText: "text-orange-100", darkBorder: "border-orange-800" },
+        DELIVERY: { gradient: "from-green-500 to-green-600", bg: "bg-green-50", text: "text-green-700", border: "border-green-200", darkBg: "bg-green-900", darkText: "text-green-100", darkBorder: "border-green-800" },
+        ADMIN: { gradient: "from-red-600 to-red-700", bg: "bg-red-50", text: "text-red-700", border: "border-red-200", darkBg: "bg-red-900", darkText: "text-red-100", darkBorder: "border-red-800" },
     };
 
     const roleNames = {
@@ -120,7 +120,7 @@ export default function CompleteProfilePage() {
     const roleName = roleNames[session.user.role] || session.user.role;
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
             {/* Header */}
             <header className={`bg-gradient-to-r ${colors.gradient} py-8 shadow-lg`}>
                 <div className="container mx-auto px-4">
@@ -143,13 +143,13 @@ export default function CompleteProfilePage() {
 
             {/* Progress Section */}
             {profileStatus && !profileStatus.isComplete && (
-                <div className="border-b bg-white py-6 shadow-sm">
+                <div className="border-b bg-white py-6 shadow-sm dark:bg-gray-900 dark:shadow-none">
                     <div className="container mx-auto px-4">
                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                             <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-2">
                                     <AlertCircle className="h-5 w-5 text-amber-500" />
-                                    <h2 className="text-lg font-semibold text-gray-900">Profile Completion Required</h2>
+                                    <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Profile Completion Required</h2>
                                 </div>
 
                                 {profileStatus.missingFields && profileStatus.missingFields.length > 0 && (
@@ -159,14 +159,14 @@ export default function CompleteProfilePage() {
                                             {profileStatus.missingFields.slice(0, 5).map((field, idx) => (
                                                 <span
                                                     key={idx}
-                                                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${colors.bg} ${colors.text} ${colors.border} border`}
+                                                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium ${colors.bg} ${colors.text} ${colors.border} border dark:${colors.darkBg} dark:${colors.darkText} dark:${colors.darkBorder}`}
                                                 >
                                                     <ChevronRight className="h-3 w-3" />
                                                     {getHumanLabel(field)}
                                                 </span>
                                             ))}
                                             {profileStatus.missingFields.length > 5 && (
-                                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                                                <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300">
                                                     +{profileStatus.missingFields.length - 5} more
                                                 </span>
                                             )}
@@ -177,9 +177,9 @@ export default function CompleteProfilePage() {
 
                             <div className="flex items-center gap-4">
                                 <div className="text-right">
-                                    <p className="text-2xl font-bold text-gray-900">{profileStatus.percentage}%</p>
-                                    <p className="text-xs text-gray-500">Complete</p>
-                                </div>
+                                        <p className="text-2xl font-bold text-gray-900 dark:text-white">{profileStatus.percentage}%</p>
+                                        <p className="text-xs text-gray-500 dark:text-gray-300">Complete</p>
+                                    </div>
                                 <ProgressIndicator
                                     percentage={profileStatus.percentage}
                                     size="md"
@@ -193,11 +193,11 @@ export default function CompleteProfilePage() {
 
             {/* Form Section */}
             <div className="container mx-auto px-4 py-12">
-                <div className="mx-auto max-w-4xl">
-                    <div className="rounded-2xl border bg-white p-6 md:p-8 shadow-lg">
+                    <div className="mx-auto max-w-4xl">
+                    <div className="rounded-2xl border bg-white p-6 md:p-8 shadow-lg dark:bg-gray-800 dark:border-gray-700">
                         {/* Role-specific hint */}
-                        <div className={`mb-6 p-4 rounded-lg ${colors.bg} ${colors.border} border`}>
-                            <p className={`text-sm ${colors.text}`}>
+                        <div className={`mb-6 p-4 rounded-lg ${colors.bg} ${colors.border} border dark:${colors.darkBg} dark:${colors.darkBorder}`}>
+                            <p className={`text-sm ${colors.text} dark:${colors.darkText}`}>
                                 {session.user.role === "USER" && "💡 Add your measurements for better outfit recommendations from our AI stylist!"}
                                 {session.user.role === "TAILOR" && "✂️ Complete your profile to start receiving tailoring orders from customers."}
                                 {session.user.role === "SHOPKEEPER" && "🏪 Set up your shop details to start selling products on the platform."}
@@ -213,8 +213,8 @@ export default function CompleteProfilePage() {
                         {session.user.role === "ADMIN" && (
                             <div className="text-center py-8">
                                 <CheckCircle2 className="mx-auto h-16 w-16 text-green-500" />
-                                <h3 className="mt-4 text-xl font-semibold text-gray-900">Admin Access Granted</h3>
-                                <p className="mt-2 text-gray-600">Your administrator profile is already set up.</p>
+                                <h3 className="mt-4 text-xl font-semibold text-gray-900 dark:text-white">Admin Access Granted</h3>
+                                <p className="mt-2 text-gray-600 dark:text-gray-300">Your administrator profile is already set up.</p>
                                 <button
                                     onClick={handleComplete}
                                     className="mt-6 rounded-lg bg-gradient-to-r from-red-600 to-red-700 px-8 py-3 text-white font-medium hover:from-red-700 hover:to-red-800 transition-all shadow-lg hover:shadow-xl"

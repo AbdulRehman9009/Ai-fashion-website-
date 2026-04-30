@@ -12,10 +12,6 @@ export default function ShopSection({ onAddToCart }) {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    // In a real app, this would be an API call
-    // We will simulate it for now by fetching all products if we had an API, 
-    // or we can create a simple API endpoint for products.
-    // Let's create a quick API endpoint for products first.
     fetch("/api/products")
         .then(res => res.json())
         .then(data => {

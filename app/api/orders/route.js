@@ -133,14 +133,18 @@ export async function POST(req) {
         id: String(order._id),
         checkoutUrl: checkoutSession.url
       }, { status: 201 });
-    } else {
-      // No Paddle checkout URL - allow COD (Cash on Delivery)
-      console.log("Paddle checkout not available - proceeding with COD option");
+    } else if (checkoutSession && checkoutSession.success && !checkoutSession.url) {
+      // Transaction created but no checkout URL returned - treat as an error
+      console.error("Paddle created a transaction but returned no checkout URL", checkoutSession);
       return NextResponse.json({
-        id: String(order._id),
-        paymentMethod: "COD",
-        message: "Order created successfully. Pay on delivery."
-      }, { status: 201 });
+        error: "Payment gateway unavailable. Please try again later."
+      }, { status: 502 });
+    } else {
+      // Propagate Paddle errors to the client so the UI doesn't silently treat card payments as COD
+      console.error("Paddle checkout creation failed", checkoutSession);
+      return NextResponse.json({
+        error: checkoutSession?.error || "Failed to create payment session"
+      }, { status: 502 });
     }
   } catch (error) {
     console.error("Checkout creation error:", error);
