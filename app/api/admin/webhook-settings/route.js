@@ -3,13 +3,13 @@ import { connectDB } from "@/lib/db";
 import SystemConfig from "@/models/SystemConfig";
 import { withErrorHandler, withAuth } from "@/lib/api-middleware";
 
-async function GET(req) {
+async function getHandler(req) {
     await connectDB();
     const cfg = await SystemConfig.findOne({ key: "paddle.webhook" }).lean();
     return NextResponse.json({ success: true, data: cfg ? cfg.value : { secret: "", verifyEnabled: true } });
 }
 
-async function PUT(req) {
+async function putHandler(req) {
     await connectDB();
     const body = await req.json();
     const value = {
@@ -28,5 +28,5 @@ async function PUT(req) {
 
 const adminAuth = (handler) => withAuth(handler, { roles: ["ADMIN"] });
 
-export const GET = withErrorHandler(adminAuth(GET));
-export const PUT = withErrorHandler(adminAuth(PUT));
+export const GET = withErrorHandler(adminAuth(getHandler));
+export const PUT = withErrorHandler(adminAuth(putHandler));

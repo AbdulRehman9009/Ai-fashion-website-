@@ -2,7 +2,7 @@
 
 > **AI-Powered Fashion Marketplace** connecting customers with local tailors, shops, and delivery services for personalized outfit recommendations and custom clothing.
 
-## 🎯 Project Overview
+##  Project Overview
 
 This is a comprehensive full-stack web application built as a Final Year Project (FYP) that demonstrates a complete e-commerce workflow with AI integration. The platform allows users to receive personalized outfit recommendations based on their image, event type, and preferences, while providing a full fulfillment workflow involving shops, tailors, and delivery personnel.
 
