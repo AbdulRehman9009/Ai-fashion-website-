@@ -8,6 +8,7 @@ import { toast } from "react-toastify";
 import ImageUpload from "@/components/ui/image-upload";
 import PasswordChangeForm from "@/components/settings/PasswordChangeForm";
 import DeleteAccountSection from "@/components/settings/DeleteAccountSection";
+import PaddleWebhookSettings from "@/components/settings/PaddleWebhookSettings";
 
 export default function AdminSettings() {
     const [loading, setLoading] = useState(true);
@@ -103,6 +104,9 @@ export default function AdminSettings() {
 
             {/* Delete Account */}
             <DeleteAccountSection />
+
+            {/* Paddle Webhook Settings (Admin) */}
+            <PaddleWebhookSettings />
         </div>
     );
 }

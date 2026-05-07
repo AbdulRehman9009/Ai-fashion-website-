@@ -5,10 +5,6 @@ import { Loader2, CreditCard, ShieldCheck } from "lucide-react";
 import { toast } from "react-toastify";
 import axios from "axios";
 
-/**
- * Checkout Button Component
- * Initializes a Paddle checkout for an order
- */
 export default function CheckoutButton({
     orderId,
     amount,
@@ -29,10 +25,8 @@ export default function CheckoutButton({
             const res = await axios.post("/api/checkout", { orderId });
 
             if (res.data.checkoutUrl) {
-                // Redirect to Paddle checkout
                 window.location.href = res.data.checkoutUrl;
             } else if (res.data.transactionId) {
-                // For Paddle.js overlay checkout (if configured)
                 if (window.Paddle) {
                     window.Paddle.Checkout.open({
                         transactionId: res.data.transactionId,

@@ -6,7 +6,6 @@ import { Twitter, Instagram, Linkedin, Mail } from "lucide-react";
 export default function Footer() {
     const pathname = usePathname();
 
-    // Hide footer on dashboard routes
     if (pathname?.startsWith("/dashboard")) {
         return null;
     }
@@ -15,7 +14,7 @@ export default function Footer() {
         <footer className="bg-slate-900 border-t border-slate-800 pt-16 pb-8">
             <div className="container mx-auto px-4">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
-                    {/* Brand */}
+                    
                     <div className="space-y-4">
                         <Link href="/" className="flex items-center space-x-2">
                             <div className="h-8 w-8 rounded-lg bg-white flex items-center justify-center">
@@ -33,7 +32,7 @@ export default function Footer() {
                         </div>
                     </div>
 
-                    {/* Company */}
+                    
                     <div>
                         <h3 className="font-semibold text-white mb-4 uppercase text-xs tracking-wider">Company</h3>
                         <ul className="space-y-3 text-sm text-slate-300">
@@ -44,7 +43,7 @@ export default function Footer() {
                         </ul>
                     </div>
 
-                    {/* Resources */}
+                    
                     <div>
                         <h3 className="font-semibold text-white mb-4 uppercase text-xs tracking-wider">Resources</h3>
                         <ul className="space-y-3 text-sm text-slate-300">
@@ -55,7 +54,7 @@ export default function Footer() {
                         </ul>
                     </div>
 
-                    {/* Legal */}
+                    
                     <div>
                         <h3 className="font-semibold text-white mb-4 uppercase text-xs tracking-wider">Legal</h3>
                         <ul className="space-y-3 text-sm text-slate-300">

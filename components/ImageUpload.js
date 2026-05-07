@@ -3,16 +3,6 @@ import { useState, useRef, useCallback } from "react";
 import { Upload, X, Camera, ImageIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-/**
- * ImageUpload Component
- * Handles image upload to Cloudinary with preview and drag-drop support
- * 
- * @param {Function} onUploadSuccess - Callback with secure URL on success
- * @param {Function} onUploadError - Callback with error message
- * @param {string} className - Additional CSS classes
- * @param {boolean} showPreview - Whether to show image preview (default: true)
- * @param {number} maxSizeMB - Maximum file size in MB (default: 5)
- */
 export default function ImageUpload({
     onUploadSuccess,
     onUploadError,
@@ -131,7 +121,7 @@ export default function ImageUpload({
         fileInputRef.current?.click();
     };
 
-    // Expose methods for parent components
+    
     const getFile = () => file;
     const getPreview = () => preview;
     const upload = () => uploadFile();
@@ -252,7 +242,6 @@ export default function ImageUpload({
     );
 }
 
-// Hook version for controlled usage
 export function useImageUpload({ maxSizeMB = 5, onSuccess, onError } = {}) {
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState(null);

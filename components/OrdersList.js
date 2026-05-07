@@ -17,7 +17,6 @@ export default function OrdersList({ role, limit, compact }) {
     setLoading(true);
     setError("");
     try {
-      // Logic to support limit for dashboard summary
       let url = `/api/orders?role=${role}`;
       const res = await fetch(url);
       const data = await res.json();
@@ -124,8 +123,6 @@ export default function OrdersList({ role, limit, compact }) {
                         </span>
                       )}
                     </div>
-
-                    {/* User Info for non-users */}
                     {role !== "USER" && o.user && (
                       <div className="text-sm font-medium text-gray-700 dark:text-gray-300">
                         Customer: {o.user.name || o.user.email}
@@ -156,7 +153,6 @@ export default function OrdersList({ role, limit, compact }) {
         </CardContent>
       </Card>
 
-      {/* Order Details Modal */}
       <Dialog open={!!selectedOrder} onOpenChange={(open) => !open && setSelectedOrder(null)}>
         <DialogContent className="max-w-2xl overflow-y-auto max-h-[85vh]">
           <DialogHeader>

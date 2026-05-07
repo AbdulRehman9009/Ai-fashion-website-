@@ -56,7 +56,7 @@ export default function DeliveryStats({ stats, earnings }) {
                             <div className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                                 {card.value}
                             </div>
-                            {/* Additional info logic if needed, simplified for clean look */}
+                            
                         </CardContent>
                     </Card>
                 );

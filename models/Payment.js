@@ -20,28 +20,24 @@ const PaymentSchema = new mongoose.Schema(
       index: true
     },
 
-    // Transaction identifiers
     transactionId: { type: String, unique: true, sparse: true },
     paddleTransactionId: { type: String, sparse: true, index: true },
     paddleCustomerId: { type: String, sparse: true },
 
-    // Refund tracking
     refundAmount: { type: Number, default: 0, min: 0 },
     refundReason: { type: String },
     refundedAt: { type: Date },
 
-    // Webhook & provider data (flexible storage for Paddle event payloads)
     providerData: { type: mongoose.Schema.Types.Mixed },
 
-    // Payment method details (masked / safe to store)
+    
     paymentMethodDetails: {
-      brand: String,          // e.g. "Visa", "Mastercard"
-      last4: String,          // e.g. "4242"
+      brand: String,
+      last4: String,
       expiryMonth: Number,
       expiryYear: Number,
     },
-
-    // IP / audit
+    
     ipAddress: { type: String },
     userAgent: { type: String },
   },

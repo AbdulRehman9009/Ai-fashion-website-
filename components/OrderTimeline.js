@@ -1,7 +1,6 @@
 import { CheckCircle, Circle, ArrowDown } from "lucide-react";
 
 export default function OrderTimeline({ timeline = [], status }) {
-    // Define standard steps in order
     const steps = [
         { id: "PENDING", label: "Order Placed" },
         { id: "ACCEPTED", label: "Accepted by Shop" },
@@ -11,7 +10,6 @@ export default function OrderTimeline({ timeline = [], status }) {
         { id: "DELIVERED", label: "Delivered" },
     ];
 
-    // Helper to find if step is completed
     const isCompleted = (stepId) => {
         const currentIndex = steps.findIndex(s => s.id === status);
         const stepIndex = steps.findIndex(s => s.id === stepId);
@@ -43,8 +41,6 @@ export default function OrderTimeline({ timeline = [], status }) {
                                 <p className={`font-semibold ${completed ? "text-gray-900 dark:text-gray-100" : "text-gray-500 dark:text-gray-400"}`}>
                                     {step.label}
                                 </p>
-                                {/* Optional: Show timestamp if available in timeline */}
-                                {/* <p className="text-xs text-gray-400">Date here</p> */}
                             </div>
                         </div>
                     );

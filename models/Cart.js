@@ -31,15 +31,14 @@ const CartSchema = new mongoose.Schema(
             ref: "User",
             required: true
         },
-        // Denormalized shop reference — enables O(1) multi-shop conflict check
-        // without populating all cart items every request.
+        
         shop: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "Shop",
             default: null
         },
         items: [CartItemSchema],
-        // TTL: remove carts that haven't been updated in 90 days
+        
         lastActivity: {
             type: Date,
             default: Date.now

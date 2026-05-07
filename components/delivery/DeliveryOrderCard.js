@@ -89,7 +89,7 @@ export default function DeliveryOrderCard({ delivery, onUpdate }) {
             <CardHeader className="p-4 bg-gradient-to-r from-green-50 to-white">
                 <div className="flex justify-between items-start">
                     <div className="flex gap-4">
-                        {/* Customer Avatar */}
+                        
                         <div className="h-14 w-14 rounded-full bg-gray-200 flex items-center justify-center border-2 border-white shadow-sm overflow-hidden">
                             {delivery.customer?.image ? (
                                 <img src={delivery.customer.image} alt="Customer" className="h-full w-full object-cover" />
@@ -116,9 +116,9 @@ export default function DeliveryOrderCard({ delivery, onUpdate }) {
             </CardHeader>
 
             <CardContent className="p-4 grid md:grid-cols-2 gap-6">
-                {/* Delivery Details */}
+                
                 <div className="space-y-4">
-                    {/* Outfit Image */}
+                    
                     <div className="flex gap-4">
                         <div className="h-24 w-24 bg-gray-100 rounded-lg overflow-hidden border-2 border-gray-200 shadow-sm">
                             {delivery.outfitImage ? (
@@ -141,7 +141,7 @@ export default function DeliveryOrderCard({ delivery, onUpdate }) {
                         </div>
                     </div>
 
-                    {/* Delivery Address */}
+                    
                     <div className="bg-gray-50 p-3 rounded-lg border">
                         <div className="flex items-start gap-2">
                             <MapPin className="h-4 w-4 text-green-600 mt-0.5 flex-shrink-0" />
@@ -160,7 +160,7 @@ export default function DeliveryOrderCard({ delivery, onUpdate }) {
                     </div>
                 </div>
 
-                {/* Action Panel */}
+                
                 <div className="space-y-4 border-l pl-4 md:pl-6">
                     {!isDelivered ? (
                         <>
@@ -227,7 +227,7 @@ export default function DeliveryOrderCard({ delivery, onUpdate }) {
                         </div>
                     )}
 
-                    {/* Earnings Info */}
+                    
                     <div className="pt-4 border-t">
                         <div className="flex justify-between items-center">
                             <span className="text-sm text-gray-600">Delivery Fee:</span>

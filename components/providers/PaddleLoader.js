@@ -12,18 +12,17 @@ export default function PaddleLoader() {
                             token: process.env.NEXT_PUBLIC_PADDLE_CLIENT_TOKEN
                         };
 
-                        // Set environment based on env variable
-                        // Sandbox tokens start with "test_", live tokens start with "live_"
-                        if (process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT === 'sandbox') {
-                            initConfig.environment = 'sandbox';
-                        }
+                        try {
+                            if (typeof window.Paddle.Initialize === 'function') {
+                                window.Paddle.Initialize(initConfig);
+                            } else if (typeof window.Paddle.Setup === 'function') {
+                                window.Paddle.Setup(initConfig);
+                            }
 
-                        window.Paddle.Initialize(initConfig);
-                        console.log(
-                            "Paddle initialized in",
-                            process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT || "production",
-                            "mode"
-                        );
+                            console.log("Paddle initialized", process.env.NEXT_PUBLIC_PADDLE_ENVIRONMENT || "production");
+                        } catch (err) {
+                            console.warn("Paddle init error:", err?.message || err);
+                        }
                     } else {
                         console.warn("Paddle Client Token not found");
                     }

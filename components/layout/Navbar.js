@@ -33,7 +33,6 @@ export default function Navbar() {
         return null;
     }, [pathname]);
 
-    // Return null for dashboard and auth pages AFTER all hooks
     if (isDashboard || isAuth) return null;
 
     const roleLinks = [
@@ -60,7 +59,7 @@ export default function Navbar() {
         return `/dashboard/${role === "user" ? "user" : role}`;
     };
 
-    // Role-specific navigation items for logged-in users
+    
     const getRoleNavItems = () => {
         if (!session) return [];
         const role = session.user.role;
@@ -98,7 +97,7 @@ export default function Navbar() {
 
     const sessionNavItems = getRoleNavItems();
 
-    // Default public links
+    
     const publicLinks = [
         { href: "/", label: "Home" },
         { href: "/features", label: "Features" },
@@ -113,7 +112,7 @@ export default function Navbar() {
             <nav className="sticky top-0 z-50 w-full border-b bg-white dark:bg-gray-900 dark:border-gray-800 shadow-sm">
                 <div className="container mx-auto px-4">
                     <div className="flex h-16 items-center justify-between">
-                        {/* Logo */}
+                        
                         <Link href={session ? getDashboardLink() : "/"} className="flex items-center space-x-2 transition-opacity hover:opacity-80">
                             <div className="flex items-center justify-center h-9 w-9 rounded-lg bg-slate-900 dark:bg-indigo-600 text-white">
                                 <span className="text-xl font-bold font-serif">S</span>
@@ -123,7 +122,7 @@ export default function Navbar() {
                             </span>
                         </Link>
 
-                        {/* Desktop Navigation */}
+                        
                         <div className="hidden md:flex md:items-center md:space-x-8">
                             {navLinks.map((link) => (
                                 <Link
@@ -136,7 +135,7 @@ export default function Navbar() {
                                 </Link>
                             ))}
 
-                            {/* Role Selector for Public Visitors */}
+                            
                             {!session && (
                                 <div className="relative group">
                                     <button className="flex items-center gap-1 text-sm font-medium text-slate-500 hover:text-slate-900 transition-colors">
@@ -164,18 +163,18 @@ export default function Navbar() {
                             )}
                         </div>
 
-                        {/* Right Section */}
+                        
                         <div className="hidden md:flex md:items-center md:space-x-4">
-                            {/* Theme Toggle */}
+                            
                             <ThemeToggle />
                             {session ? (
                                 <>
-                                    {/* Role Badge */}
+                                    
                                     <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-gray-800 text-slate-600 dark:text-gray-300 border border-slate-200 dark:border-gray-700 capitalize">
                                         {session.user.role.toLowerCase()}
                                     </span>
 
-                                    {/* Cart Icon (Only for Users) */}
+                                    
                                     {session.user.role === 'USER' && (
                                         <>
                                             <Link href={getDashboardLink() + "?tab=wishlist"} className="text-slate-500 dark:text-gray-400 hover:text-slate-900 dark:hover:text-white p-2">
@@ -195,7 +194,7 @@ export default function Navbar() {
                                         </>
                                     )}
 
-                                    {/* User Menu */}
+                                    
                                     <div className="relative ml-2">
                                         <button
                                             onClick={() => setUserMenuOpen(!userMenuOpen)}
@@ -210,7 +209,7 @@ export default function Navbar() {
                                             )}
                                         </button>
 
-                                        {/* User Dropdown */}
+                                        
                                         {userMenuOpen && (
                                             <>
                                                 <div
@@ -272,7 +271,7 @@ export default function Navbar() {
                             )}
                         </div>
 
-                        {/* Mobile Menu Button & Cart */}
+                        
                         <div className="flex items-center gap-2 md:hidden">
                             <ThemeToggle />
                             {session?.user?.role === 'USER' && (
@@ -298,7 +297,7 @@ export default function Navbar() {
                     </div>
                 </div>
 
-                {/* Mobile Menu */}
+                
                 {mobileMenuOpen && (
                     <div className="md:hidden border-t bg-white dark:bg-gray-900 dark:border-gray-800">
                         <div className="container mx-auto px-4 py-4 space-y-2">
@@ -373,7 +372,7 @@ export default function Navbar() {
                 )}
             </nav>
 
-            {/* Cart Sidebar */}
+            
             <CartSidebar isOpen={cartOpen} onClose={() => setCartOpen(false)} />
         </>
     );

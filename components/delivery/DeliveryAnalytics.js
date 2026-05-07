@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 
 export default function DeliveryAnalytics({ deliveries, earnings }) {
-    // Process deliveries for analytics
+    
     const last7Days = [];
     const today = new Date();
 
@@ -19,7 +19,7 @@ export default function DeliveryAnalytics({ deliveries, earnings }) {
         });
     }
 
-    // Count deliveries and earnings per day
+    
     deliveries.forEach((delivery) => {
         if (delivery.status === "Delivered" && delivery.confirmedAt) {
             const deliveredDate = new Date(delivery.confirmedAt);
@@ -33,13 +33,13 @@ export default function DeliveryAnalytics({ deliveries, earnings }) {
         }
     });
 
-    // Calculate average delivery time (mock for now)
+    
     const avgDeliveryTime = deliveries.length > 0 ? "2.5 hours" : "N/A";
     const totalDeliveries = deliveries.filter(d => d.status === "Delivered").length;
 
     return (
         <div className="space-y-6">
-            {/* Summary Metrics */}
+            
             <div className="grid gap-4 md:grid-cols-3">
                 <Card>
                     <CardHeader className="pb-2">
@@ -76,7 +76,7 @@ export default function DeliveryAnalytics({ deliveries, earnings }) {
                 </Card>
             </div>
 
-            {/* Charts */}
+            
             <div className="grid gap-6 md:grid-cols-2">
                 <Card>
                     <CardHeader>
