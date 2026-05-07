@@ -5,7 +5,6 @@ import { ToastContainer } from "react-toastify";
 import { CartProvider } from "@/contexts/CartContext";
 import PaddleLoader from "@/components/providers/PaddleLoader";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import ThemeToggle from "@/components/ui/ThemeToggle";
 import "react-toastify/dist/ReactToastify.css";
 import NextTopLoader from "nextjs-toploader";
 
@@ -14,7 +13,6 @@ export function Providers({ children }) {
         <SessionProvider>
             <ThemeProvider>
                 <NextTopLoader showSpinner={false} color={"#fff"} height={3} />
-                    <ThemeToggle />
                     <CartProvider>
                         <PaddleLoader />
                         {children}
