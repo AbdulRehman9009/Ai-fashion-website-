@@ -12,6 +12,7 @@ export default function RecommendationForm({ onProductSelect }) {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [eventType, setEventType] = useState("Casual");
+  const [genderPreference, setGenderPreference] = useState("auto");
   const [prefs, setPrefs] = useState("");
   const [loading, setLoading] = useState(false);
   const [loadingStep, setLoadingStep] = useState(0); // 0: Start, 1: Uploading, 2: Analyzing, 3: Matching
@@ -46,7 +47,7 @@ export default function RecommendationForm({ onProductSelect }) {
     const formData = new FormData();
     formData.append("image", file);
     formData.append("eventType", eventType);
-    formData.append("preferences", JSON.stringify({ style: prefs }));
+    formData.append("preferences", JSON.stringify({ style: prefs, genderPreference }));
 
     try {
       // Simulate steps for UX
@@ -141,7 +142,7 @@ export default function RecommendationForm({ onProductSelect }) {
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-8">
+            <div className="grid md:grid-cols-3 gap-8">
               <div className="space-y-4">
                 <Label htmlFor="occasion" className="text-lg font-medium">2. The Occasion</Label>
                 <select
@@ -157,7 +158,22 @@ export default function RecommendationForm({ onProductSelect }) {
               </div>
 
               <div className="space-y-4">
-                <Label htmlFor="prefs" className="text-lg font-medium">3. Style Preferences <span className="text-sm font-normal text-slate-500 dark:text-slate-400">(Optional)</span></Label>
+                <Label htmlFor="gender-fit" className="text-lg font-medium">3. Outfit Fit</Label>
+                <select
+                  id="gender-fit"
+                  value={genderPreference}
+                  onChange={(e) => setGenderPreference(e.target.value)}
+                  className="flex h-12 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-4 text-base shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 dark:focus-visible:ring-purple-400"
+                >
+                  <option value="auto">Auto detect fit</option>
+                  <option value="any">Any suitable fit</option>
+                  <option value="female">Female / women outfits</option>
+                  <option value="male">Male / men outfits</option>
+                </select>
+              </div>
+
+              <div className="space-y-4">
+                <Label htmlFor="prefs" className="text-lg font-medium">4. Style Preferences <span className="text-sm font-normal text-slate-500 dark:text-slate-400">(Optional)</span></Label>
                 <Input
                   id="prefs"
                   value={prefs}

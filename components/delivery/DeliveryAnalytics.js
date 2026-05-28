@@ -41,35 +41,35 @@ export default function DeliveryAnalytics({ deliveries, earnings }) {
         <div className="space-y-6">
             
             <div className="grid gap-4 md:grid-cols-3">
-                <Card>
+                <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-gray-600">Average Delivery Time</CardTitle>
+                        <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">Average Delivery Time</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-gray-900">{avgDeliveryTime}</div>
-                        <p className="text-xs text-gray-500 mt-1">Based on {totalDeliveries} deliveries</p>
+                        <div className="text-2xl font-bold text-gray-900 dark:text-white">{avgDeliveryTime}</div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Based on {totalDeliveries} deliveries</p>
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-gray-600">This Week</CardTitle>
+                        <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">This Week</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-green-600">${earnings?.thisWeek || 0}</div>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                             {last7Days.reduce((sum, day) => sum + day.deliveries, 0)} deliveries
                         </p>
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
                     <CardHeader className="pb-2">
-                        <CardTitle className="text-sm font-medium text-gray-600">Today</CardTitle>
+                        <CardTitle className="text-sm font-medium text-gray-600 dark:text-gray-400">Today</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className="text-2xl font-bold text-blue-600">${earnings?.today || 0}</div>
-                        <p className="text-xs text-gray-500 mt-1">
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
                             {last7Days[6]?.deliveries || 0} deliveries
                         </p>
                     </CardContent>
@@ -78,18 +78,18 @@ export default function DeliveryAnalytics({ deliveries, earnings }) {
 
             
             <div className="grid gap-6 md:grid-cols-2">
-                <Card>
+                <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
                     <CardHeader>
-                        <CardTitle>Deliveries per Day</CardTitle>
+                        <CardTitle className="text-gray-900 dark:text-white">Deliveries per Day</CardTitle>
                     </CardHeader>
                     <CardContent className="h-[300px]">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={last7Days}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                                 <XAxis dataKey="name" fontSize={12} />
                                 <YAxis fontSize={12} />
                                 <Tooltip
-                                    contentStyle={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "8px" }}
+                                    contentStyle={{ backgroundColor: "var(--card)", color: "var(--card-foreground)", border: "1px solid var(--border)", borderRadius: "8px" }}
                                 />
                                 <Bar dataKey="deliveries" fill="#10b981" radius={[8, 8, 0, 0]} />
                             </BarChart>
@@ -97,18 +97,18 @@ export default function DeliveryAnalytics({ deliveries, earnings }) {
                     </CardContent>
                 </Card>
 
-                <Card>
+                <Card className="bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
                     <CardHeader>
-                        <CardTitle>Earnings Trend</CardTitle>
+                        <CardTitle className="text-gray-900 dark:text-white">Earnings Trend</CardTitle>
                     </CardHeader>
                     <CardContent className="h-[300px]">
                         <ResponsiveContainer width="100%" height="100%">
                             <LineChart data={last7Days}>
-                                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
                                 <XAxis dataKey="name" fontSize={12} />
                                 <YAxis fontSize={12} />
                                 <Tooltip
-                                    contentStyle={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "8px" }}
+                                    contentStyle={{ backgroundColor: "var(--card)", color: "var(--card-foreground)", border: "1px solid var(--border)", borderRadius: "8px" }}
                                     formatter={(value) => `$${value}`}
                                 />
                                 <Line

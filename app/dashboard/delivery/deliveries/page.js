@@ -26,15 +26,30 @@ export default function DeliveryDeliveriesPage() {
 
     useEffect(() => { fetchDeliveries(); }, []);
 
-    const handleAction = async (orderId, action) => {
+    const handleAction = async (deliveryId, nextStatus) => {
         try {
-            const apiAction = action === "confirm" ? "confirm_delivery" : action;
-            await axios.patch(`/api/orders/${orderId}/fulfillment`, { action: apiAction });
-            toast.success(action === "pickup" ? "Order picked up!" : "Delivery confirmed!");
+            await axios.patch(`/api/deliveries/${deliveryId}/status`, { status: nextStatus });
+            const messages = {
+                OutForPickup: "Pickup started",
+                PickedUp: "Order picked up",
+                OutForDelivery: "Out for delivery",
+                Delivered: "Delivery confirmed",
+            };
+            toast.success(messages[nextStatus] || "Delivery updated");
             fetchDeliveries();
         } catch (e) {
             toast.error(e.response?.data?.error || "Action failed");
         }
+    };
+
+    const getNextDeliveryStep = (status) => {
+        const steps = {
+            Assigned: { status: "OutForPickup", label: "Start Pickup", icon: Truck, className: "bg-blue-600 hover:bg-blue-700" },
+            OutForPickup: { status: "PickedUp", label: "Mark Picked Up", icon: Package, className: "bg-indigo-600 hover:bg-indigo-700" },
+            PickedUp: { status: "OutForDelivery", label: "Out for Delivery", icon: Truck, className: "bg-purple-600 hover:bg-purple-700" },
+            OutForDelivery: { status: "Delivered", label: "Confirm Delivery", icon: CheckCircle, className: "bg-green-600 hover:bg-green-700" },
+        };
+        return steps[status];
     };
 
     const ACTIVE_STATUSES = ["Assigned", "OutForPickup", "PickedUp", "OutForDelivery"];
@@ -93,22 +108,17 @@ export default function DeliveryDeliveriesPage() {
                                 <OrderCard
                                     key={delivery._id}
                                     order={delivery}
-                                    actions={
-                                        <>
-                                            {delivery.status === "Assigned" && (
-                                                <Button className="w-full bg-blue-600 hover:bg-blue-700 gap-2"
-                                                    onClick={() => handleAction(delivery._id, "pickup")}>
-                                                    <Package className="h-4 w-4" /> Pickup Order
-                                                </Button>
-                                            )}
-                                            {["OutForPickup", "PickedUp", "OutForDelivery"].includes(delivery.status) && (
-                                                <Button className="w-full bg-green-600 hover:bg-green-700 gap-2"
-                                                    onClick={() => handleAction(delivery._id, "confirm")}>
-                                                    <CheckCircle className="h-4 w-4" /> Confirm Delivery
-                                                </Button>
-                                            )}
-                                        </>
-                                    }
+                                    actions={(() => {
+                                        const step = getNextDeliveryStep(delivery.status);
+                                        if (!step) return null;
+                                        const Icon = step.icon;
+                                        return (
+                                            <Button className={`w-full gap-2 text-white ${step.className}`}
+                                                onClick={() => handleAction(delivery._id, step.status)}>
+                                                <Icon className="h-4 w-4" /> {step.label}
+                                            </Button>
+                                        );
+                                    })()}
                                 />
                             ))}
                         </div>

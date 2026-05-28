@@ -26,6 +26,9 @@ export default function OrderCard({
     const item = order.items?.[0] || {};
     const product = item.product || {};
     const date = order.createdAt ? new Date(order.createdAt) : new Date();
+    const imageSrc = product.images?.[0] || product.imageUrl || order.outfitImage;
+    const customer = order.user || order.customer;
+    const address = order.shippingAddress || order.deliveryAddress;
 
     return (
         <Card
@@ -38,9 +41,9 @@ export default function OrderCard({
         >
             <div className="flex p-4 gap-4">
                 {/* Product Image */}
-                <div className="h-24 w-24 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden border relative">
-                    {product.imageUrl ? (
-                        <img src={product.imageUrl} alt={product.title} className="h-full w-full object-cover" />
+                <div className="h-24 w-24 flex-shrink-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border dark:border-gray-700 relative">
+                    {imageSrc ? (
+                        <img src={imageSrc} alt={product.title || "Order item"} className="h-full w-full object-cover" />
                     ) : (
                         <div className="h-full w-full flex items-center justify-center text-gray-400">
                             <Package className="h-8 w-8" />
@@ -58,20 +61,20 @@ export default function OrderCard({
                     <div>
                         <div className="flex justify-between items-start">
                             <div className="flex flex-col">
-                                <span className="text-xs text-gray-500 font-mono">#{String(order._id || order.id).slice(-6)}</span>
-                                <span className="font-semibold text-sm truncate pr-2">{product.title || "Custom Order"}</span>
+                                <span className="text-xs text-gray-500 dark:text-gray-400 font-mono">#{String(order.orderId || order._id || order.id).slice(-6)}</span>
+                                <span className="font-semibold text-sm truncate pr-2 text-gray-900 dark:text-gray-100">{product.title || "Custom Order"}</span>
                             </div>
                             <StatusBadge status={order.status} size="sm" />
                         </div>
 
                         {showCustomer && (
-                            <div className="flex items-center gap-1.5 mt-1 text-sm text-gray-600">
+                            <div className="flex items-center gap-1.5 mt-1 text-sm text-gray-600 dark:text-gray-400">
                                 <User className="h-3.5 w-3.5" />
-                                <span className="truncate">{order.user?.name || "Customer"}</span>
+                                <span className="truncate">{customer?.name || "Customer"}</span>
                             </div>
                         )}
 
-                        <div className="flex items-center gap-1.5 mt-1 text-xs text-gray-500">
+                        <div className="flex items-center gap-1.5 mt-1 text-xs text-gray-500 dark:text-gray-400">
                             <Clock className="h-3 w-3" />
                             <span>{format(date, "MMM d, yyyy")}</span>
                         </div>
@@ -87,18 +90,18 @@ export default function OrderCard({
             </div>
 
             {/* Address if relevant (e.g. for delivery) */}
-            {order.shippingAddress && (
-                <div className="px-4 pb-3 flex items-start gap-2 text-xs text-gray-500 border-t pt-3 mx-4 border-gray-100">
+            {address && (
+                <div className="px-4 pb-3 flex items-start gap-2 text-xs text-gray-500 dark:text-gray-400 border-t pt-3 mx-4 border-gray-100 dark:border-gray-800">
                     <MapPin className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
                     <span className="line-clamp-1">
-                        {[order.shippingAddress.city, order.shippingAddress.street].filter(Boolean).join(", ")}
+                        {[address.city, address.street].filter(Boolean).join(", ")}
                     </span>
                 </div>
             )}
 
             {/* Footer Actions */}
             {actions && (
-                <CardFooter className="bg-gray-50/50 p-3 pt-3 flex gap-2 justify-end border-t">
+                <CardFooter className="bg-gray-50/50 dark:bg-gray-900/60 p-3 pt-3 flex gap-2 justify-end border-t dark:border-gray-800">
                     {actions}
                 </CardFooter>
             )}

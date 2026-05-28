@@ -6,6 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Loader2, RefreshCw, X, MapPin } from "lucide-react";
 import { toast } from "react-toastify";
 import OrderTimeline from "@/components/OrderTimeline";
+import { getStatusLabel } from "@/lib/workflow";
 
 export default function OrdersList({ role, limit, compact }) {
   const [orders, setOrders] = useState([]);
@@ -70,13 +71,19 @@ export default function OrdersList({ role, limit, compact }) {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "PENDING": return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300";
-      case "ACCEPTED": return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300";
-      case "STITCHING": return "bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300";
-      case "READY_FOR_DELIVERY": return "bg-teal-100 dark:bg-teal-900/30 text-teal-800 dark:text-teal-300";
-      case "OUT_FOR_DELIVERY": return "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300";
-      case "DELIVERED": return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300";
-      case "CANCELLED": return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300";
+      case "OrderCreated": return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300";
+      case "PaymentPending": return "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300";
+      case "PaymentConfirmed": return "bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300";
+      case "TailoringPending": return "bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300";
+      case "TailoringInProgress": return "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-800 dark:text-indigo-300";
+      case "TailoringCompleted": return "bg-teal-100 dark:bg-teal-900/30 text-teal-800 dark:text-teal-300";
+      case "DeliveryPending": return "bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300";
+      case "OutForPickup":
+      case "PickedUp":
+      case "OutForDelivery": return "bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300";
+      case "Delivered":
+      case "Completed": return "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300";
+      case "Canceled": return "bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300";
       default: return "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-300";
     }
   };
@@ -104,8 +111,8 @@ export default function OrdersList({ role, limit, compact }) {
                 <div className="flex gap-4 items-center flex-1">
                   {/* Product Image */}
                   <div className="h-16 w-16 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 dark:border-gray-600">
-                    {(o.items?.[0]?.product?.imageUrl) ? (
-                      <img src={o.items[0].product.imageUrl} alt="Product" className="h-full w-full object-cover" />
+                    {(o.items?.[0]?.product?.images?.[0] || o.items?.[0]?.product?.imageUrl) ? (
+                      <img src={o.items[0].product.images?.[0] || o.items[0].product.imageUrl} alt={o.items[0].product.title || "Product"} className="h-full w-full object-cover" />
                     ) : (
                       <div className="h-full w-full flex items-center justify-center text-gray-400 dark:text-gray-500 text-xs font-medium">No Img</div>
                     )}
@@ -115,7 +122,7 @@ export default function OrdersList({ role, limit, compact }) {
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-bold text-gray-900 dark:text-gray-100">#{String(o._id).slice(-4).toUpperCase()}</span>
                       <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full font-bold ${getStatusColor(o.status)}`}>
-                        {o.status.replace(/_/g, ' ')}
+                        {getStatusLabel(o.status)}
                       </span>
                       {o.urgent && (
                         <span className="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full font-bold bg-red-500 text-white animate-pulse">
@@ -169,7 +176,7 @@ export default function OrdersList({ role, limit, compact }) {
               <div className="space-y-6">
                 <div>
                   <h4 className="font-semibold mb-2">Order Timeline</h4>
-                  <OrderTimeline status={selectedOrder.status} />
+                  <OrderTimeline status={selectedOrder.status} timeline={selectedOrder.timeline || []} />
                 </div>
 
                 <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg space-y-2">
@@ -188,10 +195,16 @@ export default function OrdersList({ role, limit, compact }) {
                     {selectedOrder.items?.map((item, i) => (
                       <div key={i} className="flex gap-3 items-center">
                         <div className="h-12 w-12 bg-gray-100 dark:bg-gray-800 rounded-md overflow-hidden">
-                          {item.product?.imageUrl && <img src={item.product.imageUrl} className="h-full w-full object-cover" />}
+                          {(item.product?.images?.[0] || item.product?.imageUrl) && (
+                            <img
+                              src={item.product.images?.[0] || item.product.imageUrl}
+                              alt={item.product?.title || item.product?.name || "Product"}
+                              className="h-full w-full object-cover"
+                            />
+                          )}
                         </div>
                         <div className="text-sm">
-                          <p className="font-medium">{item.product?.name || "Product"}</p>
+                          <p className="font-medium">{item.product?.title || item.product?.name || "Product"}</p>
                           <p className="text-gray-500 dark:text-gray-400">Qty: {item.quantity}</p>
                         </div>
                       </div>
@@ -208,7 +221,7 @@ export default function OrdersList({ role, limit, compact }) {
                   </div>
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
-                    <span>${selectedOrder.totalAmount || "0.00"}</span>
+                    <span>${(selectedOrder.pricing?.grandTotal || selectedOrder.totalAmount || 0).toFixed(2)}</span>
                   </div>
                 </div>
               </div>

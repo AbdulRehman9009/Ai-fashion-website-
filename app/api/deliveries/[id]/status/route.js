@@ -22,10 +22,15 @@ export async function PATCH(req, { params }) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  // Validate status enum
   const validStatuses = ["Assigned", "OutForPickup", "PickedUp", "OutForDelivery", "Delivered"];
   if (status && !validStatuses.includes(status)) {
     return NextResponse.json({ error: "Invalid status" }, { status: 400 });
+  }
+
+  const currentIndex = validStatuses.indexOf(delivery.status);
+  const nextIndex = validStatuses.indexOf(status);
+  if (status && nextIndex !== currentIndex && nextIndex < currentIndex) {
+    return NextResponse.json({ error: "Delivery status cannot move backwards" }, { status: 400 });
   }
 
   // Update status if provided
@@ -60,12 +65,7 @@ export async function PATCH(req, { params }) {
 
     order.status = statusMap[status] || order.status;
 
-    if (status === "Delivered") {
-      order.timeline.push({ byRole: "DELIVERY", event: "Delivered", notes });
-      order.status = "Completed"; // Mark order as completed
-    } else {
-      order.timeline.push({ byRole: "DELIVERY", event: status, notes });
-    }
+    order.timeline.push({ byRole: "DELIVERY", event: order.status, notes });
 
     await order.save();
   }

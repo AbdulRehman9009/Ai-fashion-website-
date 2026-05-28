@@ -3,13 +3,17 @@
 :root {
   --background: #fafbfc;
   --foreground: #0f172a;
+  --font-geist-sans: Arial, Helvetica, sans-serif;
+  --font-geist-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 
   /* Brand Colors - Premium Purple/Indigo Theme */
   --primary: #6366f1;
   --primary-foreground: #ffffff;
   --primary-hover: #4f46e5;
   --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
   --accent: #8b5cf6;
+  --accent-foreground: #ffffff;
   --accent-hover: #7c3aed;
 
   /* Gradient Colors */
@@ -24,6 +28,8 @@
   --warning-light: #fef3c7;
   --error: #ef4444;
   --error-light: #fee2e2;
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
   --info: #3b82f6;
   --info-light: #dbeafe;
 
@@ -33,9 +39,13 @@
 
   /* Border & Card */
   --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #6366f1;
   --card: #ffffff;
   --card-foreground: #0f172a;
   --card-hover: #f8fafc;
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
 
   /* Shadows - Enhanced depth */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -53,6 +63,23 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
@@ -76,18 +103,26 @@ html.dark {
   --primary-foreground: #ffffff;
   --primary-hover: #6366f1;
   --secondary: #1e293b;
+  --secondary-foreground: #f8fafc;
   /* Slate 800 */
   --accent: #a78bfa;
+  --accent-foreground: #020617;
   --accent-hover: #8b5cf6;
   --muted: #0f172a;
   /* Slate 900 */
   --muted-foreground: #94a3b8;
   --border: #1e293b;
+  --input: #334155;
+  --ring: #818cf8;
+  --destructive: #f87171;
+  --destructive-foreground: #020617;
   /* Slate 800 - Subtle borders */
   --card: #0f172a;
   /* Slate 900 */
   --card-foreground: #f8fafc;
   --card-hover: #1e293b;
+  --popover: #0f172a;
+  --popover-foreground: #f8fafc;
   --gradient-start: #6366f1;
   /* Indigo 500 */
   --gradient-end: #a855f7;
@@ -107,14 +142,22 @@ html.dark {
     --primary-foreground: #ffffff;
     --primary-hover: #6366f1;
     --secondary: #1e293b;
+    --secondary-foreground: #f8fafc;
     --accent: #a78bfa;
+    --accent-foreground: #020617;
     --accent-hover: #8b5cf6;
     --muted: #0f172a;
     --muted-foreground: #94a3b8;
     --border: #1e293b;
+    --input: #334155;
+    --ring: #818cf8;
+    --destructive: #f87171;
+    --destructive-foreground: #020617;
     --card: #0f172a;
     --card-foreground: #f8fafc;
     --card-hover: #1e293b;
+    --popover: #0f172a;
+    --popover-foreground: #f8fafc;
     --gradient-start: #6366f1;
     --gradient-end: #a855f7;
   }
@@ -133,6 +176,86 @@ html {
 ::selection {
   background-color: rgba(99, 102, 241, 0.2);
   color: inherit;
+}
+
+/* Dark-mode safety net for legacy light-only utility classes.
+   Explicit dark:* classes still win by opting out through the class attribute. */
+.dark .bg-white:not([class*="dark:bg-"]) {
+  background-color: var(--card);
+}
+
+.dark .bg-gray-50:not([class*="dark:bg-"]),
+.dark .bg-slate-50:not([class*="dark:bg-"]) {
+  background-color: var(--muted);
+}
+
+.dark .bg-gray-100:not([class*="dark:bg-"]),
+.dark .bg-slate-100:not([class*="dark:bg-"]) {
+  background-color: var(--card-hover);
+}
+
+.dark .text-gray-900:not([class*="dark:text-"]),
+.dark .text-slate-900:not([class*="dark:text-"]),
+.dark .text-gray-800:not([class*="dark:text-"]),
+.dark .text-slate-800:not([class*="dark:text-"]) {
+  color: var(--foreground);
+}
+
+.dark .text-gray-700:not([class*="dark:text-"]),
+.dark .text-slate-700:not([class*="dark:text-"]),
+.dark .text-gray-600:not([class*="dark:text-"]),
+.dark .text-slate-600:not([class*="dark:text-"]) {
+  color: var(--muted-foreground);
+}
+
+.dark .border-gray-100:not([class*="dark:border-"]),
+.dark .border-slate-100:not([class*="dark:border-"]),
+.dark .border-gray-200:not([class*="dark:border-"]),
+.dark .border-slate-200:not([class*="dark:border-"]) {
+  border-color: var(--border);
+}
+
+.dark .hover\:bg-gray-50:hover:not([class*="dark:hover:bg-"]),
+.dark .hover\:bg-slate-50:hover:not([class*="dark:hover:bg-"]) {
+  background-color: var(--card-hover);
+}
+
+.dark .to-white:not([class*="dark:to-"]) {
+  --tw-gradient-to: #0f172a var(--tw-gradient-to-position);
+}
+
+.dark .from-blue-50:not([class*="dark:from-"]) {
+  --tw-gradient-from: #172554 var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(23 37 84 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.dark .from-green-50:not([class*="dark:from-"]),
+.dark .from-emerald-50:not([class*="dark:from-"]) {
+  --tw-gradient-from: #052e16 var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(5 46 22 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.dark .from-purple-50:not([class*="dark:from-"]),
+.dark .from-indigo-50:not([class*="dark:from-"]) {
+  --tw-gradient-from: #312e81 var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(49 46 129 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.dark .from-orange-50:not([class*="dark:from-"]),
+.dark .from-amber-50:not([class*="dark:from-"]) {
+  --tw-gradient-from: #431407 var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(67 20 7 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
+}
+
+.dark .from-red-50:not([class*="dark:from-"]),
+.dark .from-pink-50:not([class*="dark:from-"]) {
+  --tw-gradient-from: #450a0a var(--tw-gradient-from-position);
+  --tw-gradient-to: rgb(69 10 10 / 0) var(--tw-gradient-to-position);
+  --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to);
 }
 
 /* Better focus-visible for all interactive elements */

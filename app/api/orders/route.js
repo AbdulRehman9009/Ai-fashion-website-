@@ -111,6 +111,18 @@ export async function POST(req) {
 
   // Generate Paddle Checkout Session using INLINE pricing
   // No paddlePriceId needed — we pass the order total directly
+  const markPaymentFailed = async (message) => {
+    order.status = "Canceled";
+    order.paymentStatus = "FAILED";
+    order.timeline.push({
+      at: new Date(),
+      byRole: "SYSTEM",
+      event: "PaymentFailed",
+      notes: message,
+    });
+    await order.save();
+  };
+
   try {
     const itemNames = products.map(p => p.title || p.name).join(", ");
     const checkoutSession = await createCheckoutSession({
@@ -136,23 +148,26 @@ export async function POST(req) {
     } else if (checkoutSession && checkoutSession.success && !checkoutSession.url) {
       // Transaction created but no checkout URL returned - treat as an error
       console.error("Paddle created a transaction but returned no checkout URL", checkoutSession);
+      await markPaymentFailed("Payment gateway returned no checkout URL");
       return NextResponse.json({
-        error: "Payment gateway unavailable. Please try again later."
+        error: "Payment gateway unavailable. Please choose Cash on Delivery or try again later.",
+        id: String(order._id)
       }, { status: 502 });
     } else {
       // Propagate Paddle errors to the client so the UI doesn't silently treat card payments as COD
       console.error("Paddle checkout creation failed", checkoutSession);
+      await markPaymentFailed(checkoutSession?.error || "Payment session creation failed");
       return NextResponse.json({
-        error: checkoutSession?.error || "Failed to create payment session"
+        error: checkoutSession?.error || "Failed to create payment session",
+        id: String(order._id)
       }, { status: 502 });
     }
   } catch (error) {
     console.error("Checkout creation error:", error);
-    // Order was created, proceed with COD
+    await markPaymentFailed(error.message || "Payment session creation failed");
     return NextResponse.json({
       id: String(order._id),
-      paymentMethod: "COD",
-      message: "Order created. Pay on delivery."
-    }, { status: 201 });
+      error: "Payment gateway unavailable. Please choose Cash on Delivery or try again later."
+    }, { status: 502 });
   }
 }

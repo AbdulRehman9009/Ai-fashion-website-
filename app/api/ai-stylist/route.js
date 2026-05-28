@@ -12,9 +12,13 @@ import Product from "@/models/Product";
 import RecommendationLog from "@/models/RecommendationLog";
 import { getToken } from "next-auth/jwt";
 import { withErrorHandler } from "@/lib/api-middleware";
-import { successResponse, validationErrorResponse } from "@/lib/api-response";
+import { successResponse } from "@/lib/api-response";
 import { ValidationError } from "@/lib/errors";
 import { logger } from "@/lib/logger";
+import {
+    buildRecommendationProductMatches,
+    normalizeGenderPreference,
+} from "@/lib/ai/catalogMatching";
 
 // Initialize Gemini AI
 const apiKey = process.env.GEMINI_API_KEY || "";
@@ -24,7 +28,7 @@ const genAI = new GoogleGenerativeAI(apiKey);
 const GEMINI_MODEL = "gemini-2.0-flash";
 const SYSTEM_INSTRUCTION = `You are Style Genie, an expert AI fashion stylist specializing in South Asian, Pakistani, and international fashion. 
 You have deep knowledge of fabrics like cotton, silk, chiffon, lawn, khaddar, and linen, as well as traditional garments like shalwar kameez, kurta, saree, and lehenga alongside modern western styles.
-Always provide practical, specific, and culturally-sensitive fashion advice. Return ONLY valid JSON as specified — no extra text.`;
+Always provide practical, specific, and culturally-sensitive fashion advice. Return ONLY valid JSON as specified - no extra text.`;
 
 const model = genAI.getGenerativeModel({
     model: GEMINI_MODEL,
@@ -57,6 +61,10 @@ async function aiStylistHandler(req) {
 
     const body = await req.json();
     const { imageUrl, eventType, skinTone, preferences = {} } = body;
+    const rawGenderPreference = preferences.gender || preferences.genderPreference || preferences.audience || body.gender;
+    const requestedGender = rawGenderPreference && !["auto", "detect"].includes(String(rawGenderPreference).toLowerCase())
+        ? normalizeGenderPreference(rawGenderPreference)
+        : null;
 
     // Validate required fields
     if (!imageUrl) {
@@ -84,17 +92,20 @@ async function aiStylistHandler(req) {
     User Context:
     - Event Type: ${eventType}
     - Skin Tone: ${skinTone || "Not specified"}
+    - Intended Outfit Gender Fit: ${requestedGender || "Auto detect the best clothing category"}
     - Style Preferences: ${JSON.stringify(preferences)}
     - Reference Image URL: ${imageUrl}
     
     Provide exactly 3 distinct outfit color combinations and styles. Consider Pakistani/South Asian fashion preferences as well as modern trends.
+    Treat gender as outfit fit/category only. Do not make identity claims about the person; use the provided preference when present.
     
     Return ONLY valid JSON in this exact format:
     {
       "analysis": {
         "skinTone": "detected or provided skin tone",
         "occasion": "formal/casual/festive analysis",
-        "seasonalSuggestion": "best season for recommended colors"
+        "seasonalSuggestion": "best season for recommended colors",
+        "genderPresentation": "male/female/any outfit fit"
       },
       "recommendations": [
         {
@@ -107,6 +118,7 @@ async function aiStylistHandler(req) {
           "colorNames": ["Color 1", "Color 2", "Color 3"],
           "style": "Traditional/Modern/Fusion/Contemporary",
           "outfitType": "Shalwar Kameez/Kurta/Suit/Dress/Saree etc",
+          "targetGender": "male/female/any",
           "description": "Brief description of the look",
           "stylingTips": "Specific and actionable styling advice",
           "accessories": ["Accessory 1", "Accessory 2"],
@@ -142,53 +154,28 @@ async function aiStylistHandler(req) {
         });
 
         // Fallback response
-        aiResponse = generateFallbackRecommendations(eventType, skinTone);
+        aiResponse = generateFallbackRecommendations(eventType, skinTone, requestedGender);
     }
 
-    // Step 2: Find matching products from database
-    const searchTags = aiResponse.recommendations?.flatMap(r => r.searchTags || []) || [];
-    const colorNames = aiResponse.recommendations?.flatMap(r => r.colorNames || []) || [];
-    const searchTerms = [...new Set([...searchTags, ...colorNames, eventType])].join(" ");
-
-    let matchingProducts = [];
+    // Step 2: Check the available catalog and rank products per recommendation.
+    let availableProducts = [];
     try {
-        matchingProducts = await Product.find(
-            { $text: { $search: searchTerms } },
-            { score: { $meta: "textScore" } }
-        )
-            .sort({ score: { $meta: "textScore" } })
-            .limit(9)
-            .populate("shop", "name logo")
+        availableProducts = await Product.find({ isActive: true, stock: { $gt: 0 } })
+            .sort({ createdAt: -1 })
+            .populate("shop", "name logo isActive isVisibleToCustomers ratingAvg")
             .lean();
-
-        // Fallback to recent products if no matches
-        if (matchingProducts.length < 3) {
-            const recentProducts = await Product.find()
-                .sort({ createdAt: -1 })
-                .limit(6)
-                .populate("shop", "name logo")
-                .lean();
-
-            matchingProducts = [...matchingProducts, ...recentProducts].slice(0, 9);
-        }
     } catch (dbError) {
-        logger.error("Product search failed", { error: dbError.message });
+        logger.error("Available product lookup failed", { error: dbError.message });
     }
 
-    // Step 3: Map products to recommendations
-    const recommendationsWithProducts = aiResponse.recommendations?.map((rec, index) => ({
-        ...rec,
-        matchedProducts: matchingProducts.slice(index * 3, (index + 1) * 3).map(p => ({
-            id: p._id,
-            title: p.title,
-            price: p.basePrice,
-            image: p.images?.[0] || null,
-            type: p.type,
-            shop: p.shop?.name || "Unknown Shop",
-            color: p.attributes?.color,
-            fabric: p.attributes?.fabric
-        }))
-    })) || [];
+    const detectedGender = normalizeGenderPreference(aiResponse.analysis?.genderPresentation);
+    const effectiveGender = requestedGender || detectedGender || "any";
+    const matchResult = buildRecommendationProductMatches(availableProducts, aiResponse.recommendations || [], {
+        eventType,
+        style: preferences.style,
+        genderPreference: effectiveGender,
+    });
+    const recommendationsWithProducts = matchResult.recommendations;
 
     // Step 4: Log recommendation for analytics
     if (userId) {
@@ -198,11 +185,12 @@ async function aiStylistHandler(req) {
                 context: {
                     eventType,
                     skinTone,
+                    genderPreference: effectiveGender,
                     userPreferences: preferences,
                     imageUrl
                 },
-                suggestedProducts: matchingProducts.map(p => p._id),
-                promptUsed: "AI Stylist v3",
+                suggestedProducts: matchResult.matchedProductIds,
+                promptUsed: "AI Stylist v4 catalog-aware",
                 modelVersion: GEMINI_MODEL
 
             });
@@ -215,14 +203,16 @@ async function aiStylistHandler(req) {
         analysis: aiResponse.analysis,
         recommendations: recommendationsWithProducts,
         generalTips: aiResponse.generalTips,
-        totalProductsMatched: matchingProducts.length
+        genderFilter: effectiveGender,
+        availableProductsChecked: matchResult.availableProductsChecked,
+        totalProductsMatched: matchResult.matchedProductIds.length
     });
 }
 
 /**
  * Generate fallback recommendations when AI fails
  */
-function generateFallbackRecommendations(eventType, skinTone) {
+function generateFallbackRecommendations(eventType, skinTone, genderPreference = "any") {
     const eventColors = {
         Wedding: [
             { primary: "#D4AF37", secondary: "#8B0000", accent: "#FFD700", names: ["Gold", "Maroon", "Champagne"] },
@@ -248,11 +238,34 @@ function generateFallbackRecommendations(eventType, skinTone) {
 
     const colors = eventColors[eventType] || eventColors.Casual;
 
+    const genderOutfits = {
+        male: {
+            Wedding: "Sherwani/Kurta Pajama",
+            Formal: "Suit/Blazer",
+            Casual: "Kurta/Smart Casual",
+            Party: "Statement Shirt/Jacket",
+        },
+        female: {
+            Wedding: "Lehenga/Saree",
+            Formal: "Elegant Suit/Dress",
+            Casual: "Kurti/Smart Casual",
+            Party: "Dress/Fusion Wear",
+        },
+        any: {
+            Wedding: "Traditional Wear",
+            Formal: "Suit/Blazer",
+            Casual: "Smart Casual",
+            Party: "Fusion Wear",
+        },
+    };
+    const outfitMap = genderOutfits[genderPreference] || genderOutfits.any;
+
     return {
         analysis: {
             skinTone: skinTone || "Warm undertones (analyzed)",
             occasion: `${eventType} - ${eventType === 'Formal' ? 'Professional' : eventType === 'Wedding' ? 'Festive' : 'Relaxed'} setting`,
-            seasonalSuggestion: "All seasons"
+            seasonalSuggestion: "All seasons",
+            genderPresentation: genderPreference
         },
         recommendations: colors.map((c, i) => ({
             id: i + 1,
@@ -263,11 +276,12 @@ function generateFallbackRecommendations(eventType, skinTone) {
             },
             colorNames: c.names,
             style: i === 0 ? "Classic" : i === 1 ? "Contemporary" : "Bold",
-            outfitType: eventType === "Wedding" ? "Traditional Wear" : eventType === "Formal" ? "Suit/Blazer" : "Smart Casual",
+            outfitType: outfitMap[eventType] || outfitMap.Casual,
+            targetGender: genderPreference,
             description: `A ${i === 0 ? 'timeless' : i === 1 ? 'modern' : 'statement'} look perfect for ${eventType.toLowerCase()} occasions.`,
             stylingTips: "Pair with minimal accessories for a balanced look.",
             accessories: ["Statement watch", "Elegant footwear"],
-            searchTags: [eventType.toLowerCase(), ...c.names.map(n => n.toLowerCase())]
+            searchTags: [eventType.toLowerCase(), genderPreference, ...c.names.map(n => n.toLowerCase())]
         })),
         generalTips: "Choose fabrics that suit the weather and always prioritize comfort alongside style."
     };

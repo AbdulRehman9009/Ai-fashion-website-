@@ -1,21 +1,29 @@
-import { CheckCircle, Circle, ArrowDown } from "lucide-react";
+import { CheckCircle, Circle } from "lucide-react";
 
 export default function OrderTimeline({ timeline = [], status }) {
     const steps = [
-        { id: "PENDING", label: "Order Placed" },
-        { id: "ACCEPTED", label: "Accepted by Shop" },
-        { id: "STITCHING", label: "Tailoring in Progress" },
-        { id: "READY_FOR_DELIVERY", label: "Ready for Delivery" },
-        { id: "OUT_FOR_DELIVERY", label: "Out For Delivery" },
-        { id: "DELIVERED", label: "Delivered" },
+        { id: "OrderCreated", label: "Order Placed" },
+        { id: "PaymentPending", label: "Payment Pending" },
+        { id: "PaymentConfirmed", label: "Payment Confirmed" },
+        { id: "TailoringPending", label: "Awaiting Tailor" },
+        { id: "TailoringInProgress", label: "Tailoring in Progress" },
+        { id: "TailoringCompleted", label: "Ready for Delivery" },
+        { id: "DeliveryPending", label: "Delivery Assigned" },
+        { id: "OutForPickup", label: "Courier to Pickup" },
+        { id: "PickedUp", label: "Picked Up" },
+        { id: "OutForDelivery", label: "Out for Delivery" },
+        { id: "Delivered", label: "Delivered" },
+        { id: "Completed", label: "Completed" },
     ];
 
     const isCompleted = (stepId) => {
+        if (status === "Canceled") return false;
+
         const currentIndex = steps.findIndex(s => s.id === status);
         const stepIndex = steps.findIndex(s => s.id === stepId);
 
         // Timeline event check (if provided)
-        const hasEvent = timeline.some(t => t.status === stepId);
+        const hasEvent = timeline.some(t => t.event === stepId || t.status === stepId);
 
         return hasEvent || (currentIndex >= 0 && stepIndex <= currentIndex);
     };

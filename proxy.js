@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 
-export async function middleware(req) {
+export async function proxy(req) {
   const { pathname } = req.nextUrl;
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
 
@@ -40,25 +40,19 @@ export async function middleware(req) {
     }
 
     const isProfilePage = pathname.includes("/profile") || pathname.includes("/settings") || pathname.includes("/complete-profile");
-    if (!isProfilePage) {
-      if (token.isProfileComplete === false) {
-        const profileUrl = new URL(`/dashboard/complete-profile?required=true`, req.url);
-        return NextResponse.redirect(profileUrl);
-      }
+    if (!isProfilePage && token.isProfileComplete === false) {
+      const profileUrl = new URL("/dashboard/complete-profile?required=true", req.url);
+      return NextResponse.redirect(profileUrl);
     }
   }
 
-  
-  
-  
   const response = NextResponse.next();
 
-  // Security headers
-  response.headers.set('X-Content-Type-Options', 'nosniff');
-  response.headers.set('X-Frame-Options', 'SAMEORIGIN');
-  response.headers.set('X-XSS-Protection', '1; mode=block');
-  response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("X-Frame-Options", "SAMEORIGIN");
+  response.headers.set("X-XSS-Protection", "1; mode=block");
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
 
   return response;
 }
@@ -66,4 +60,3 @@ export async function middleware(req) {
 export const config = {
   matcher: ["/dashboard/:path*", "/auth/:path*", "/shops/:path*"],
 };
-

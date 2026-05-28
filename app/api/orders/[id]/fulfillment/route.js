@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { connectDB } from "@/lib/db";
 import Order from "@/models/Order";
+import Delivery from "@/models/Delivery";
 import { logger } from "@/lib/logger";
 
 export async function PATCH(req, { params }) {
@@ -9,12 +10,23 @@ export async function PATCH(req, { params }) {
         const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
         if (!token) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-        const { id } = params;
+        const { id } = await params;
         const body = await req.json();
         const { action } = body;
 
         await connectDB();
-        const order = await Order.findById(id);
+        let order = await Order.findById(id);
+        let delivery = null;
+
+        // Delivery dashboards pass a Delivery document id; tailor/admin actions pass an Order id.
+        if (!order) {
+            delivery = await Delivery.findById(id);
+            if (delivery) {
+                order = await Order.findById(delivery.order);
+            }
+        } else if (order.delivery) {
+            delivery = await Delivery.findById(order.delivery);
+        }
 
         if (!order) return NextResponse.json({ error: "Order not found" }, { status: 404 });
 
@@ -50,18 +62,36 @@ export async function PATCH(req, { params }) {
                 break;
 
             case "pickup":
-                // Logic: Status -> out_for_delivery
+                // Logic: Status -> out for pickup
                 if (role !== "DELIVERY") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-                // Could verify assignment if delivery assignment exists
+                if (!delivery || String(delivery.assignedTo) !== String(userId)) {
+                    return NextResponse.json({ error: "Not assigned to this delivery" }, { status: 403 });
+                }
 
-                newStatus = "OutForDelivery"; // Skipping "PickedUp" intermediate if user wants direct "out_for_delivery"
+                newStatus = "OutForPickup";
+                delivery.status = "OutForPickup";
+                delivery.events.push({
+                    at: new Date(),
+                    status: "OutForPickup",
+                    note: "Courier is heading to pickup"
+                });
                 break;
 
             case "confirm_delivery":
                 // Logic: Status -> delivered
                 if (role !== "DELIVERY") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+                if (!delivery || String(delivery.assignedTo) !== String(userId)) {
+                    return NextResponse.json({ error: "Not assigned to this delivery" }, { status: 403 });
+                }
 
                 newStatus = "Delivered";
+                delivery.status = "Delivered";
+                delivery.confirmedAt = new Date();
+                delivery.events.push({
+                    at: delivery.confirmedAt,
+                    status: "Delivered",
+                    note: "Delivery confirmed"
+                });
                 break;
 
             default:
@@ -90,6 +120,9 @@ export async function PATCH(req, { params }) {
         }
 
         await order.save();
+        if (delivery) {
+            await delivery.save();
+        }
 
         // Log
         logger.info(`Order ${id} updated via fulfillment action: ${action}`, { userId, role });

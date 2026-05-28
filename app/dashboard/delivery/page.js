@@ -24,7 +24,7 @@ export default function DeliveryDashboard() {
       setDeliveries(data);
 
       // Calculate stats (Delivery statuses: Assigned, OutForPickup, PickedUp, OutForDelivery, Delivered)
-      const assigned = data.filter(d => ["OutForPickup", "PickedUp", "OutForDelivery"].includes(d.status)).length;
+      const assigned = data.filter(d => ["Assigned", "OutForPickup", "PickedUp", "OutForDelivery"].includes(d.status)).length;
       const completed = data.filter(d => d.status === "Delivered").length;
       const pending = data.filter(d => d.status === "Assigned").length;
 
@@ -51,13 +51,16 @@ export default function DeliveryDashboard() {
     fetchEarnings();
   }, []);
 
-  const handleAction = async (orderId, action) => {
+  const handleAction = async (deliveryId, nextStatus) => {
     try {
-      // action maps to: "pickup", "confirm" -> "confirm_delivery"
-      const apiAction = action === "confirm" ? "confirm_delivery" : action;
-
-      await axios.patch(`/api/orders/${orderId}/fulfillment`, { action: apiAction });
-      toast.success(action === "pickup" ? "Order Picked Up" : "Delivery Confirmed");
+      await axios.patch(`/api/deliveries/${deliveryId}/status`, { status: nextStatus });
+      const messages = {
+        OutForPickup: "Pickup started",
+        PickedUp: "Order picked up",
+        OutForDelivery: "Out for delivery",
+        Delivered: "Delivery confirmed",
+      };
+      toast.success(messages[nextStatus] || "Delivery updated");
       fetchDeliveries();
       fetchEarnings();
     } catch (e) {
@@ -69,6 +72,16 @@ export default function DeliveryDashboard() {
   // Filter deliveries by their status (Delivery model uses: Assigned, OutForPickup, PickedUp, OutForDelivery, Delivered)
   const activeDeliveries = deliveries.filter(d => ["Assigned", "OutForPickup", "PickedUp", "OutForDelivery"].includes(d.status));
   const completedDeliveries = deliveries.filter(d => ["Delivered"].includes(d.status));
+
+  const getNextDeliveryStep = (status) => {
+    const steps = {
+      Assigned: { status: "OutForPickup", label: "Start Pickup", icon: Truck, className: "bg-blue-600 hover:bg-blue-700" },
+      OutForPickup: { status: "PickedUp", label: "Mark Picked Up", icon: Package, className: "bg-indigo-600 hover:bg-indigo-700" },
+      PickedUp: { status: "OutForDelivery", label: "Out for Delivery", icon: Truck, className: "bg-purple-600 hover:bg-purple-700" },
+      OutForDelivery: { status: "Delivered", label: "Confirm Delivery", icon: CheckCircle, className: "bg-green-600 hover:bg-green-700" },
+    };
+    return steps[status];
+  };
 
   const container = {
     hidden: { opacity: 0 },
@@ -181,20 +194,16 @@ export default function DeliveryDashboard() {
                   <OrderCard
                     key={delivery._id}
                     order={delivery}
-                    actions={
-                      <>
-                        {delivery.status === "Assigned" && (
-                          <Button className="w-full bg-blue-600 hover:bg-blue-700 shadow-md" onClick={() => handleAction(delivery._id, "pickup")}>
-                            <Package className="mr-2 h-4 w-4" /> Pickup Order
-                          </Button>
-                        )}
-                        {(delivery.status === "OutForPickup" || delivery.status === "PickedUp" || delivery.status === "OutForDelivery") && (
-                          <Button className="w-full bg-green-600 hover:bg-green-700 shadow-md" onClick={() => handleAction(delivery._id, "confirm")}>
-                            <CheckCircle className="mr-2 h-4 w-4" /> Confirm Delivery
-                          </Button>
-                        )}
-                      </>
-                    }
+                    actions={(() => {
+                      const step = getNextDeliveryStep(delivery.status);
+                      if (!step) return null;
+                      const Icon = step.icon;
+                      return (
+                        <Button className={`w-full text-white shadow-md ${step.className}`} onClick={() => handleAction(delivery._id, step.status)}>
+                          <Icon className="mr-2 h-4 w-4" /> {step.label}
+                        </Button>
+                      );
+                    })()}
                   />
                 ))}
               </div>
@@ -305,10 +314,10 @@ function StatsCard({ title, value, icon: Icon, trend, trendUp, description, colo
   };
 
   const lightColors = {
-    blue: "bg-blue-50 text-blue-700",
-    green: "bg-emerald-50 text-emerald-700",
-    orange: "bg-orange-50 text-orange-700",
-    purple: "bg-purple-50 text-purple-700",
+    blue: "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+    green: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+    orange: "bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
+    purple: "bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
   };
 
   return (
@@ -318,7 +327,7 @@ function StatsCard({ title, value, icon: Icon, trend, trendUp, description, colo
 
         <CardContent className="p-6">
           <div className="flex justify-between items-start mb-4">
-            <div className={`p-2.5 rounded-xl ${lightColors[color]} dark:bg-opacity-10 dark:text-white ring-1 ring-inset ring-black/5 dark:ring-white/10`}>
+            <div className={`p-2.5 rounded-xl ${lightColors[color]} ring-1 ring-inset ring-black/5 dark:ring-white/10`}>
               <Icon className="h-5 w-5" />
             </div>
             {trend && (

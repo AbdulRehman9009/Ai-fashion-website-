@@ -196,6 +196,7 @@ export default function UserDashboard() {
     defaultValues: {
       eventType: "Casual",
       skinTone: "",
+      genderPreference: "auto",
       stylePreferences: ""
     }
   });
@@ -309,7 +310,10 @@ export default function UserDashboard() {
           imageUrl,
           eventType: data.eventType,
           skinTone: data.skinTone,
-          preferences: { style: data.stylePreferences }
+          preferences: {
+            style: data.stylePreferences,
+            genderPreference: data.genderPreference
+          }
         }),
       });
 
@@ -531,6 +535,15 @@ export default function UserDashboard() {
                             <option value="">Auto-detect skin tone</option>
                             {["Fair - Cool", "Fair - Warm", "Medium - Cool", "Medium - Warm", "Olive", "Dark - Cool", "Dark - Warm"].map(t => <option key={t} value={t}>{t}</option>)}
                           </select>
+                          <select
+                            {...register("genderPreference")}
+                            className="w-full h-10 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 text-sm focus:ring-2 focus:ring-purple-500 dark:text-white"
+                          >
+                            <option value="auto">Auto detect fit</option>
+                            <option value="any">Any suitable fit</option>
+                            <option value="female">Female / women outfits</option>
+                            <option value="male">Male / men outfits</option>
+                          </select>
                           <Input {...register("stylePreferences")} placeholder="Any specific style notes?..." className="h-10 text-sm bg-white dark:bg-gray-900" />
                         </div>
                       </div>
@@ -606,8 +619,10 @@ export default function UserDashboard() {
                               <span className="font-semibold">{watchEventType}</span>
                             </div>
                             <div className="bg-white/10 backdrop-blur-md rounded-xl p-4 border border-white/10">
-                              <span className="text-xs text-purple-200 block mb-1">Vibe</span>
-                              <span className="font-semibold">Modern & Chic</span>
+                              <span className="text-xs text-purple-200 block mb-1">Catalog Match</span>
+                              <span className="font-semibold">
+                                {aiResults.availableProductsChecked ?? 0} checked
+                              </span>
                             </div>
                           </div>
 
@@ -648,8 +663,13 @@ export default function UserDashboard() {
                                       <Badge variant="secondary" className="bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
                                         {rec.outfitType}
                                       </Badge>
+                                      {rec.targetGender && rec.targetGender !== "any" && (
+                                        <Badge variant="outline" className="border-indigo-200 text-indigo-700 dark:border-indigo-800 dark:text-indigo-300">
+                                          {rec.targetGender}
+                                        </Badge>
+                                      )}
                                       {rec.colorNames?.map((c, ci) => (
-                                        <span key={ci} className="text-xs text-gray-500 border border-gray-100 dark:border-gray-700 px-2 py-0.5 rounded-full">{c}</span>
+                                        <span key={ci} className="text-xs text-gray-500 dark:text-gray-400 border border-gray-100 dark:border-gray-700 px-2 py-0.5 rounded-full">{c}</span>
                                       ))}
                                     </div>
                                   </div>
@@ -687,7 +707,10 @@ export default function UserDashboard() {
                                             </button>
                                           </div>
                                           <p className="text-xs text-gray-700 dark:text-gray-300 truncate">{p.title}</p>
-                                          <p className="text-xs font-bold text-gray-900 dark:text-white">${p.price}</p>
+                                          <div className="flex items-center justify-between gap-1">
+                                            <p className="text-xs font-bold text-gray-900 dark:text-white">${p.price}</p>
+                                            <span className="text-[10px] uppercase text-gray-400 dark:text-gray-500">{p.genderFit}</span>
+                                          </div>
                                         </div>
                                       ))}
                                     </div>
@@ -755,18 +778,18 @@ export default function UserDashboard() {
 }
 
 function StatsCard({ title, value, icon: Icon, trend, trendUp = true, description, color }) {
-  const colors = {
-    blue: "from-blue-500 to-cyan-500",
-    green: "from-emerald-500 to-teal-500",
-    orange: "from-orange-500 to-amber-500",
-    purple: "from-purple-500 to-pink-500",
+  const lightColors = {
+    blue: "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+    green: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+    orange: "bg-orange-50 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
+    purple: "bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
   };
 
-  const lightColors = {
-    blue: "bg-blue-50 text-blue-700",
-    green: "bg-emerald-50 text-emerald-700",
-    orange: "bg-orange-50 text-orange-700",
-    purple: "bg-purple-50 text-purple-700",
+  const trendColors = {
+    blue: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+    green: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
+    orange: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
+    purple: "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400",
   };
 
   return (
@@ -776,11 +799,11 @@ function StatsCard({ title, value, icon: Icon, trend, trendUp = true, descriptio
 
         <CardContent className="p-6">
           <div className="flex justify-between items-start mb-4">
-            <div className={`p-2.5 rounded-xl ${lightColors[color]} dark:bg-${color}-900/30 dark:text-${color}-400 ring-1 ring-inset ring-black/5 dark:ring-white/10`}>
+            <div className={`p-2.5 rounded-xl ${lightColors[color]} ring-1 ring-inset ring-black/5 dark:ring-white/10`}>
               <Icon className="h-5 w-5" />
             </div>
             {trend && (
-              <div className={`flex items-center text-xs font-medium px-2 py-1 rounded-full ${color === 'orange' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30' : 'bg-green-100 text-green-700 dark:bg-green-900/30'} dark:text-${color}-400`}>
+              <div className={`flex items-center text-xs font-medium px-2 py-1 rounded-full ${trendColors[color] || trendColors.green}`}>
                 <TrendingUp className="h-3 w-3 mr-1" />
                 {trend}
               </div>

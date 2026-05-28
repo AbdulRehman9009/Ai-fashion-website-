@@ -89,7 +89,7 @@ export default function Sidebar({ role, isOpen, onClose }) {
     <>
       <aside
         className={cn(
-          "w-64 flex flex-col border-r border-gray-200/50 dark:border-gray-800 bg-white/50 dark:bg-gray-900/50 backdrop-blur-xl h-full",
+          "w-64 flex flex-col border-r border-gray-200/70 dark:border-gray-800 bg-card/95 text-card-foreground backdrop-blur-xl h-full",
           "md:w-64 md:flex-shrink-0"
         )}
       >
@@ -105,7 +105,12 @@ export default function Sidebar({ role, isOpen, onClose }) {
               <span className="text-[10px] font-bold text-slate-400 dark:text-gray-500 uppercase tracking-widest mt-0.5">{role}</span>
             </div>
           </Link>
-          <button onClick={onClose} className="md:hidden text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 p-1 rounded-md">
+          <button
+            type="button"
+            aria-label="Close sidebar"
+            onClick={onClose}
+            className="md:hidden text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring p-1 rounded-md"
+          >
             <X className="h-5 w-5" />
           </button>
         </div>
@@ -122,7 +127,7 @@ export default function Sidebar({ role, isOpen, onClose }) {
                 href={link.href}
                 onClick={onClose}
                 className={cn(
-                  "relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 group overflow-hidden border",
+                  "relative flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 group overflow-hidden border focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                   isActive
                     ? activeClass + " shadow-sm"
                     : "text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white border-transparent"
@@ -150,7 +155,7 @@ export default function Sidebar({ role, isOpen, onClose }) {
         <div className="border-t border-gray-100 dark:border-gray-800 p-4 space-y-2">
           <Link
             href="/"
-            className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white transition-colors"
+            className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
           >
             <Home className="h-4 w-4 opacity-70" />
             <span>Home Website</span>

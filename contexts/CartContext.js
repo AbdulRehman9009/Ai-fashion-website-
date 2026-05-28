@@ -19,10 +19,7 @@ export function CartProvider({ children }) {
     const [cartShop, setCartShop] = useState(null);
     const [cartCount, setCartCount] = useState(0);
     const [loading, setLoading] = useState(false);
-    // Prevent fetch races — track if a fetch is already in flight
     const fetchingRef = useRef(false);
-
-    // ── Derived total ──────────────────────────────────────────────────────
     const cartTotal = useMemo(() => {
         return cart.reduce((total, item) => {
             const price = item.product?.basePrice ?? item.product?.price ?? 0;
@@ -30,7 +27,6 @@ export function CartProvider({ children }) {
         }, 0);
     }, [cart]);
 
-    // ── Fetch cart from server ─────────────────────────────────────────────
     const fetchCart = useCallback(async () => {
         if (fetchingRef.current) return;
         fetchingRef.current = true;
@@ -47,8 +43,6 @@ export function CartProvider({ children }) {
             fetchingRef.current = false;
         }
     }, []);
-
-    // Fetch on login / logout
     useEffect(() => {
         if (status === "authenticated" && session?.user) {
             fetchCart();
@@ -58,8 +52,6 @@ export function CartProvider({ children }) {
             setCartShop(null);
         }
     }, [session, status, fetchCart]);
-
-    // ── Add to cart ────────────────────────────────────────────────────────
     const addToCart = useCallback(
         async (productId, quantity = 1, selectedOptions = {}) => {
             if (!session?.user) {
@@ -79,7 +71,7 @@ export function CartProvider({ children }) {
 
                 if (res.ok) {
                     toast.success("Added to cart!");
-                    await fetchCart(); // Sync authoritative count from server
+                    await fetchCart(); 
                     return true;
                 }
 
@@ -88,13 +80,11 @@ export function CartProvider({ children }) {
                         "Your cart has items from a different shop. Clear your cart and add this item instead?"
                     );
                     if (shouldClear) {
-                        // Clear backend cart first, then retry
                         const clearRes = await fetch("/api/cart?clear=true", { method: "DELETE" });
                         if (clearRes.ok) {
                             setCart([]);
                             setCartCount(0);
                             setCartShop(null);
-                            // Retry the original add
                             const retryRes = await fetch("/api/cart", {
                                 method: "POST",
                                 headers: { "Content-Type": "application/json" },
@@ -127,8 +117,6 @@ export function CartProvider({ children }) {
         },
         [session, fetchCart]
     );
-
-    // ── Remove from cart ───────────────────────────────────────────────────
     const removeFromCart = useCallback(
         async (productId, selectedOptions = {}) => {
             if (!productId) return false;
@@ -156,7 +144,6 @@ export function CartProvider({ children }) {
                 const data = await res.json();
 
                 if (!res.ok) {
-                    // Rollback on failure
                     setCart(prevCart);
                     setCartCount(prevCount);
                     toast.error(data.error || "Failed to remove from cart");
@@ -178,7 +165,6 @@ export function CartProvider({ children }) {
         [cart, cartCount]
     );
 
-    // ── Update quantity ────────────────────────────────────────────────────
     const updateQuantity = useCallback(
         async (productId, quantity, selectedOptions = {}) => {
             if (quantity < 1) return false;
