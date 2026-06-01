@@ -4,6 +4,7 @@ import { Providers } from "@/components/Providers";
 import ProfileWarningBanner from "@/components/ui/ProfileWarningBanner";
 import Footer from "@/components/layout/Footer";
 import Navbar from "@/components/layout/Navbar";
+import CartGlobalButton from "@/components/cart/CartGlobalButton";
 
 export const metadata = {
   title: "Style Genie - AI-Powered Custom Fashion",
@@ -24,6 +25,7 @@ export default function RootLayout({ children }) {
           <Navbar />
           <ProfileWarningBanner />
           {children}
+          <CartGlobalButton />
           <Footer />
         </Providers>
       </body>

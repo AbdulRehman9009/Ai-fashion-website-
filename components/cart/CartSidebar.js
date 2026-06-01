@@ -39,7 +39,7 @@ export default function CartSidebar({ isOpen, onClose }) {
                         animate={{ x: 0 }}
                         exit={{ x: "100%" }}
                         transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                        className="fixed right-0 top-0 h-full sm:h-auto sm:max-h-[90vh] sm:top-4 sm:right-4 sm:rounded-2xl w-full sm:w-100 bg-white dark:bg-gray-900 shadow-2xl z-50 flex flex-col overflow-hidden border-l sm:border border-gray-200 dark:border-gray-800"
+                        className="fixed right-0 top-0 h-full sm:h-auto sm:max-h-[90vh] sm:top-4 sm:right-4 sm:rounded-2xl w-full sm:w-[28rem] bg-white dark:bg-gray-900 shadow-2xl z-50 flex flex-col overflow-hidden border-l sm:border border-gray-200 dark:border-gray-800"
                     >
                         <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
                             <div className="flex items-center gap-3">
@@ -66,9 +66,13 @@ export default function CartSidebar({ isOpen, onClose }) {
                                     <p className="text-sm">Start shopping to add items!</p>
                                 </div>
                             ) : (
-                                cart.map((item, index) => (
+                                cart.map((item, index) => {
+                                    const productId = item.product?._id || item.product?.id;
+                                    const selectedOptions = item.selectedOptions || {};
+
+                                    return (
                                     <motion.div
-                                        key={index}
+                                        key={`${productId || index}-${JSON.stringify(selectedOptions)}`}
                                         layout
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
@@ -94,7 +98,7 @@ export default function CartSidebar({ isOpen, onClose }) {
                                         {/* Product Info */}
                                         <div className="flex-1 min-w-0">
                                             <h3 className="font-semibold text-sm truncate text-gray-900 dark:text-gray-100">
-                                                {item.product?.name || "Product"}
+                                                {item.product?.title || item.product?.name || "Product"}
                                             </h3>
                                             <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
                                                 {item.product?.shop?.name || "Shop"}
@@ -112,7 +116,7 @@ export default function CartSidebar({ isOpen, onClose }) {
                                             <div className="flex items-center justify-between mt-2">
                                                 <div className="flex items-center gap-1 bg-white dark:bg-gray-700 rounded-lg p-1">
                                                     <button
-                                                        onClick={() => updateQuantity(index, item.quantity - 1)}
+                                                        onClick={() => updateQuantity(productId, item.quantity - 1, selectedOptions)}
                                                         disabled={loading || item.quantity <= 1}
                                                         className="p-1 hover:bg-gray-100 dark:hover:bg-gray-600 rounded disabled:opacity-50 transition-colors"
                                                     >
@@ -122,7 +126,7 @@ export default function CartSidebar({ isOpen, onClose }) {
                                                         {item.quantity}
                                                     </span>
                                                     <button
-                                                        onClick={() => updateQuantity(index, item.quantity + 1)}
+                                                        onClick={() => updateQuantity(productId, item.quantity + 1, selectedOptions)}
                                                         disabled={loading}
                                                         className="p-1 hover:bg-gray-100 dark:hover:bg-gray-600 rounded transition-colors"
                                                     >
@@ -130,7 +134,7 @@ export default function CartSidebar({ isOpen, onClose }) {
                                                     </button>
                                                 </div>
                                                 <button
-                                                    onClick={() => removeFromCart(index)}
+                                                    onClick={() => removeFromCart(productId, selectedOptions)}
                                                     disabled={loading}
                                                     className="p-1.5 hover:bg-red-50 dark:hover:bg-red-900/20 text-red-500 rounded-lg transition-colors"
                                                 >
@@ -139,7 +143,8 @@ export default function CartSidebar({ isOpen, onClose }) {
                                             </div>
                                         </div>
                                     </motion.div>
-                                ))
+                                    );
+                                })
                             )}
                         </div>
 

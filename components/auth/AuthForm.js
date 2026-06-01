@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { signIn } from "next-auth/react";
+import { getSession, signIn, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -89,11 +89,24 @@ export default function AuthForm({ role, type }) { // type: "login" | "register"
         const loginRes = await signIn("credentials", { email, password, redirect: false });
 
         if (!loginRes?.ok) router.push(`/auth/${role.toLowerCase()}/login`);
-        else router.push(`/dashboard/${role.toLowerCase()}`);
+        else {
+          const session = await getSession();
+          if (session?.user?.role !== role) {
+            await signOut({ redirect: false });
+            throw new Error(`This email belongs to a ${roleConfig[session?.user?.role]?.label || "different"} account. Please use the correct ${config.label} login.`);
+          }
+          router.push(`/dashboard/${role.toLowerCase()}`);
+        }
 
       } else {
         const res = await signIn("credentials", { email, password, redirect: false });
         if (res?.error) throw new Error("Invalid credentials");
+
+        const session = await getSession();
+        if (session?.user?.role !== role) {
+          await signOut({ redirect: false });
+          throw new Error(`This email belongs to a ${roleConfig[session?.user?.role]?.label || "different"} account. Please use the correct ${config.label} login.`);
+        }
 
         toast.success("Welcome back!");
         router.push(`/dashboard/${role.toLowerCase()}`);
@@ -107,6 +120,7 @@ export default function AuthForm({ role, type }) { // type: "login" | "register"
   }
 
   const handleSocialLogin = (provider) => {
+    document.cookie = `style_genie_oauth_role=${role}; path=/; max-age=600; SameSite=Lax`;
     signIn(provider, { callbackUrl: `/dashboard/${role.toLowerCase()}` });
   };
 
@@ -160,6 +174,9 @@ export default function AuthForm({ role, type }) { // type: "login" | "register"
               GitHub
             </Button>
           </div>
+          <p className="text-xs text-center text-gray-500 dark:text-gray-400">
+            Social signup will create or enter the selected {config.label} role.
+          </p>
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-gray-200 dark:border-gray-700" /></div>

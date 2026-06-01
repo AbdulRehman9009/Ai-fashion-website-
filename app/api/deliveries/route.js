@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { getToken } from "next-auth/jwt";
 import { connectDB } from "@/lib/db";
 import Delivery from "@/models/Delivery";
-import Order from "@/models/Order";
-import User from "@/models/User";
 
 export async function GET(req) {
     await connectDB();
@@ -24,10 +22,10 @@ export async function GET(req) {
                 path: "order",
                 populate: [
                     { path: "user", select: "name email image" },
-                    { path: "shop", select: "name logo" },
+                    { path: "shop", select: "name logo location" },
                     {
                         path: "items.product",
-                        select: "title images basePrice"
+                        select: "title images basePrice category"
                     }
                 ]
             })
@@ -39,10 +37,15 @@ export async function GET(req) {
             const order = delivery.order;
             return {
                 ...delivery,
+                items: order?.items || [],
+                user: order?.user,
                 customer: order?.user,
                 shop: order?.shop,
                 outfitImage: order?.items?.[0]?.product?.images?.[0],
+                shippingAddress: order?.shippingAddress,
                 deliveryAddress: order?.shippingAddress,
+                pickupAddress: delivery.pickupAddress || order?.shop?.location,
+                dropoffAddress: delivery.dropoffAddress || order?.shippingAddress,
                 urgent: order?.urgent || false,
                 orderStatus: order?.status,
                 paymentStatus: order?.paymentStatus,

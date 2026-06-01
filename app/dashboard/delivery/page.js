@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Truck, TrendingUp, Calendar, CreditCard, CheckCircle, Package, ArrowUpRight, Loader2 } from "lucide-react";
+import { Truck, TrendingUp, Calendar, CreditCard, CheckCircle, Package, ArrowUpRight, Loader2, RefreshCw } from "lucide-react";
 import { toast } from "react-toastify";
 import OrderCard from "@/components/ui/OrderCard";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ export default function DeliveryDashboard() {
   const [deliveries, setDeliveries] = useState([]);
   const [earnings, setEarnings] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [updatingId, setUpdatingId] = useState(null);
   const [stats, setStats] = useState({ assigned: 0, completed: 0, pending: 0 });
 
   const fetchDeliveries = async () => {
@@ -52,6 +53,7 @@ export default function DeliveryDashboard() {
   }, []);
 
   const handleAction = async (deliveryId, nextStatus) => {
+    setUpdatingId(deliveryId);
     try {
       await axios.patch(`/api/deliveries/${deliveryId}/status`, { status: nextStatus });
       const messages = {
@@ -66,6 +68,8 @@ export default function DeliveryDashboard() {
     } catch (e) {
       console.error(e);
       toast.error(e.response?.data?.error || "Action failed");
+    } finally {
+      setUpdatingId(null);
     }
   };
 
@@ -102,8 +106,9 @@ export default function DeliveryDashboard() {
           <p className="text-gray-500 dark:text-gray-400 mt-1">Manage your deliveries and track earnings.</p>
         </div>
         <div className="flex gap-3">
-          <Button variant="outline" className="h-10 border-gray-200 dark:border-gray-800">
-            Route Map
+          <Button variant="outline" className="h-10 border-gray-200 dark:border-gray-800" onClick={fetchDeliveries} disabled={loading}>
+            <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+            Refresh
           </Button>
         </div>
       </div>
@@ -199,8 +204,9 @@ export default function DeliveryDashboard() {
                       if (!step) return null;
                       const Icon = step.icon;
                       return (
-                        <Button className={`w-full text-white shadow-md ${step.className}`} onClick={() => handleAction(delivery._id, step.status)}>
-                          <Icon className="mr-2 h-4 w-4" /> {step.label}
+                        <Button className={`w-full text-white shadow-md ${step.className}`} onClick={() => handleAction(delivery._id, step.status)} disabled={updatingId === delivery._id}>
+                          {updatingId === delivery._id ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Icon className="mr-2 h-4 w-4" />}
+                          {step.label}
                         </Button>
                       );
                     })()}
@@ -306,13 +312,6 @@ export default function DeliveryDashboard() {
 }
 
 function StatsCard({ title, value, icon: Icon, trend, trendUp, description, color }) {
-  const colors = {
-    blue: "from-blue-500 to-cyan-500",
-    green: "from-emerald-500 to-teal-500",
-    orange: "from-orange-500 to-amber-500",
-    purple: "from-purple-500 to-pink-500",
-  };
-
   const lightColors = {
     blue: "bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
     green: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",

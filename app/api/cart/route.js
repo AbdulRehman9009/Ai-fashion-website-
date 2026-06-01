@@ -13,6 +13,14 @@ function isValidId(id) {
     return mongoose.Types.ObjectId.isValid(id);
 }
 
+function requireCustomerCart(session) {
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (session.user?.role !== "USER") {
+        return NextResponse.json({ error: "Only customer accounts can use the cart" }, { status: 403 });
+    }
+    return null;
+}
+
 /** Return the shop ID for a product efficiently */
 async function getProductShopId(productId) {
     const p = await Product.findById(productId).select("shop stock isActive").lean();
@@ -28,9 +36,8 @@ async function getProductShopId(productId) {
 export async function GET() {
     try {
         const session = await getServerSession(authOptions);
-        if (!session) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
+        const authError = requireCustomerCart(session);
+        if (authError) return authError;
 
         await connectDB();
 
@@ -67,9 +74,8 @@ export async function GET() {
 export async function POST(req) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
+        const authError = requireCustomerCart(session);
+        if (authError) return authError;
 
         const body = await req.json();
         const { productId, quantity = 1, selectedOptions = {} } = body;
@@ -186,9 +192,8 @@ export async function POST(req) {
 export async function PATCH(req) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
+        const authError = requireCustomerCart(session);
+        if (authError) return authError;
 
         const { productId, selectedOptions = {}, quantity } = await req.json();
 
@@ -251,9 +256,8 @@ export async function PATCH(req) {
 export async function DELETE(req) {
     try {
         const session = await getServerSession(authOptions);
-        if (!session) {
-            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        }
+        const authError = requireCustomerCart(session);
+        if (authError) return authError;
 
         const { searchParams } = new URL(req.url);
         const clearCart = searchParams.get("clear") === "true" || searchParams.get("action") === "clear";

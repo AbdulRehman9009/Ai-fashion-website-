@@ -28,7 +28,8 @@ import {
   ArrowRight,
   Heart,
   TrendingUp,
-  ArrowUpRight
+  ArrowUpRight,
+  ExternalLink
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -688,28 +689,37 @@ export default function UserDashboard() {
                                     <p className="text-xs font-bold text-gray-900 dark:text-white uppercase tracking-wider mb-3">Shop the Look</p>
                                     <div className="flex gap-3 overflow-x-auto pb-2">
                                       {rec.matchedProducts.slice(0, 4).map((p, pi) => (
-                                        <div key={pi} className="group relative flex-shrink-0 w-24">
-                                          <div className="aspect-square rounded-lg bg-gray-100 dark:bg-gray-800 overflow-hidden mb-2">
-                                            {p.image ? (
-                                              <img src={p.image} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-                                            ) : (
-                                              <div className="w-full h-full flex items-center justify-center">
-                                                <ShoppingBag className="h-6 w-6 text-gray-300" />
-                                              </div>
-                                            )}
-                                            <button
-                                              onClick={() => handleAddToCart(p)}
-                                              className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity"
-                                            >
-                                              <div className="bg-white text-black p-2 rounded-full shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-transform">
-                                                <ShoppingBag className="h-4 w-4" />
-                                              </div>
-                                            </button>
-                                          </div>
-                                          <p className="text-xs text-gray-700 dark:text-gray-300 truncate">{p.title}</p>
-                                          <div className="flex items-center justify-between gap-1">
+                                        <div key={pi} className="group relative flex-shrink-0 w-36">
+                                          <Link href={p.productUrl || `/products/${p.id}`} className="block">
+                                            <div className="aspect-square rounded-lg bg-gray-100 dark:bg-gray-800 overflow-hidden mb-2 border border-gray-100 dark:border-gray-700">
+                                              {p.image ? (
+                                                <img src={p.image} alt={p.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
+                                              ) : (
+                                                <div className="w-full h-full flex items-center justify-center">
+                                                  <ShoppingBag className="h-6 w-6 text-gray-300" />
+                                                </div>
+                                              )}
+                                            </div>
+                                            <p className="text-xs text-gray-700 dark:text-gray-300 truncate">{p.title}</p>
+                                          </Link>
+                                          <div className="flex items-center justify-between gap-1 mt-1">
                                             <p className="text-xs font-bold text-gray-900 dark:text-white">${p.price}</p>
                                             <span className="text-[10px] uppercase text-gray-400 dark:text-gray-500">{p.genderFit}</span>
+                                          </div>
+                                          <div className="mt-2 grid grid-cols-2 gap-1.5">
+                                            <button
+                                              type="button"
+                                              onClick={() => handleAddToCart(p)}
+                                              className="inline-flex h-8 items-center justify-center rounded-md bg-purple-600 text-white text-[11px] font-semibold hover:bg-purple-700 transition-colors"
+                                            >
+                                              Buy
+                                            </button>
+                                            <Link
+                                              href={p.productUrl || `/products/${p.id}`}
+                                              className="inline-flex h-8 items-center justify-center gap-1 rounded-md border border-gray-200 dark:border-gray-700 text-[11px] font-semibold text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors"
+                                            >
+                                              View <ExternalLink className="h-3 w-3" />
+                                            </Link>
                                           </div>
                                         </div>
                                       ))}

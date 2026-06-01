@@ -33,6 +33,18 @@ export async function POST(req) {
         userId
     );
 
+    const origin = req.nextUrl?.origin || process.env.NEXTAUTH_URL || "";
+    if (origin && Array.isArray(result.recommendations)) {
+      result.recommendations = result.recommendations.map((recommendation) => ({
+        ...recommendation,
+        product: recommendation.product ? {
+          ...recommendation.product,
+          absoluteProductUrl: new URL(recommendation.product.productUrl || `/products/${recommendation.product.id}`, origin).toString(),
+          absoluteShopUrl: recommendation.product.shopUrl ? new URL(recommendation.product.shopUrl, origin).toString() : recommendation.product.shopUrl,
+        } : null,
+      }));
+    }
+
     return NextResponse.json(result);
 
   } catch (error) {

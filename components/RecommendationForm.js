@@ -4,9 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Upload, Sparkles, X, Camera, Palette, Ruler } from "lucide-react";
+import { Loader2, Sparkles, X, Camera, Palette, Ruler, ExternalLink } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
+import Link from "next/link";
 
 export default function RecommendationForm({ onProductSelect }) {
   const [file, setFile] = useState(null);
@@ -275,12 +276,20 @@ export default function RecommendationForm({ onProductSelect }) {
                       </div>
                     </div>
 
-                    <Button
-                      onClick={() => onProductSelect && onProductSelect(rec.product)}
-                      className="w-full bg-slate-900 hover:bg-black dark:bg-white dark:hover:bg-slate-200 dark:text-black text-white rounded-xl h-11"
-                    >
-                      <Ruler className="mr-2 h-4 w-4" /> Customize & Buy
-                    </Button>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button
+                        onClick={() => onProductSelect && onProductSelect(rec.product)}
+                        className="bg-slate-900 hover:bg-black dark:bg-white dark:hover:bg-slate-200 dark:text-black text-white rounded-xl h-11"
+                      >
+                        <Ruler className="mr-2 h-4 w-4" /> Buy
+                      </Button>
+                      <Link
+                        href={rec.product.productUrl || `/products/${rec.product.id}`}
+                        className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
+                      >
+                        View <ExternalLink className="h-4 w-4" />
+                      </Link>
+                    </div>
                   </div>
                 </motion.div>
               ))}

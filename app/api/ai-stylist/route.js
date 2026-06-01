@@ -61,6 +61,7 @@ async function aiStylistHandler(req) {
 
     const body = await req.json();
     const { imageUrl, eventType, skinTone, preferences = {} } = body;
+    const origin = req.nextUrl?.origin || process.env.NEXTAUTH_URL || "";
     const rawGenderPreference = preferences.gender || preferences.genderPreference || preferences.audience || body.gender;
     const requestedGender = rawGenderPreference && !["auto", "detect"].includes(String(rawGenderPreference).toLowerCase())
         ? normalizeGenderPreference(rawGenderPreference)
@@ -77,12 +78,6 @@ async function aiStylistHandler(req) {
         throw new ValidationError("Event type is required", [
             { field: "eventType", message: "Please select an event type" }
         ]);
-    }
-
-    // Check API key
-    if (!apiKey) {
-        logger.error("Gemini API key not configured");
-        throw new Error("AI service is not configured");
     }
 
     // Step 1: Generate outfit analysis prompt
@@ -131,6 +126,10 @@ async function aiStylistHandler(req) {
 
     let aiResponse;
     try {
+        if (!apiKey) {
+            throw new Error("Gemini API key not configured");
+        }
+
         const result = await model.generateContent([
             { role: "user", parts: [{ text: analysisPrompt }] }
         ]);
@@ -176,6 +175,14 @@ async function aiStylistHandler(req) {
         genderPreference: effectiveGender,
     });
     const recommendationsWithProducts = matchResult.recommendations;
+    for (const recommendation of recommendationsWithProducts) {
+        recommendation.matchedProducts = recommendation.matchedProducts.map((product) => ({
+            ...product,
+            productUrl: product.productUrl,
+            absoluteProductUrl: origin ? new URL(product.productUrl, origin).toString() : product.productUrl,
+            absoluteShopUrl: product.shopUrl && origin ? new URL(product.shopUrl, origin).toString() : product.shopUrl,
+        }));
+    }
 
     // Step 4: Log recommendation for analytics
     if (userId) {

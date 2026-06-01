@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from "react";
-import { Truck, Package, CheckCircle, Loader2, Clock } from "lucide-react";
+import { Truck, Package, CheckCircle, Loader2, Clock, RefreshCw } from "lucide-react";
 import OrderCard from "@/components/ui/OrderCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -11,6 +11,7 @@ import axios from "axios";
 export default function DeliveryDeliveriesPage() {
     const [deliveries, setDeliveries] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [updatingId, setUpdatingId] = useState(null);
 
     const fetchDeliveries = async () => {
         try {
@@ -27,6 +28,7 @@ export default function DeliveryDeliveriesPage() {
     useEffect(() => { fetchDeliveries(); }, []);
 
     const handleAction = async (deliveryId, nextStatus) => {
+        setUpdatingId(deliveryId);
         try {
             await axios.patch(`/api/deliveries/${deliveryId}/status`, { status: nextStatus });
             const messages = {
@@ -39,6 +41,8 @@ export default function DeliveryDeliveriesPage() {
             fetchDeliveries();
         } catch (e) {
             toast.error(e.response?.data?.error || "Action failed");
+        } finally {
+            setUpdatingId(null);
         }
     };
 
@@ -66,18 +70,24 @@ export default function DeliveryDeliveriesPage() {
 
     return (
         <div className="space-y-6 pb-10">
-            <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
-                    <Truck className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-blue-50 dark:bg-blue-900/30 rounded-xl">
+                        <Truck className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                        <h2 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
+                            My Deliveries
+                        </h2>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                            Track and complete your assigned deliveries.
+                        </p>
+                    </div>
                 </div>
-                <div>
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
-                        My Deliveries
-                    </h2>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">
-                        Track and complete your assigned deliveries.
-                    </p>
-                </div>
+                <Button variant="outline" className="gap-2 self-start sm:self-auto" onClick={fetchDeliveries} disabled={loading}>
+                    <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
+                    Refresh
+                </Button>
             </div>
 
             <Tabs defaultValue="active" className="space-y-6">
@@ -85,13 +95,13 @@ export default function DeliveryDeliveriesPage() {
                     <TabsTrigger value="active" className="rounded-lg px-5 h-10">
                         Active
                         {activeDeliveries.length > 0 && (
-                            <Badge className="ml-2 bg-blue-100 text-blue-700 border-0">{activeDeliveries.length}</Badge>
+                            <Badge className="ml-2 bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300 border-0">{activeDeliveries.length}</Badge>
                         )}
                     </TabsTrigger>
                     <TabsTrigger value="history" className="rounded-lg px-5 h-10">
                         Completed
                         {completedDeliveries.length > 0 && (
-                            <Badge className="ml-2 bg-green-100 text-green-700 border-0">{completedDeliveries.length}</Badge>
+                            <Badge className="ml-2 bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300 border-0">{completedDeliveries.length}</Badge>
                         )}
                     </TabsTrigger>
                 </TabsList>
@@ -114,8 +124,10 @@ export default function DeliveryDeliveriesPage() {
                                         const Icon = step.icon;
                                         return (
                                             <Button className={`w-full gap-2 text-white ${step.className}`}
-                                                onClick={() => handleAction(delivery._id, step.status)}>
-                                                <Icon className="h-4 w-4" /> {step.label}
+                                                onClick={() => handleAction(delivery._id, step.status)}
+                                                disabled={updatingId === delivery._id}>
+                                                {updatingId === delivery._id ? <Loader2 className="h-4 w-4 animate-spin" /> : <Icon className="h-4 w-4" />}
+                                                {step.label}
                                             </Button>
                                         );
                                     })()}
