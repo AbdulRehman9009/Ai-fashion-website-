@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { ArrowLeft, Loader2, Package } from "lucide-react";
 import OrderTimeline from "@/components/OrderTimeline";
 import Link from "next/link";
-import CheckoutButton from "@/components/checkout/CheckoutButton";
+
 
 export default function OrderDetailPage() {
     const { id } = useParams();
@@ -117,13 +117,13 @@ export default function OrderDetailPage() {
                                 <span>${order.pricing?.grandTotal?.toFixed(2)}</span>
                             </div>
 
-                            {order.paymentStatus !== "PAID" && (
-                                <div className="pt-4">
-                                    <CheckoutButton
-                                        orderId={order._id}
-                                        amount={order.pricing?.grandTotal}
-                                        currency={order.pricing?.currency}
-                                    />
+                            {order.paymentStatus !== "PAID" ? (
+                                <div className="pt-4 text-center p-4 bg-orange-50 dark:bg-orange-950/20 text-orange-800 dark:text-orange-300 rounded-xl border border-orange-200 dark:border-orange-900 text-sm font-medium">
+                                    Cash on Delivery — Please prepare ${order.pricing?.grandTotal?.toFixed(2)} to pay when your package arrives.
+                                </div>
+                            ) : (
+                                <div className="pt-4 text-center p-4 bg-green-50 dark:bg-green-950/20 text-green-800 dark:text-green-300 rounded-xl border border-green-200 dark:border-green-900 text-sm font-medium">
+                                    Payment Completed on Delivery.
                                 </div>
                             )}
                         </CardContent>

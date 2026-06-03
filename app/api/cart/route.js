@@ -27,6 +27,27 @@ async function getProductShopId(productId) {
     return p;
 }
 
+async function getPopulatedCartResponse(userId, message) {
+    const cart = await Cart.findOne({ user: userId })
+        .select("items shop")
+        .populate({
+            path: "items.product",
+            select: "title images basePrice price stock shop isActive",
+            populate: { path: "shop", select: "name logo" }
+        })
+        .lean();
+
+    const items = cart?.items || [];
+
+    return NextResponse.json({
+        success: true,
+        message,
+        data: items,
+        count: items.length,
+        shop: cart?.shop || null
+    });
+}
+
 // ─── GET /api/cart ───────────────────────────────────────────────────────────
 
 /**
@@ -142,11 +163,7 @@ export async function POST(req) {
                     { $inc: { "items.$.quantity": quantity } },
                     { new: true }
                 );
-                return NextResponse.json({
-                    success: true,
-                    message: "Cart updated",
-                    count: updated.items.length
-                });
+                return await getPopulatedCartResponse(session.user.id, "Cart updated");
             } else {
                 // Push new item and set shop atomically
                 const updated = await Cart.findOneAndUpdate(
@@ -157,11 +174,7 @@ export async function POST(req) {
                     },
                     { new: true }
                 );
-                return NextResponse.json({
-                    success: true,
-                    message: "Product added to cart",
-                    count: updated.items.length
-                });
+                return await getPopulatedCartResponse(session.user.id, "Product added to cart");
             }
         } else {
             // Create new cart
@@ -170,11 +183,7 @@ export async function POST(req) {
                 shop: product.shop,
                 items: [{ product: productId, quantity, selectedOptions }]
             });
-            return NextResponse.json({
-                success: true,
-                message: "Product added to cart",
-                count: newCart.items.length
-            });
+            return await getPopulatedCartResponse(session.user.id, "Product added to cart");
         }
     } catch (error) {
         console.error("[POST /api/cart]", error);
@@ -235,11 +244,7 @@ export async function PATCH(req) {
             return NextResponse.json({ error: "Cart or item not found" }, { status: 404 });
         }
 
-        return NextResponse.json({
-            success: true,
-            message: "Cart updated",
-            count: updated.items.length
-        });
+        return await getPopulatedCartResponse(session.user.id, "Cart updated");
     } catch (error) {
         console.error("[PATCH /api/cart]", error);
         return NextResponse.json({ error: "Failed to update cart" }, { status: 500 });
@@ -273,10 +278,7 @@ export async function DELETE(req) {
                 { $set: { items: [], shop: null } },
                 { new: true }
             );
-            if (!cart) {
-                return NextResponse.json({ error: "Cart not found" }, { status: 404 });
-            }
-            return NextResponse.json({ success: true, message: "Cart cleared", count: 0 });
+            return await getPopulatedCartResponse(session.user.id, "Cart cleared");
         }
 
         if (!productId || !isValidId(productId)) {
@@ -310,11 +312,7 @@ export async function DELETE(req) {
             await Cart.updateOne({ user: session.user.id }, { $set: { shop: null } });
         }
 
-        return NextResponse.json({
-            success: true,
-            message: "Product removed from cart",
-            count: updated.items.length
-        });
+        return await getPopulatedCartResponse(session.user.id, "Product removed from cart");
     } catch (error) {
         console.error("[DELETE /api/cart]", error);
         return NextResponse.json({ error: "Failed to remove from cart" }, { status: 500 });

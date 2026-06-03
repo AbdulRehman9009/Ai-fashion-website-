@@ -85,6 +85,7 @@ export async function PATCH(req, { params }) {
                 }
 
                 newStatus = "Delivered";
+                order.paymentStatus = "PAID";
                 delivery.status = "Delivered";
                 delivery.confirmedAt = new Date();
                 delivery.events.push({

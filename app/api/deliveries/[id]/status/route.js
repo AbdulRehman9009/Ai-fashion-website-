@@ -65,6 +65,10 @@ export async function PATCH(req, { params }) {
 
     order.status = statusMap[status] || order.status;
 
+    if (status === "Delivered") {
+      order.paymentStatus = "PAID";
+    }
+
     order.timeline.push({ byRole: "DELIVERY", event: order.status, notes });
 
     await order.save();

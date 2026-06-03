@@ -43,6 +43,7 @@ export function CartProvider({ children }) {
             fetchingRef.current = false;
         }
     }, []);
+
     useEffect(() => {
         if (status === "authenticated" && session?.user) {
             fetchCart();
@@ -52,11 +53,35 @@ export function CartProvider({ children }) {
             setCartShop(null);
         }
     }, [session, status, fetchCart]);
+
     const addToCart = useCallback(
         async (productId, quantity = 1, selectedOptions = {}) => {
             if (!session?.user) {
                 toast.error("Please log in to add items to cart");
                 return false;
+            }
+
+            // Optimistic update
+            const prevCart = cart;
+            const prevCount = cartCount;
+            const prevShop = cartShop;
+
+            const existingItemIndex = cart.findIndex(
+                (item) =>
+                    item.product?._id?.toString() === productId.toString() &&
+                    JSON.stringify(item.selectedOptions || {}) === JSON.stringify(selectedOptions)
+            );
+
+            if (existingItemIndex > -1) {
+                setCart((prev) =>
+                    prev.map((item, idx) =>
+                        idx === existingItemIndex
+                            ? { ...item, quantity: item.quantity + quantity }
+                            : item
+                    )
+                );
+            } else {
+                setCartCount((prev) => prev + 1);
             }
 
             setLoading(true);
@@ -71,9 +96,16 @@ export function CartProvider({ children }) {
 
                 if (res.ok) {
                     toast.success("Added to cart!");
-                    await fetchCart(); 
+                    setCart(data.data || []);
+                    setCartCount(data.count || 0);
+                    setCartShop(data.shop || null);
                     return true;
                 }
+
+                // Rollback if request fails
+                setCart(prevCart);
+                setCartCount(prevCount);
+                setCartShop(prevShop);
 
                 if (data.code === "MULTI_SHOP_ERROR") {
                     const shouldClear = window.confirm(
@@ -90,9 +122,12 @@ export function CartProvider({ children }) {
                                 headers: { "Content-Type": "application/json" },
                                 body: JSON.stringify({ productId, quantity, selectedOptions })
                             });
+                            const retryData = await retryRes.json();
                             if (retryRes.ok) {
                                 toast.success("Cart cleared and item added!");
-                                await fetchCart();
+                                setCart(retryData.data || []);
+                                setCartCount(retryData.count || 0);
+                                setCartShop(retryData.shop || null);
                                 return true;
                             }
                         }
@@ -108,6 +143,11 @@ export function CartProvider({ children }) {
                 }
                 return false;
             } catch (error) {
+                // Rollback
+                setCart(prevCart);
+                setCartCount(prevCount);
+                setCartShop(prevShop);
+
                 console.error("[CartContext] addToCart:", error);
                 toast.error("Failed to add to cart");
                 return false;
@@ -115,8 +155,9 @@ export function CartProvider({ children }) {
                 setLoading(false);
             }
         },
-        [session, fetchCart]
+        [session, cart, cartCount, cartShop]
     );
+
     const removeFromCart = useCallback(
         async (productId, selectedOptions = {}) => {
             if (!productId) return false;
@@ -124,6 +165,8 @@ export function CartProvider({ children }) {
             // Optimistic update
             const prevCart = cart;
             const prevCount = cartCount;
+            const prevShop = cartShop;
+
             const newCart = cart.filter(
                 (item) =>
                     !(
@@ -133,6 +176,9 @@ export function CartProvider({ children }) {
             );
             setCart(newCart);
             setCartCount(newCart.length);
+            if (newCart.length === 0) {
+                setCartShop(null);
+            }
 
             setLoading(true);
             try {
@@ -146,15 +192,20 @@ export function CartProvider({ children }) {
                 if (!res.ok) {
                     setCart(prevCart);
                     setCartCount(prevCount);
+                    setCartShop(prevShop);
                     toast.error(data.error || "Failed to remove from cart");
                     return false;
                 }
 
+                setCart(data.data || []);
+                setCartCount(data.count || 0);
+                setCartShop(data.shop || null);
                 toast.success("Removed from cart");
                 return true;
             } catch (error) {
                 setCart(prevCart);
                 setCartCount(prevCount);
+                setCartShop(prevShop);
                 console.error("[CartContext] removeFromCart:", error);
                 toast.error("Failed to remove from cart");
                 return false;
@@ -162,7 +213,7 @@ export function CartProvider({ children }) {
                 setLoading(false);
             }
         },
-        [cart, cartCount]
+        [cart, cartCount, cartShop]
     );
 
     const updateQuantity = useCallback(
@@ -196,6 +247,9 @@ export function CartProvider({ children }) {
                     return false;
                 }
 
+                setCart(data.data || []);
+                setCartCount(data.count || 0);
+                setCartShop(data.shop || null);
                 return true;
             } catch (error) {
                 setCart(prevCart);
@@ -209,27 +263,35 @@ export function CartProvider({ children }) {
         [cart]
     );
 
-    // ── Clear cart ─────────────────────────────────────────────────────────
     const clearCart = useCallback(async () => {
         const prevCart = cart;
+        const prevCount = cartCount;
+        const prevShop = cartShop;
+
         setCart([]);
         setCartCount(0);
         setCartShop(null);
         try {
             const res = await fetch("/api/cart?clear=true", { method: "DELETE" });
+            const data = await res.json();
             if (!res.ok) {
                 setCart(prevCart);
-                setCartCount(prevCart.length);
+                setCartCount(prevCount);
+                setCartShop(prevShop);
                 toast.error("Failed to clear cart");
+            } else {
+                setCart(data.data || []);
+                setCartCount(data.count || 0);
+                setCartShop(data.shop || null);
             }
         } catch (error) {
             setCart(prevCart);
-            setCartCount(prevCart.length);
+            setCartCount(prevCount);
+            setCartShop(prevShop);
             console.error("[CartContext] clearCart:", error);
         }
-    }, [cart]);
+    }, [cart, cartCount, cartShop]);
 
-    // ── Cart totals with shipping + tax ────────────────────────────────────
     const getCartTotal = useCallback(
         (includeExtras = false) => {
             if (!includeExtras) return cartTotal;

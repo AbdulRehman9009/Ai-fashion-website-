@@ -187,13 +187,13 @@ export default function OrderListShop() {
                             </div>
                         </CardHeader>
                         <CardContent className="flex flex-wrap justify-end gap-2 pt-0">
-                            {o.status === "PaymentPending" && (
+                            {(o.status === "OrderCreated" || o.status === "PaymentPending") && (
                                 <>
                                     <Button size="sm" variant="destructive" onClick={() => handleStatusUpdate(o._id, "Canceled")} disabled={actionLoading}>
                                         <X className="h-4 w-4 mr-1" /> Reject
                                     </Button>
                                     <Button size="sm" className="bg-green-600 hover:bg-green-700" onClick={() => handleStatusUpdate(o._id, "PaymentConfirmed")} disabled={actionLoading}>
-                                        <Check className="h-4 w-4 mr-1" /> Confirm Payment
+                                        <Check className="h-4 w-4 mr-1" /> Confirm Order
                                     </Button>
                                 </>
                             )}

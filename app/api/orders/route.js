@@ -122,7 +122,6 @@ export async function POST(req) {
   const pricing = computePricing({ items: orderItems, tailoringRequests, urgent, deliveryZone });
 
   // Create Order
-  const isCOD = paymentMethod === "cod";
   const order = await Order.create({
     user: token.sub,
     shop: shop._id,
@@ -130,80 +129,15 @@ export async function POST(req) {
     tailoringRequests,
     urgent,
     pricing,
-    status: isCOD ? "OrderCreated" : "PaymentPending",
+    status: "OrderCreated",
     paymentStatus: "PENDING",
     shippingAddress,
-    timeline: [{ byRole: "USER", event: "OrderCreated", notes: isCOD ? "Customer chose Cash on Delivery" : "Customer chose Card Payment" }],
+    timeline: [{ byRole: "USER", event: "OrderCreated", notes: "Customer chose Cash on Delivery" }],
   });
 
-  // If COD, return early without Paddle
-  if (isCOD) {
-    return NextResponse.json({
-      id: String(order._id),
-      paymentMethod: "COD",
-      message: "Order created successfully. Pay on delivery."
-    }, { status: 201 });
-  }
-
-  // Generate Paddle Checkout Session using INLINE pricing
-  // No paddlePriceId needed — we pass the order total directly
-  const markPaymentFailed = async (message) => {
-    order.status = "Canceled";
-    order.paymentStatus = "FAILED";
-    order.timeline.push({
-      at: new Date(),
-      byRole: "SYSTEM",
-      event: "PaymentFailed",
-      notes: message,
-    });
-    await order.save();
-  };
-
-  try {
-    const itemNames = products.map(p => p.title || p.name).join(", ");
-    const checkoutSession = await createCheckoutSession({
-      orderId: order._id.toString(),
-      orderName: `Order from ${shop.name || "Style Genie"}`,
-      orderDescription: itemNames.length > 200 ? itemNames.slice(0, 197) + "..." : itemNames,
-      totalAmount: pricing.grandTotal,
-      currency: pricing.currency || "USD",
-      customerEmail: token.email,
-      successUrl: `${process.env.NEXTAUTH_URL}/checkout/success?orderId=${order._id}`,
-      cancelUrl: `${process.env.NEXTAUTH_URL}/checkout`
-    });
-
-    if (checkoutSession && checkoutSession.success && checkoutSession.url) {
-      // Update order with checkout ID for tracking
-      order.paddleCheckoutId = checkoutSession.id;
-      await order.save();
-
-      return NextResponse.json({
-        id: String(order._id),
-        checkoutUrl: checkoutSession.url
-      }, { status: 201 });
-    } else if (checkoutSession && checkoutSession.success && !checkoutSession.url) {
-      // Transaction created but no checkout URL returned - treat as an error
-      console.error("Paddle created a transaction but returned no checkout URL", checkoutSession);
-      await markPaymentFailed("Payment gateway returned no checkout URL");
-      return NextResponse.json({
-        error: "Payment gateway unavailable. Please choose Cash on Delivery or try again later.",
-        id: String(order._id)
-      }, { status: 502 });
-    } else {
-      // Propagate Paddle errors to the client so the UI doesn't silently treat card payments as COD
-      console.error("Paddle checkout creation failed", checkoutSession);
-      await markPaymentFailed(checkoutSession?.error || "Payment session creation failed");
-      return NextResponse.json({
-        error: checkoutSession?.error || "Failed to create payment session",
-        id: String(order._id)
-      }, { status: 502 });
-    }
-  } catch (error) {
-    console.error("Checkout creation error:", error);
-    await markPaymentFailed(error.message || "Payment session creation failed");
-    return NextResponse.json({
-      id: String(order._id),
-      error: "Payment gateway unavailable. Please choose Cash on Delivery or try again later."
-    }, { status: 502 });
-  }
+  return NextResponse.json({
+    id: String(order._id),
+    paymentMethod: "COD",
+    message: "Order created successfully. Pay on delivery."
+  }, { status: 201 });
 }

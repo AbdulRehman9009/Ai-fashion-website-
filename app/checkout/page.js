@@ -40,7 +40,7 @@ export default function CheckoutPage() {
         country: "Pakistan",
         notes: ""
     });
-    const [paymentMethod, setPaymentMethod] = useState("card"); // 'card' or 'cod'
+    const [paymentMethod, setPaymentMethod] = useState("cod"); // 'card' or 'cod'
     useEffect(() => {
         if (status === "unauthenticated") {
             router.push("/auth/user/login?redirect=/checkout");
