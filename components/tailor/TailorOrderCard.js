@@ -8,6 +8,7 @@ import { User, Shirt, Clock, CheckCircle, XCircle } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "react-toastify";
+import { getProductImage, useProductImageFallback } from "@/lib/productImages";
 
 export default function TailorOrderCard({ order, onUpdate }) {
     const [notes, setNotes] = useState(order.tailorNotes || "");
@@ -76,11 +77,12 @@ export default function TailorOrderCard({ order, onUpdate }) {
                 <div className="space-y-4">
                     <div className="flex gap-4">
                         <div className="h-24 w-24 bg-gray-100 rounded-lg overflow-hidden border">
-                            {order.items?.[0]?.product?.imageUrl ? (
-                                <img src={order.items[0].product.imageUrl} className="h-full w-full object-cover" />
-                            ) : (
-                                <div className="h-full w-full flex items-center justify-center text-gray-300"><Shirt /></div>
-                            )}
+                            <img
+                                src={getProductImage(order.items?.[0]?.product)}
+                                alt={order.items?.[0]?.product?.title || "Outfit"}
+                                onError={useProductImageFallback}
+                                className="h-full w-full object-cover"
+                            />
                         </div>
                         <div>
                             <p className="font-medium">Outfit Details</p>

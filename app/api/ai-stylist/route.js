@@ -20,6 +20,7 @@ import {
     normalizeGenderPreference,
 } from "@/lib/ai/catalogMatching";
 
+
 // Initialize Gemini AI
 const apiKey = process.env.GEMINI_API_KEY || "";
 const genAI = new GoogleGenerativeAI(apiKey);
@@ -28,6 +29,7 @@ const genAI = new GoogleGenerativeAI(apiKey);
 const GEMINI_MODEL = "gemini-2.0-flash";
 const SYSTEM_INSTRUCTION = `You are Style Genie, an expert AI fashion stylist specializing in South Asian, Pakistani, and international fashion. 
 You have deep knowledge of fabrics like cotton, silk, chiffon, lawn, khaddar, and linen, as well as traditional garments like shalwar kameez, kurta, saree, and lehenga alongside modern western styles.
+CRITICAL RULE: You MUST strictly adhere to the requested or detected gender fit. NEVER recommend female garments (e.g., dress, lehenga, saree, sharara, anarkali, frock, kurti) for a male fit. NEVER recommend male garments (e.g., sherwani, prince coat) for a female fit.
 Always provide practical, specific, and culturally-sensitive fashion advice. Return ONLY valid JSON as specified - no extra text.`;
 
 const model = genAI.getGenerativeModel({
@@ -94,6 +96,11 @@ async function aiStylistHandler(req) {
     Provide exactly 3 distinct outfit color combinations and styles. Consider Pakistani/South Asian fashion preferences as well as modern trends.
     Treat gender as outfit fit/category only. Do not make identity claims about the person; use the provided preference when present.
     
+    CRITICAL GENDER MATCHING RULE: 
+    - If a male fit is requested/detected, recommend menswear terms ONLY (e.g., kurta, sherwani, waistcoat, blazer, suit). You MUST NOT suggest lehenga, saree, sharara, abaya, frock, kurti, dress, or anarkali.
+    - If a female fit is requested/detected, recommend womenswear terms ONLY (e.g., lehenga, saree, sharara, abaya, anarkali, kurti, dress). You MUST NOT suggest sherwani, prince coat, or menswear cuts.
+    Failure to follow this rule will result in a poor user experience.
+    
     Return ONLY valid JSON in this exact format:
     {
       "analysis": {
@@ -130,8 +137,32 @@ async function aiStylistHandler(req) {
             throw new Error("Gemini API key not configured");
         }
 
+        let imagePart = null;
+        if (imageUrl) {
+            try {
+                const imgRes = await fetch(imageUrl);
+                const arrayBuffer = await imgRes.arrayBuffer();
+                const buffer = Buffer.from(arrayBuffer);
+                const mimeType = imgRes.headers.get("content-type") || "image/jpeg";
+                imagePart = {
+                    inlineData: {
+                        data: buffer.toString("base64"),
+                        mimeType: mimeType
+                    }
+                };
+            } catch (err) {
+                logger.error("Failed to fetch image for AI analysis", { imageUrl, error: err.message });
+            }
+        }
+
+        const parts = [];
+        if (imagePart) {
+            parts.push(imagePart);
+        }
+        parts.push({ text: analysisPrompt });
+
         const result = await model.generateContent([
-            { role: "user", parts: [{ text: analysisPrompt }] }
+            { role: "user", parts }
         ]);
 
         const responseText = result.response.text()

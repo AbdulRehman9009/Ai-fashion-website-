@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Save, Package, DollarSign, Layers, Tag, FileText, Image as ImageIcon, Sparkles } from "lucide-react";
+import { Loader2, Save, Package, DollarSign, Layers, Tag, FileText, Image as ImageIcon, Sparkles, Users } from "lucide-react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import ImageUpload from "@/components/ui/image-upload";
@@ -29,6 +29,7 @@ const PRODUCT_TYPES = [
 export default function ProductForm({ product, onSuccess }) {
     const router = useRouter();
     const [loading, setLoading] = useState(false);
+    const [aiLoading, setAiLoading] = useState(false);
     const [formData, setFormData] = useState({
         title: product?.title || "",
         description: product?.description || "",
@@ -36,7 +37,8 @@ export default function ProductForm({ product, onSuccess }) {
         basePrice: product?.basePrice || "",
         stock: product?.stock || 0,
         imageUrl: product?.images?.[0] || "",
-        type: product?.type || "READY_TO_WEAR"
+        type: product?.type || "READY_TO_WEAR",
+        audience: product?.audience || ""
     });
 
     const handleChange = (e) => {
@@ -46,6 +48,10 @@ export default function ProductForm({ product, onSuccess }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!formData.audience) {
+            toast.error("Please select a Gender.");
+            return;
+        }
         setLoading(true);
 
         try {
@@ -69,6 +75,38 @@ export default function ProductForm({ product, onSuccess }) {
         }
     };
 
+    const generateAIDetails = async () => {
+        if (!formData.title && !formData.imageUrl) {
+            toast.error("Please provide a title or upload an image first for AI to analyze.");
+            return;
+        }
+
+        setAiLoading(true);
+        try {
+            const res = await axios.post("/api/ai-product-details", {
+                title: formData.title,
+                category: formData.category,
+                imageUrl: formData.imageUrl
+            });
+
+            const data = res.data;
+            if (data.description) {
+                setFormData(prev => ({
+                    ...prev,
+                    description: data.description,
+                    audience: data.audience || prev.audience,
+                    type: data.type || prev.type
+                }));
+                toast.success("AI generated details successfully!");
+            }
+        } catch (err) {
+            toast.error("Failed to generate AI details");
+            console.error(err);
+        } finally {
+            setAiLoading(false);
+        }
+    };
+
     return (
         <form onSubmit={handleSubmit} className="space-y-6">
             {/* Header Info */}
@@ -85,11 +123,24 @@ export default function ProductForm({ product, onSuccess }) {
             )}
 
             {/* Basic Information */}
-            <Card className="border-0 shadow-md dark:bg-gray-800/50">
+            <Card className="border border-gray-100 dark:border-gray-800/60 shadow-xl bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-2xl overflow-hidden">
                 <CardHeader className="pb-4">
-                    <div className="flex items-center gap-2">
-                        <Package className="h-5 w-5 text-orange-600 dark:text-orange-400" />
-                        <CardTitle className="text-lg">Basic Information</CardTitle>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Package className="h-5 w-5 text-orange-600 dark:text-orange-400" />
+                            <CardTitle className="text-lg">Basic Information</CardTitle>
+                        </div>
+                        <Button 
+                            type="button" 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={generateAIDetails}
+                            disabled={aiLoading}
+                            className="gap-2 border-purple-200 text-purple-700 hover:bg-purple-50 dark:border-purple-800 dark:text-purple-300 dark:hover:bg-purple-900/30"
+                        >
+                            {aiLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
+                            Auto-fill with AI
+                        </Button>
                     </div>
                     <CardDescription>Enter the product details</CardDescription>
                 </CardHeader>
@@ -110,8 +161,8 @@ export default function ProductForm({ product, onSuccess }) {
                         />
                     </div>
 
-                    {/* Category and Type - Responsive Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {/* Category, Type, and Gender - Responsive Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div className="space-y-2">
                             <Label className="flex items-center gap-2">
                                 <Layers className="h-4 w-4 text-gray-500" />
@@ -154,6 +205,23 @@ export default function ProductForm({ product, onSuccess }) {
                                 </SelectContent>
                             </Select>
                         </div>
+
+                        <div className="space-y-2">
+                            <Label className="flex items-center gap-2">
+                                <Users className="h-4 w-4 text-gray-500" />
+                                Gender <span className="text-red-500">*</span>
+                            </Label>
+                            <Select value={formData.audience} onValueChange={(val) => setFormData(p => ({ ...p, audience: val }))}>
+                                <SelectTrigger className="h-11">
+                                    <SelectValue placeholder="Select Gender" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="MEN">Men</SelectItem>
+                                    <SelectItem value="WOMEN">Women</SelectItem>
+                                    <SelectItem value="UNISEX">Unisex</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
 
                     {/* Description */}
@@ -175,7 +243,7 @@ export default function ProductForm({ product, onSuccess }) {
             </Card>
 
             {/* Pricing & Stock */}
-            <Card className="border-0 shadow-md dark:bg-gray-800/50">
+            <Card className="border border-gray-100 dark:border-gray-800/60 shadow-xl bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-2xl overflow-hidden">
                 <CardHeader className="pb-4">
                     <div className="flex items-center gap-2">
                         <DollarSign className="h-5 w-5 text-green-600 dark:text-green-400" />
@@ -225,7 +293,7 @@ export default function ProductForm({ product, onSuccess }) {
             </Card>
 
             {/* Product Image */}
-            <Card className="border-0 shadow-md dark:bg-gray-800/50">
+            <Card className="border border-gray-100 dark:border-gray-800/60 shadow-xl bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl rounded-2xl overflow-hidden">
                 <CardHeader className="pb-4">
                     <div className="flex items-center gap-2">
                         <ImageIcon className="h-5 w-5 text-purple-600 dark:text-purple-400" />

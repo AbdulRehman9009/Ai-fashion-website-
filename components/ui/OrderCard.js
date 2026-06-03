@@ -7,6 +7,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import { format } from "date-fns";
 import { Package, User, Clock, AlertCircle, ChevronRight, MapPin } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getProductImage, useProductImageFallback } from "@/lib/productImages";
 
 /**
  * Generic OrderCard component for mobile-first dashboard views
@@ -26,7 +27,7 @@ export default function OrderCard({
     const item = order.items?.[0] || {};
     const product = item.product || {};
     const date = order.createdAt ? new Date(order.createdAt) : new Date();
-    const imageSrc = product.images?.[0] || product.imageUrl || order.outfitImage;
+    const imageSrc = order.outfitImage || getProductImage(product);
     const customer = order.user || order.customer;
     const address = order.shippingAddress || order.deliveryAddress;
 
@@ -42,13 +43,7 @@ export default function OrderCard({
             <div className="flex p-4 gap-4">
                 {/* Product Image */}
                 <div className="h-24 w-24 flex-shrink-0 bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border dark:border-gray-700 relative">
-                    {imageSrc ? (
-                        <img src={imageSrc} alt={product.title || "Order item"} className="h-full w-full object-cover" />
-                    ) : (
-                        <div className="h-full w-full flex items-center justify-center text-gray-400">
-                            <Package className="h-8 w-8" />
-                        </div>
-                    )}
+                    <img src={imageSrc} alt={product.title || "Order item"} onError={useProductImageFallback} className="h-full w-full object-cover" />
                     {order.items?.length > 1 && (
                         <div className="absolute bottom-0 right-0 bg-black/60 text-white text-xs px-1.5 py-0.5 rounded-tl">
                             +{order.items.length - 1} more

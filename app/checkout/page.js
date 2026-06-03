@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { useCart } from "@/contexts/CartContext";
 import { motion, AnimatePresence } from "framer-motion";
+import { getProductImage } from "@/lib/productImages";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -327,18 +328,12 @@ export default function CheckoutPage() {
                                                 <div key={index} className="flex gap-3 sm:gap-4 p-3 sm:p-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
                                                     {/* Product Image */}
                                                     <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-700">
-                                                        {item.product?.images?.[0] ? (
-                                                            <Image
-                                                                src={item.product.images[0]}
-                                                                alt={item.product?.title || "Product image"}
-                                                                fill
-                                                                className="object-cover"
-                                                            />
-                                                        ) : (
-                                                            <div className="w-full h-full flex items-center justify-center text-slate-400 dark:text-slate-500">
-                                                                <Package className="h-6 w-6" />
-                                                            </div>
-                                                        )}
+                                                        <Image
+                                                            src={getProductImage(item.product)}
+                                                            alt={item.product?.title || "Product image"}
+                                                            fill
+                                                            className="object-cover"
+                                                        />
                                                     </div>
 
                                                     {/* Product Info */}

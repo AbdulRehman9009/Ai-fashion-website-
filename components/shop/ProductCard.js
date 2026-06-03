@@ -5,23 +5,21 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ShoppingCart } from "lucide-react";
 import { toast } from "react-toastify";
+import { getProductImage, PRODUCT_IMAGE_FALLBACK, useProductImageFallback } from "@/lib/productImages";
 
 export default function ProductCard({ product, onAddToCart, onBuyNow }) {
-  const imageSrc = product.imageUrl || (product.images && product.images[0]) || "";
+  const imageSrc = getProductImage(product);
   const tags = Array.isArray(product.tags) ? product.tags.slice(0, 3) : [];
 
   return (
     <Card className="flex flex-col h-full overflow-hidden hover:shadow-lg transition-shadow">
       <div className="relative aspect-[4/5] bg-gray-100 dark:bg-gray-800 overflow-hidden">
-        {imageSrc ? (
-          <img
-            src={imageSrc}
-            alt={product.title}
-            className="object-cover w-full h-full hover:scale-105 transition-transform duration-500"
-          />
-        ) : (
-          <div className="flex items-center justify-center h-full text-gray-400 dark:text-gray-500">No Image</div>
-        )}
+        <img
+          src={imageSrc}
+          alt={product.title || "Product image"}
+          onError={useProductImageFallback}
+          className={`object-cover w-full h-full hover:scale-105 transition-transform duration-500 ${imageSrc === PRODUCT_IMAGE_FALLBACK ? "p-6" : ""}`}
+        />
         {product.type === "READY_TO_WEAR" && (
           <span className="absolute top-2 right-2 bg-black/70 dark:bg-black/80 text-white text-xs px-2 py-1 rounded">Ready to Wear</span>
         )}

@@ -283,6 +283,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  overflow-x: hidden;
   /* Improve performance with GPU acceleration */
   -webkit-transform: translateZ(0);
   transform: translateZ(0);

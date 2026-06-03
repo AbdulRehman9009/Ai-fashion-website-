@@ -9,6 +9,7 @@ import ProductForm from "./ProductForm";
 import { Dialog, DialogContent, DialogTrigger, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
+import { getProductImage, PRODUCT_IMAGE_FALLBACK, useProductImageFallback } from "@/lib/productImages";
 
 export default function ProductList() {
     const [products, setProducts] = useState([]);
@@ -107,7 +108,9 @@ export default function ProductList() {
                         </motion.div>
                     ) : null}
 
-                    {products.map((p, i) => (
+                    {products.map((p, i) => {
+                        const productImage = getProductImage(p);
+                        return (
                         <motion.div
                             key={p._id}
                             initial={{ opacity: 0, y: 20 }}
@@ -116,13 +119,12 @@ export default function ProductList() {
                         >
                             <Card className="overflow-hidden group h-full border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
                                 <div className="h-56 bg-gray-100 dark:bg-gray-800 relative overflow-hidden">
-                                    {p.images?.[0] ? (
-                                        <img src={p.images[0]} alt={p.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                                    ) : (
-                                        <div className="h-full w-full flex items-center justify-center text-gray-400">
-                                            <PackageX className="h-12 w-12 opacity-20" />
-                                        </div>
-                                    )}
+                                    <img
+                                        src={productImage}
+                                        alt={p.title || "Product image"}
+                                        onError={useProductImageFallback}
+                                        className={`h-full w-full object-cover transition-transform duration-500 group-hover:scale-110 ${productImage === PRODUCT_IMAGE_FALLBACK ? "p-8" : ""}`}
+                                    />
 
                                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2 pt-4">
                                         <Button size="icon" variant="secondary" className="h-9 w-9 bg-white text-gray-900 hover:bg-gray-100 shadow-lg translate-y-4 group-hover:translate-y-0 transition-all duration-300 delay-75" onClick={() => openEdit(p)}>
@@ -162,7 +164,8 @@ export default function ProductList() {
                                 </CardContent>
                             </Card>
                         </motion.div>
-                    ))}
+                    );
+                    })}
                 </AnimatePresence>
             </div>
         </div>

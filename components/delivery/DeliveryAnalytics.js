@@ -34,7 +34,15 @@ export default function DeliveryAnalytics({ deliveries, earnings }) {
     });
 
     
-    const avgDeliveryTime = deliveries.length > 0 ? "2.5 hours" : "N/A";
+    const deliveredWithTiming = deliveries
+        .filter((delivery) => delivery.status === "Delivered" && delivery.confirmedAt && delivery.createdAt)
+        .map((delivery) => Math.max(0, new Date(delivery.confirmedAt) - new Date(delivery.createdAt)));
+    const avgMs = deliveredWithTiming.length
+        ? deliveredWithTiming.reduce((sum, duration) => sum + duration, 0) / deliveredWithTiming.length
+        : 0;
+    const avgDeliveryTime = deliveredWithTiming.length
+        ? `${Math.max(1, Math.round(avgMs / (1000 * 60)))} min`
+        : "N/A";
     const totalDeliveries = deliveries.filter(d => d.status === "Delivered").length;
 
     return (

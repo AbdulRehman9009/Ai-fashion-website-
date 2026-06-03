@@ -11,6 +11,12 @@ const ProductSchema = new mongoose.Schema(
     images: [String], // URLs
     stock: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true, index: true },
+    audience: {
+      type: String,
+      enum: ["MEN", "WOMEN", "UNISEX"],
+      default: "UNISEX",
+      index: true,
+    },
     type: { type: String, enum: ["STITCHED", "UNSTITCHED", "READY_TO_WEAR"], default: "READY_TO_WEAR" },
     attributes: {
       color: String,

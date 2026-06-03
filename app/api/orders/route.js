@@ -19,7 +19,7 @@ export async function GET(req) {
   } else if (role === "SHOPKEEPER") {
     const shops = await Shop.find({ owner: token.sub }).select("_id").lean();
     const shopIds = shops.map((s) => s._id);
-    orders = await Order.find({ shop: { $in: shopIds } }).sort({ createdAt: -1 }).populate("user").lean();
+    orders = await Order.find({ shop: { $in: shopIds } }).sort({ createdAt: -1 }).populate("user").populate("shop").lean();
   } else if (role === "USER") {
     orders = await Order.find({ user: token.sub }).sort({ createdAt: -1 }).populate("shop").lean();
   } else if (role === "DELIVERY") {

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="1125" viewBox="0 0 900 1125" role="img" aria-labelledby="title desc">
+  <title id="title">Product image placeholder</title>
+  <desc id="desc">A neutral fashion product placeholder for dresses and apparel.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f8fafc"/>
+      <stop offset="1" stop-color="#e2e8f0"/>
+    </linearGradient>
+    <linearGradient id="dress" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f97316"/>
+      <stop offset="0.55" stop-color="#ec4899"/>
+      <stop offset="1" stop-color="#4f46e5"/>
+    </linearGradient>
+  </defs>
+  <rect width="900" height="1125" fill="url(#bg)"/>
+  <circle cx="450" cy="280" r="92" fill="#cbd5e1"/>
+  <path d="M315 405c25-48 70-77 135-77s110 29 135 77l107 408c8 31-15 62-47 62H255c-32 0-55-31-47-62l107-408Z" fill="url(#dress)"/>
+  <path d="M335 417h230l-43 155c-12 44-51 74-97 74s-85-30-97-74l-43-155Z" fill="#ffffff" opacity=".24"/>
+  <path d="M260 811h380" stroke="#ffffff" stroke-width="18" stroke-linecap="round" opacity=".36"/>
+  <text x="450" y="995" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="38" font-weight="700" fill="#475569">Style Genie</text>
+</svg>

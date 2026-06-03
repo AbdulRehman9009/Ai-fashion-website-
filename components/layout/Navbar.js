@@ -299,7 +299,7 @@ export default function Navbar() {
 
                 
                 {mobileMenuOpen && (
-                    <div className="md:hidden border-t bg-white dark:bg-gray-900 dark:border-gray-800">
+                    <div className="md:hidden border-t bg-white dark:bg-gray-900 dark:border-gray-800 overflow-y-auto max-h-[calc(100vh-4rem)]">
                         <div className="container mx-auto px-4 py-4 space-y-2">
                             {navLinks.map((link) => (
                                 <Link

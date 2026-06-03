@@ -56,6 +56,7 @@ async function getProducts(req) {
     category: searchParams.get('category'),
     minPrice: searchParams.get('minPrice'),
     maxPrice: searchParams.get('maxPrice'),
+    audience: searchParams.get('audience'),
     type: searchParams.get('type'),
     search: searchParams.get('search'),
     sort: searchParams.get('sort')
@@ -65,14 +66,21 @@ async function getProducts(req) {
     throw new ValidationError("Invalid query parameters", queryValidation.errors);
   }
 
-  const { page, limit, category, minPrice, maxPrice, type, search, sort } = queryValidation.data;
+  const { page, limit, category, minPrice, maxPrice, audience, type, search, sort } = queryValidation.data;
   const skip = (page - 1) * limit;
 
   // Build query
-  const query = {};
+  const includeAll = searchParams.get('includeAll') === 'true';
+  const query = includeAll
+    ? {}
+    : {
+      isActive: true,
+      "images.0": { $exists: true, $nin: ["", null] }
+    };
   const shopId = searchParams.get("shop");
   if (shopId) query.shop = shopId;
   if (category) query.category = category;
+  if (audience) query.audience = audience;
   if (type) query.type = type;
   if (minPrice !== undefined || maxPrice !== undefined) {
     query.basePrice = {};
@@ -109,9 +117,6 @@ async function getProducts(req) {
       .lean(),
     Product.countDocuments(query)
   ]);
-
-  // Allow includeAll param for development/testing (admin only in prod)
-  const includeAll = searchParams.get('includeAll') === 'true';
 
   // Filter out products from inactive or hidden shops (unless includeAll)
   const visibleProducts = includeAll

@@ -27,6 +27,7 @@ import {
 import { toast } from "react-toastify";
 import axios from "axios";
 import Link from "next/link";
+import { getProductImage, PRODUCT_IMAGE_FALLBACK, useProductImageFallback } from "@/lib/productImages";
 
 const CATEGORIES = ["All", "Wedding", "Party", "Casual", "Formal"];
 const PRODUCT_TYPES = [
@@ -328,23 +329,19 @@ export default function CustomerProductsPage() {
 
 function ProductCard({ product, viewMode }) {
     const [liked, setLiked] = useState(false);
+    const productImage = getProductImage(product);
 
     if (viewMode === "list") {
         return (
             <Card className="overflow-hidden hover:shadow-lg transition-all">
                 <div className="flex">
                     <div className="w-32 h-32 sm:w-48 sm:h-48 bg-gray-100 dark:bg-gray-700 shrink-0">
-                        {product.images?.[0] ? (
-                            <img
-                                src={product.images[0]}
-                                alt={product.title}
-                                className="w-full h-full object-cover"
-                            />
-                        ) : (
-                            <div className="w-full h-full flex items-center justify-center">
-                                <Package className="h-8 w-8 text-gray-300" />
-                            </div>
-                        )}
+                        <img
+                            src={productImage}
+                            alt={product.title || "Product image"}
+                            onError={useProductImageFallback}
+                            className={`w-full h-full object-cover ${productImage === PRODUCT_IMAGE_FALLBACK ? "p-6" : ""}`}
+                        />
                     </div>
                     <CardContent className="flex-1 p-4">
                         <div className="flex justify-between items-start">
@@ -392,17 +389,12 @@ function ProductCard({ product, viewMode }) {
     return (
         <Card className="overflow-hidden group hover:shadow-lg transition-all">
             <div className="aspect-square bg-gray-100 dark:bg-gray-700 relative overflow-hidden">
-                {product.images?.[0] ? (
-                    <img
-                        src={product.images[0]}
-                        alt={product.title}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                ) : (
-                    <div className="w-full h-full flex items-center justify-center">
-                        <Package className="h-12 w-12 text-gray-300" />
-                    </div>
-                )}
+                <img
+                    src={productImage}
+                    alt={product.title || "Product image"}
+                    onError={useProductImageFallback}
+                    className={`w-full h-full object-cover group-hover:scale-105 transition-transform duration-300 ${productImage === PRODUCT_IMAGE_FALLBACK ? "p-8" : ""}`}
+                />
 
                 {/* Badges */}
                 <div className="absolute top-2 left-2 flex flex-col gap-1">

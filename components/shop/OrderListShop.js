@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Check, X, Scissors, User, Star, MapPin, Phone } from "lucide-react";
+import { Loader2, Check, X, Scissors, User, Star, MapPin, Phone, Truck } from "lucide-react";
 import { toast } from "react-toastify";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import axios from "axios";
 import Link from "next/link";
+import { getProductImage, useProductImageFallback } from "@/lib/productImages";
+import AssignDeliveryDialog from "@/components/tailor/AssignDeliveryDialog";
 
 export default function OrderListShop() {
     const [orders, setOrders] = useState([]);
@@ -20,6 +22,7 @@ export default function OrderListShop() {
     const [tailorsLoading, setTailorsLoading] = useState(false);
     const [selectedTailor, setSelectedTailor] = useState("");
     const [actionLoading, setActionLoading] = useState(false);
+    const [deliveryDialogOrder, setDeliveryDialogOrder] = useState(null);
 
     useEffect(() => {
         fetchOrders();
@@ -138,13 +141,12 @@ export default function OrderListShop() {
                             <div className="flex justify-between items-start">
                                 <div className="flex gap-4">
                                     <div className="h-16 w-16 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden flex-shrink-0">
-                                        {o.items?.[0]?.product?.images?.[0] ? (
-                                            <img src={o.items[0].product.images[0]} className="h-full w-full object-cover" alt="" />
-                                        ) : (
-                                            <div className="h-full w-full flex items-center justify-center text-gray-400">
-                                                <Scissors className="h-6 w-6" />
-                                            </div>
-                                        )}
+                                        <img
+                                            src={getProductImage(o.items?.[0]?.product)}
+                                            className="h-full w-full object-cover"
+                                            alt={o.items?.[0]?.product?.title || "Order item"}
+                                            onError={useProductImageFallback}
+                                        />
                                     </div>
                                     <div>
                                         <CardTitle className="text-lg">Order #{String(o._id).slice(-6).toUpperCase()}</CardTitle>
@@ -195,20 +197,26 @@ export default function OrderListShop() {
                                     </Button>
                                 </>
                             )}
+
                             {o.status === "PaymentConfirmed" && requiresTailoring(o) && (
                                 <Button size="sm" variant="outline" onClick={() => { setSelectedOrder(o); setSelectedTailor(""); }} className="gap-2 border-purple-300 text-purple-700 hover:bg-purple-50 hover:text-purple-800">
                                     <Scissors className="h-4 w-4" /> Assign Tailor
                                 </Button>
                             )}
-                            {o.status === "PaymentConfirmed" && !requiresTailoring(o) && (
-                                <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={() => handleStatusUpdate(o._id, "DeliveryPending")}>
-                                    Ready for Delivery
+                            {o.status === "PaymentConfirmed" && !requiresTailoring(o) && !o.delivery && (
+                                <Button size="sm" className="bg-blue-600 hover:bg-blue-700 gap-1.5" onClick={() => setDeliveryDialogOrder(o)}>
+                                    <Truck className="h-4 w-4" /> Assign Delivery
                                 </Button>
                             )}
-                            {o.status === "TailoringCompleted" && (
-                                <Button size="sm" className="bg-blue-600 hover:bg-blue-700" onClick={() => handleStatusUpdate(o._id, "DeliveryPending")}>
-                                    Mark Ready for Delivery
+                            {o.status === "TailoringCompleted" && !o.delivery && (
+                                <Button size="sm" className="bg-blue-600 hover:bg-blue-700 gap-1.5" onClick={() => setDeliveryDialogOrder(o)}>
+                                    <Truck className="h-4 w-4" /> Assign Delivery
                                 </Button>
+                            )}
+                            {o.delivery && (
+                                <Badge variant="secondary" className="text-xs gap-1.5">
+                                    <Truck className="h-3.5 w-3.5 text-blue-600" /> Courier Assigned
+                                </Badge>
                             )}
                             {o.assignedTailor && (
                                 <Badge variant="secondary" className="text-xs">
@@ -358,6 +366,17 @@ export default function OrderListShop() {
                     </div>
                 </DialogContent>
             </Dialog>
+
+            {/* Assign Delivery Dialog */}
+            <AssignDeliveryDialog
+                open={!!deliveryDialogOrder}
+                onOpenChange={(open) => !open && setDeliveryDialogOrder(null)}
+                order={deliveryDialogOrder}
+                onSuccess={() => {
+                    setDeliveryDialogOrder(null);
+                    fetchOrders();
+                }}
+            />
         </div>
     );
 }

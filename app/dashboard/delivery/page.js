@@ -133,7 +133,7 @@ export default function DeliveryDashboard() {
           title="Completed"
           value={stats.completed}
           icon={CheckCircle}
-          trend="+12 this week"
+          trend={stats.completed > 0 ? "Completed" : "No history"}
           trendUp={true}
           description="successfully delivered"
           color="green"

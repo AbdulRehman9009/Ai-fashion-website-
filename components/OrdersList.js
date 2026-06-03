@@ -7,6 +7,7 @@ import { Loader2, RefreshCw, X, MapPin } from "lucide-react";
 import { toast } from "react-toastify";
 import OrderTimeline from "@/components/OrderTimeline";
 import { getStatusLabel } from "@/lib/workflow";
+import { getProductImage, useProductImageFallback } from "@/lib/productImages";
 
 export default function OrdersList({ role, limit, compact }) {
   const [orders, setOrders] = useState([]);
@@ -111,11 +112,12 @@ export default function OrdersList({ role, limit, compact }) {
                 <div className="flex gap-4 items-center flex-1">
                   {/* Product Image */}
                   <div className="h-16 w-16 bg-gray-200 dark:bg-gray-700 rounded-lg overflow-hidden flex-shrink-0 border border-gray-100 dark:border-gray-600">
-                    {(o.items?.[0]?.product?.images?.[0] || o.items?.[0]?.product?.imageUrl) ? (
-                      <img src={o.items[0].product.images?.[0] || o.items[0].product.imageUrl} alt={o.items[0].product.title || "Product"} className="h-full w-full object-cover" />
-                    ) : (
-                      <div className="h-full w-full flex items-center justify-center text-gray-400 dark:text-gray-500 text-xs font-medium">No Img</div>
-                    )}
+                    <img
+                      src={getProductImage(o.items?.[0]?.product)}
+                      alt={o.items?.[0]?.product?.title || "Product"}
+                      onError={useProductImageFallback}
+                      className="h-full w-full object-cover"
+                    />
                   </div>
 
                   <div className="space-y-1">
@@ -195,13 +197,12 @@ export default function OrdersList({ role, limit, compact }) {
                     {selectedOrder.items?.map((item, i) => (
                       <div key={i} className="flex gap-3 items-center">
                         <div className="h-12 w-12 bg-gray-100 dark:bg-gray-800 rounded-md overflow-hidden">
-                          {(item.product?.images?.[0] || item.product?.imageUrl) && (
-                            <img
-                              src={item.product.images?.[0] || item.product.imageUrl}
-                              alt={item.product?.title || item.product?.name || "Product"}
-                              className="h-full w-full object-cover"
-                            />
-                          )}
+                          <img
+                            src={getProductImage(item.product)}
+                            alt={item.product?.title || item.product?.name || "Product"}
+                            onError={useProductImageFallback}
+                            className="h-full w-full object-cover"
+                          />
                         </div>
                         <div className="text-sm">
                           <p className="font-medium">{item.product?.title || item.product?.name || "Product"}</p>

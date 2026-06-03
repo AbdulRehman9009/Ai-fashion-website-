@@ -10,6 +10,7 @@ import axios from "axios";
 import Link from "next/link";
 import BackButton from "@/components/navigation/BackButton";
 import { useCart } from "@/contexts/CartContext";
+import { getProductImage, PRODUCT_IMAGE_FALLBACK, useProductImageFallback } from "@/lib/productImages";
 
 export default function ShopProfilePage() {
     const params = useParams();
@@ -228,17 +229,18 @@ export default function ShopProfilePage() {
                         </Card>
                     ) : (
                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
-                            {products.map((product) => (
+                            {products.map((product) => {
+                                const productImage = getProductImage(product);
+                                return (
                                 <Card key={product._id} className="overflow-hidden group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
                                     <Link href={`/products/${product._id}`} className="block h-full">
                                         <div className="aspect-[4/5] bg-slate-100 dark:bg-slate-800 relative overflow-hidden">
-                                            {product.images?.[0] ? (
-                                                <img src={product.images[0]} alt={product.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center">
-                                                    <Package className="h-12 w-12 text-slate-300 dark:text-slate-600" />
-                                                </div>
-                                            )}
+                                            <img
+                                                src={productImage}
+                                                alt={product.title || "Product image"}
+                                                onError={useProductImageFallback}
+                                                className={`w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ${productImage === PRODUCT_IMAGE_FALLBACK ? "p-8" : ""}`}
+                                            />
 
                                             {/* Overlays */}
                                             <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -308,7 +310,8 @@ export default function ShopProfilePage() {
                                         </CardContent>
                                     </Link>
                                 </Card>
-                            ))}
+                            );
+                            })}
                         </div>
                     )}
                 </div>
