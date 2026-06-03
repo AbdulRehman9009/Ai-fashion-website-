@@ -5,6 +5,7 @@ import Order from "@/models/Order";
 import User from "@/models/User";
 import Product from "@/models/Product";
 import Shop from "@/models/Shop";
+import Profile from "@/models/Profile";
 import { computePricing } from "@/lib/pricing";
 import { createCheckoutSession } from "@/lib/paddle/paddleCheckout";
 
@@ -49,6 +50,43 @@ export async function POST(req) {
   if (token.role !== "USER") return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   const body = await req.json();
+  const { items = [], shopId, tailoringRequests = [], urgent = false, deliveryZone = "standard", shippingAddress = {}, paymentMethod = "card" } = body;
+
+  // Auto-fill/update Profile using checkout shipping details to guarantee user meets profile completion
+  try {
+    let profile = await Profile.findOne({ user: token.sub });
+    if (!profile) {
+      profile = new Profile({ user: token.sub });
+    }
+    if (!profile.phone && shippingAddress.phone) {
+      profile.phone = shippingAddress.phone;
+    }
+    if (!profile.name && shippingAddress.fullName) {
+      profile.name = shippingAddress.fullName;
+    }
+    if (!profile.addresses || profile.addresses.length === 0) {
+      profile.addresses = [{
+        street: shippingAddress.street,
+        city: shippingAddress.city,
+        state: shippingAddress.state,
+        zip: shippingAddress.zip,
+        country: shippingAddress.country || "Pakistan",
+        isDefault: true
+      }];
+    }
+    await profile.save();
+
+    const { checkProfileCompletion } = await import("@/lib/profile-completion");
+    const completion = await checkProfileCompletion(token.sub, "USER");
+    await User.findByIdAndUpdate(token.sub, {
+      "profileCompletion.isComplete": completion.isComplete,
+      "profileCompletion.percentage": completion.percentage,
+      "profileCompletion.missingFields": completion.missingFields,
+      "profileCompletion.lastChecked": new Date(),
+    });
+  } catch (err) {
+    console.error("Error auto-completing profile on checkout:", err);
+  }
 
   // Check Profile Completion
   const user = await User.findById(token.sub).select("profileCompletion").lean();
@@ -58,8 +96,6 @@ export async function POST(req) {
       redirect: "/dashboard/complete-profile"
     }, { status: 403 });
   }
-
-  const { items = [], shopId, tailoringRequests = [], urgent = false, deliveryZone = "standard", shippingAddress = {}, paymentMethod = "card" } = body;
 
   if (!shopId || !Array.isArray(items) || items.length === 0) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });

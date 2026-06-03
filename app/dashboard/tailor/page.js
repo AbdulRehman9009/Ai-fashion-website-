@@ -91,15 +91,27 @@ export default function TailorDashboard() {
   const completedOrders = orders.filter(o => o.status === "TailoringCompleted");
   const historyOrders = orders.filter(o => ["DeliveryPending", "Completed", "Delivered", "stitched"].includes(o.status));
 
-  // Chart data
+  // Calculate actual daily earnings for the chart from orders completed in the last 7 days
+  const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  const dailyEarnings = { Sun: 0, Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0 };
+  
+  orders.forEach(o => {
+    if (["TailoringCompleted", "DeliveryPending", "Completed", "Delivered", "stitched"].includes(o.status)) {
+      const date = new Date(o.updatedAt || o.createdAt);
+      const dayName = daysOfWeek[date.getDay()];
+      const amt = 25 + (o.urgent ? 10 : 0);
+      dailyEarnings[dayName] += amt;
+    }
+  });
+
   const chartData = [
-    { name: 'Mon', earnings: 50 },
-    { name: 'Tue', earnings: 75 },
-    { name: 'Wed', earnings: 25 },
-    { name: 'Thu', earnings: 100 },
-    { name: 'Fri', earnings: stats.earnings > 250 ? stats.earnings : 120 },
-    { name: 'Sat', earnings: 80 },
-    { name: 'Sun', earnings: 60 },
+    { name: 'Mon', earnings: dailyEarnings['Mon'] },
+    { name: 'Tue', earnings: dailyEarnings['Tue'] },
+    { name: 'Wed', earnings: dailyEarnings['Wed'] },
+    { name: 'Thu', earnings: dailyEarnings['Thu'] },
+    { name: 'Fri', earnings: dailyEarnings['Fri'] },
+    { name: 'Sat', earnings: dailyEarnings['Sat'] },
+    { name: 'Sun', earnings: dailyEarnings['Sun'] },
   ];
 
   const container = {

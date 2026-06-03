@@ -11,6 +11,8 @@ export default function TailorAnalyticsPage() {
     const { data: session } = useSession();
     const [loading, setLoading] = useState(true);
     const [stats, setStats] = useState(null);
+    const [chartData, setChartData] = useState([]);
+    const [popularSpecializations, setPopularSpecializations] = useState([]);
 
     useEffect(() => {
         fetchAnalytics();
@@ -18,30 +20,16 @@ export default function TailorAnalyticsPage() {
 
     const fetchAnalytics = async () => {
         try {
-            // Mock data - replace with actual API calls
-            setStats({
-                totalOrders: 45,
-                completed: 38,
-                inProgress: 5,
-                pending: 2,
-                avgRating: 4.8,
-                completionRate: 95,
-            });
+            const res = await axios.get("/api/dashboard/tailor/stats");
+            setStats(res.data.stats);
+            setChartData(res.data.chartData);
+            setPopularSpecializations(res.data.popularSpecializations);
         } catch (error) {
             console.error("Error fetching analytics:", error);
         } finally {
             setLoading(false);
         }
     };
-
-    const mockChartData = [
-        { month: "Jan", total: 12, completed: 10, pending: 2 },
-        { month: "Feb", total: 15, completed: 14, pending: 1 },
-        { month: "Mar", total: 18, completed: 16, pending: 2 },
-        { month: "Apr", total: 16, completed: 15, pending: 1 },
-        { month: "May", total: 22, completed: 20, pending: 2 },
-        { month: "Jun", total: 20, completed: 19, pending: 1 },
-    ];
 
     if (loading) {
         return <LoadingSkeleton type="card" />;
@@ -60,16 +48,16 @@ export default function TailorAnalyticsPage() {
                     title="Total Orders"
                     value={stats.totalOrders}
                     icon={Scissors}
-                    trend={12}
-                    trendLabel="from last month"
+                    trend={0}
+                    trendLabel="lifetime orders"
                     colorClass="from-purple-500 to-purple-600"
                 />
                 <SummaryCard
                     title="Completed"
                     value={stats.completed}
                     icon={CheckCircle2}
-                    trend={8}
-                    trendLabel="from last month"
+                    trend={0}
+                    trendLabel="fulfilled jobs"
                     colorClass="from-green-500 to-green-600"
                 />
                 <SummaryCard
@@ -82,8 +70,8 @@ export default function TailorAnalyticsPage() {
                     title="Avg Rating"
                     value={stats.avgRating.toFixed(1)}
                     icon={Award}
-                    trend={5}
-                    trendLabel="improvement"
+                    trend={0}
+                    trendLabel="rating"
                     colorClass="from-yellow-500 to-yellow-600"
                 />
             </div>
@@ -128,18 +116,14 @@ export default function TailorAnalyticsPage() {
             {/* Orders Chart */}
             <div className="rounded-xl border bg-white p-6 shadow-sm">
                 <h2 className="mb-4 text-lg font-semibold text-gray-900">Orders Over Time</h2>
-                <OrdersChart data={mockChartData} />
+                <OrdersChart data={chartData} />
             </div>
 
             {/* Specialization Performance */}
             <div className="rounded-xl border bg-white p-6 shadow-sm">
                 <h2 className="mb-4 text-lg font-semibold text-gray-900">Popular Specializations</h2>
                 <div className="space-y-4">
-                    {[
-                        { name: "Wedding Attire", count: 18, percentage: 40 },
-                        { name: "Formal Wear", count: 15, percentage: 33 },
-                        { name: "Alterations", count: 12, percentage: 27 },
-                    ].map((spec) => (
+                    {popularSpecializations.map((spec) => (
                         <div key={spec.name}>
                             <div className="flex items-center justify-between mb-2">
                                 <span className="font-medium text-gray-900">{spec.name}</span>

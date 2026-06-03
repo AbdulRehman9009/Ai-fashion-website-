@@ -181,24 +181,13 @@ export default function CheckoutPage() {
 
             if (response.data.id) {
                 const orderId = response.data.id;
-                const checkoutUrl = response.data.checkoutUrl;
-
-                if (paymentMethod === "card" && checkoutUrl) {
-                    toast.success("Order placed! Redirecting to payment...");
-                    window.location.href = checkoutUrl;
-                    return;
-                }
-
                 setOrderCreated({
                     _id: orderId,
-                    paddleCheckoutUrl: checkoutUrl || null
+                    paddleCheckoutUrl: null
                 });
                 setStep(3);
-
-                if (paymentMethod === "cod") {
-                    toast.success("Order placed successfully! Pay on delivery.");
-                    clearCart();
-                }
+                toast.success("Order placed successfully! Pay on delivery.");
+                clearCart();
             }
         } catch (error) {
             console.error("Order creation error:", error);
@@ -207,33 +196,6 @@ export default function CheckoutPage() {
             setLoading(false);
         }
     };
-
-    // Poll order status to verify payment completion via webhook
-    useEffect(() => {
-        if (!orderCreated?._id) return;
-
-        const pollInterval = setInterval(async () => {
-            try {
-                const res = await axios.get(`/api/orders/${orderCreated._id}`);
-                if (res.data.paymentStatus === "PAID") {
-                    clearInterval(pollInterval);
-                    clearCart();
-                    toast.success("Payment verified! Your order is confirmed.");
-                    router.push(`/dashboard/user?tab=orders`);
-                }
-            } catch (err) {
-                console.error("Order status poll error:", err);
-            }
-        }, 3000); // Poll every 3 seconds
-
-        // Cleanup after 5 minutes
-        const timeout = setTimeout(() => clearInterval(pollInterval), 300000);
-
-        return () => {
-            clearInterval(pollInterval);
-            clearTimeout(timeout);
-        };
-    }, [orderCreated, clearCart, router]);
 
     // Loading state
     if (status === "loading") {
@@ -506,39 +468,18 @@ export default function CheckoutPage() {
                                             {/* Payment Method Selection */}
                                             <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-4">
                                                 <Label className="text-base font-semibold">Payment Method</Label>
-                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                                <div className="grid grid-cols-1 gap-4">
                                                     <div
-                                                        onClick={() => setPaymentMethod("card")}
-                                                        className={`cursor-pointer p-4 rounded-xl border-2 transition-all flex items-start gap-3 ${paymentMethod === "card"
-                                                            ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 ring-1 ring-indigo-600"
-                                                            : "border-slate-200 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-700 bg-slate-50 dark:bg-slate-800/50"
-                                                            }`}
+                                                        className="p-4 rounded-xl border-2 border-amber-600 bg-amber-50 dark:bg-amber-900/20 ring-1 ring-amber-600 flex items-start gap-3"
                                                     >
-                                                        <div className={`p-2 rounded-lg ${paymentMethod === "card" ? "bg-indigo-600 text-white" : "bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400"}`}>
-                                                            <CreditCard className="h-5 w-5" />
-                                                        </div>
-                                                        <div>
-                                                            <p className="font-bold text-sm">Credit / Debit Card</p>
-                                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Faster, secure checkout with Card</p>
-                                                        </div>
-                                                        {paymentMethod === "card" && <CheckCircle className="h-5 w-5 text-indigo-600 ml-auto" />}
-                                                    </div>
-
-                                                    <div
-                                                        onClick={() => setPaymentMethod("cod")}
-                                                        className={`cursor-pointer p-4 rounded-xl border-2 transition-all flex items-start gap-3 ${paymentMethod === "cod"
-                                                            ? "border-amber-600 bg-amber-50 dark:bg-amber-900/20 ring-1 ring-amber-600"
-                                                            : "border-slate-200 dark:border-slate-800 hover:border-amber-300 dark:hover:border-amber-700 bg-slate-50 dark:bg-slate-800/50"
-                                                            }`}
-                                                    >
-                                                        <div className={`p-2 rounded-lg ${paymentMethod === "cod" ? "bg-amber-600 text-white" : "bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400"}`}>
+                                                        <div className="p-2 rounded-lg bg-amber-600 text-white">
                                                             <Truck className="h-5 w-5" />
                                                         </div>
                                                         <div>
                                                             <p className="font-bold text-sm">Cash on Delivery</p>
-                                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Pay when your package arrives</p>
+                                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Pay with cash when your package arrives at your doorstep.</p>
                                                         </div>
-                                                        {paymentMethod === "cod" && <CheckCircle className="h-5 w-5 text-amber-600 ml-auto" />}
+                                                        <CheckCircle className="h-5 w-5 text-amber-600 ml-auto" />
                                                     </div>
                                                 </div>
                                             </div>
@@ -555,29 +496,17 @@ export default function CheckoutPage() {
                                                 <Button
                                                     onClick={handleCreateOrder}
                                                     disabled={loading}
-                                                    className={`flex-[2] h-12 text-lg shadow-lg transition-all ${paymentMethod === "card"
-                                                        ? "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700"
-                                                        : "bg-amber-600 hover:bg-amber-700"
-                                                        }`}
+                                                    className="flex-[2] h-12 text-lg shadow-lg transition-all bg-amber-600 hover:bg-amber-700 text-white"
                                                 >
                                                     {loading ? (
                                                         <>
                                                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                                            {paymentMethod === "card" ? "Processing..." : "Creating Order..."}
+                                                            Creating Order...
                                                         </>
                                                     ) : (
                                                         <>
-                                                            {paymentMethod === "card" ? (
-                                                                <>
-                                                                    <CreditCard className="mr-2 h-5 w-5" />
-                                                                    Pay & Place Order
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    <Package className="mr-2 h-5 w-5" />
-                                                                    Confirm Order (COD)
-                                                                </>
-                                                            )}
+                                                            <Package className="mr-2 h-5 w-5" />
+                                                            Confirm Order (COD)
                                                         </>
                                                     )}
                                                 </Button>
@@ -620,8 +549,8 @@ export default function CheckoutPage() {
                                                 <div className="h-12 w-px bg-slate-200 dark:bg-slate-700 hidden sm:block"></div>
                                                 <div className="text-center sm:text-right">
                                                     <p className="text-sm text-slate-500 dark:text-slate-400 font-medium uppercase tracking-wider">Payment Status</p>
-                                                    <p className={`text-xl font-bold mt-1 ${paymentMethod === 'cod' ? 'text-amber-600' : 'text-green-600'}`}>
-                                                        {paymentMethod === 'cod' ? 'Pay on Delivery' : 'Paid (Card)'}
+                                                    <p className="text-xl font-bold mt-1 text-amber-600">
+                                                        Cash on Delivery (Pending)
                                                     </p>
                                                 </div>
                                             </div>
