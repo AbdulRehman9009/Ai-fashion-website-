@@ -11,6 +11,7 @@ import { Loader2, Search, Star, MapPin, Phone, Mail, Scissors, Filter, ArrowLeft
 import { toast } from "react-toastify";
 import axios from "axios";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Common specializations for filtering
@@ -30,10 +31,15 @@ const SPECIALIZATIONS = [
 export default function TailorsPage() {
     const [tailors, setTailors] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [searchQuery, setSearchQuery] = useState("");
+    const searchParams = useSearchParams();
+    const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
     const [cityFilter, setCityFilter] = useState("");
     const [specializationFilter, setSpecializationFilter] = useState("");
     const [selectedTailor, setSelectedTailor] = useState(null);
+
+    useEffect(() => {
+        setSearchQuery(searchParams.get("search") || "");
+    }, [searchParams]);
 
     useEffect(() => {
         fetchTailors();
@@ -281,115 +287,119 @@ export default function TailorsPage() {
             {/* Tailor Details Dialog */}
             <Dialog open={!!selectedTailor} onOpenChange={(o) => !o && setSelectedTailor(null)}>
                 <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-                    <DialogHeader>
-                        <DialogTitle className="flex items-center gap-3">
-                            <Avatar className="h-12 w-12">
-                                <AvatarImage src={selectedTailor?.image} />
-                                <AvatarFallback className="bg-gradient-to-br from-purple-500 to-indigo-600 text-white">
-                                    {selectedTailor?.name?.charAt(0) || "T"}
-                                </AvatarFallback>
-                            </Avatar>
-                            <div>
-                                <span className="text-xl">{selectedTailor?.name}</span>
-                                {selectedTailor?.tailorProfile?.availability && (
-                                    <Badge className="ml-2 bg-green-100 text-green-700">Available</Badge>
-                                )}
-                            </div>
-                        </DialogTitle>
-                        <DialogDescription className="text-left">
-                            {selectedTailor?.email}
-                        </DialogDescription>
-                    </DialogHeader>
+                    {selectedTailor && (
+                        <>
+                            <DialogHeader>
+                                <DialogTitle className="flex items-center gap-3">
+                                    <Avatar className="h-12 w-12">
+                                        <AvatarImage src={selectedTailor?.image} />
+                                        <AvatarFallback className="bg-gradient-to-br from-purple-500 to-indigo-600 text-white">
+                                            {selectedTailor?.name?.charAt(0) || "T"}
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div>
+                                        <span className="text-xl">{selectedTailor?.name}</span>
+                                        {selectedTailor?.tailorProfile?.availability && (
+                                            <Badge className="ml-2 bg-green-100 text-green-700">Available</Badge>
+                                        )}
+                                    </div>
+                                </DialogTitle>
+                                <DialogDescription className="text-left">
+                                    {selectedTailor?.email}
+                                </DialogDescription>
+                            </DialogHeader>
 
-                    <div className="space-y-4 py-4">
-                        {/* Rating */}
-                        <div className="flex items-center gap-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                            <Star className="h-8 w-8 fill-yellow-400 text-yellow-400" />
-                            <div>
-                                <div className="font-bold text-lg">
-                                    {selectedTailor?.tailorProfile?.ratingAvg?.toFixed(1) || "0.0"}
+                            <div className="space-y-4 py-4">
+                                {/* Rating */}
+                                <div className="flex items-center gap-3 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                                    <Star className="h-8 w-8 fill-yellow-400 text-yellow-400" />
+                                    <div>
+                                        <div className="font-bold text-lg">
+                                            {selectedTailor?.tailorProfile?.ratingAvg?.toFixed(1) || "0.0"}
+                                        </div>
+                                        <div className="text-sm text-gray-600 dark:text-gray-400">
+                                            Based on {selectedTailor?.tailorProfile?.ratingCount || 0} reviews
+                                        </div>
+                                    </div>
                                 </div>
-                                <div className="text-sm text-gray-600 dark:text-gray-400">
-                                    Based on {selectedTailor?.tailorProfile?.ratingCount || 0} reviews
-                                </div>
-                            </div>
-                        </div>
 
-                        {/* Contact Info */}
-                        <div className="space-y-2">
-                            <h4 className="font-semibold text-gray-900 dark:text-white">Contact Information</h4>
-                            <div className="grid gap-2">
-                                {selectedTailor?.email && (
-                                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                        <Mail className="h-4 w-4" />
-                                        {selectedTailor.email}
+                                {/* Contact Info */}
+                                <div className="space-y-2">
+                                    <h4 className="font-semibold text-gray-900 dark:text-white">Contact Information</h4>
+                                    <div className="grid gap-2">
+                                        {selectedTailor?.email && (
+                                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                                <Mail className="h-4 w-4" />
+                                                {selectedTailor.email}
+                                            </div>
+                                        )}
+                                        {selectedTailor?.tailorProfile?.contact?.phone && (
+                                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                                <Phone className="h-4 w-4" />
+                                                {selectedTailor.tailorProfile.contact.phone}
+                                            </div>
+                                        )}
+                                        {selectedTailor?.tailorProfile?.location?.city && (
+                                            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                                                <MapPin className="h-4 w-4" />
+                                                {[
+                                                    selectedTailor.tailorProfile.location.area,
+                                                    selectedTailor.tailorProfile.location.city
+                                                ].filter(Boolean).join(", ")}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Specializations */}
+                                {selectedTailor?.tailorProfile?.specialization?.length > 0 && (
+                                    <div className="space-y-2">
+                                        <h4 className="font-semibold text-gray-900 dark:text-white">Specializations</h4>
+                                        <div className="flex flex-wrap gap-2">
+                                            {selectedTailor.tailorProfile.specialization.map((spec, i) => (
+                                                <Badge key={i} className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
+                                                    {spec}
+                                                </Badge>
+                                            ))}
+                                        </div>
                                     </div>
                                 )}
-                                {selectedTailor?.tailorProfile?.contact?.phone && (
-                                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                        <Phone className="h-4 w-4" />
-                                        {selectedTailor.tailorProfile.contact.phone}
+
+                                {/* Pricing */}
+                                {selectedTailor?.tailorProfile?.pricePerJob && (
+                                    <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                                        <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Pricing</h4>
+                                        <div className="text-2xl font-bold text-green-600">
+                                            ${selectedTailor.tailorProfile.pricePerJob}
+                                            <span className="text-sm font-normal text-gray-500"> per job</span>
+                                        </div>
                                     </div>
                                 )}
-                                {selectedTailor?.tailorProfile?.location?.city && (
-                                    <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                        <MapPin className="h-4 w-4" />
-                                        {[
-                                            selectedTailor.tailorProfile.location.area,
-                                            selectedTailor.tailorProfile.location.city
-                                        ].filter(Boolean).join(", ")}
+
+                                {/* Experience */}
+                                {selectedTailor?.tailorProfile?.experience && (
+                                    <div className="space-y-2">
+                                        <h4 className="font-semibold text-gray-900 dark:text-white">Experience</h4>
+                                        <p className="text-sm text-gray-600 dark:text-gray-400">
+                                            {selectedTailor.tailorProfile.experience} years of experience
+                                        </p>
                                     </div>
                                 )}
                             </div>
-                        </div>
 
-                        {/* Specializations */}
-                        {selectedTailor?.tailorProfile?.specialization?.length > 0 && (
-                            <div className="space-y-2">
-                                <h4 className="font-semibold text-gray-900 dark:text-white">Specializations</h4>
-                                <div className="flex flex-wrap gap-2">
-                                    {selectedTailor.tailorProfile.specialization.map((spec, i) => (
-                                        <Badge key={i} className="bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400">
-                                            {spec}
-                                        </Badge>
-                                    ))}
-                                </div>
+                            <div className="flex gap-3 mt-2">
+                                <Button variant="outline" onClick={() => setSelectedTailor(null)} className="flex-1">
+                                    Close
+                                </Button>
+                                <Link href="/dashboard/shopkeeper" className="flex-1">
+                                    <Button className="w-full bg-purple-600 hover:bg-purple-700">
+                                        <Scissors className="h-4 w-4 mr-2" />
+                                        Go to Orders
+                                    </Button>
+                                </Link>
                             </div>
-                        )}
-
-                        {/* Pricing */}
-                        {selectedTailor?.tailorProfile?.pricePerJob && (
-                            <div className="p-4 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                                <h4 className="font-semibold text-gray-900 dark:text-white mb-1">Pricing</h4>
-                                <div className="text-2xl font-bold text-green-600">
-                                    ${selectedTailor.tailorProfile.pricePerJob}
-                                    <span className="text-sm font-normal text-gray-500"> per job</span>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Experience */}
-                        {selectedTailor?.tailorProfile?.experience && (
-                            <div className="space-y-2">
-                                <h4 className="font-semibold text-gray-900 dark:text-white">Experience</h4>
-                                <p className="text-sm text-gray-600 dark:text-gray-400">
-                                    {selectedTailor.tailorProfile.experience} years of experience
-                                </p>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="flex gap-3 mt-2">
-                        <Button variant="outline" onClick={() => setSelectedTailor(null)} className="flex-1">
-                            Close
-                        </Button>
-                        <Link href="/dashboard/shopkeeper" className="flex-1">
-                            <Button className="w-full bg-purple-600 hover:bg-purple-700">
-                                <Scissors className="h-4 w-4 mr-2" />
-                                Go to Orders
-                            </Button>
-                        </Link>
-                    </div>
+                        </>
+                    )}
                 </DialogContent>
             </Dialog>
         </div>

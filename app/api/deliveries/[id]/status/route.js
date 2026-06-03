@@ -60,7 +60,7 @@ export async function PATCH(req, { params }) {
       "OutForPickup": "OutForPickup",
       "PickedUp": "PickedUp",
       "OutForDelivery": "OutForDelivery",
-      "Delivered": "Delivered"
+      "Delivered": "Completed"
     };
 
     order.status = statusMap[status] || order.status;

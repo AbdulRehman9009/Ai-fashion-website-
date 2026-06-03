@@ -9,6 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
 import { toast } from "react-toastify";
 import axios from "axios";
+import { useSearchParams } from "next/navigation";
 import AssignDeliveryDialog from "@/components/tailor/AssignDeliveryDialog";
 import { motion } from "framer-motion";
 
@@ -18,6 +19,8 @@ export default function TailorDashboard() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(null);
   const [deliveryDialogOrder, setDeliveryDialogOrder] = useState(null);
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get("search") || "";
 
   const fetchOrders = async () => {
     try {
@@ -87,9 +90,19 @@ export default function TailorDashboard() {
     fetchOrders();
   };
 
-  const activeOrders = orders.filter(o => ["TailoringPending", "TailoringInProgress", "placed"].includes(o.status));
-  const completedOrders = orders.filter(o => o.status === "TailoringCompleted");
-  const historyOrders = orders.filter(o => ["DeliveryPending", "Completed", "Delivered", "stitched"].includes(o.status));
+  const filteredOrders = orders.filter(o => {
+    const query = searchQuery.toLowerCase();
+    return !searchQuery ||
+        String(o._id).toLowerCase().includes(query) ||
+        o.user?.name?.toLowerCase().includes(query) ||
+        o.user?.email?.toLowerCase().includes(query) ||
+        o.status?.toLowerCase().includes(query) ||
+        o.items?.some(item => item.product?.title?.toLowerCase().includes(query));
+  });
+
+  const activeOrders = filteredOrders.filter(o => ["TailoringPending", "TailoringInProgress", "placed"].includes(o.status));
+  const completedOrders = filteredOrders.filter(o => o.status === "TailoringCompleted");
+  const historyOrders = filteredOrders.filter(o => ["DeliveryPending", "Completed", "Delivered", "stitched"].includes(o.status));
 
   // Calculate actual daily earnings for the chart from orders completed in the last 7 days
   const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];

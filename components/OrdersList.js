@@ -8,11 +8,25 @@ import { toast } from "react-toastify";
 import OrderTimeline from "@/components/OrderTimeline";
 import { getStatusLabel } from "@/lib/workflow";
 import { getProductImage, useProductImageFallback } from "@/lib/productImages";
+import { useSearchParams } from "next/navigation";
 
 export default function OrdersList({ role, limit, compact }) {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const searchParams = useSearchParams();
+  const searchQuery = searchParams.get("search") || "";
+
+  const filteredOrders = orders.filter(o => {
+    const query = searchQuery.toLowerCase();
+    return !searchQuery ||
+        String(o._id).toLowerCase().includes(query) ||
+        o.user?.name?.toLowerCase().includes(query) ||
+        o.user?.email?.toLowerCase().includes(query) ||
+        o.status?.toLowerCase().includes(query) ||
+        o.paymentStatus?.toLowerCase().includes(query) ||
+        o.items?.some(item => item.product?.title?.toLowerCase().includes(query));
+  });
   const [selectedOrder, setSelectedOrder] = useState(null);
 
   async function fetchOrders() {
@@ -107,7 +121,7 @@ export default function OrdersList({ role, limit, compact }) {
           {error && <p className="text-red-600 dark:text-red-400 text-sm mb-4 bg-red-50 dark:bg-red-900/20 p-2 rounded">{error}</p>}
 
           <div className="space-y-4">
-            {orders.map((o) => (
+            {filteredOrders.map((o) => (
               <div key={o._id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 border dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-800 transition-all gap-4 shadow-sm hover:shadow-md cursor-pointer" onClick={() => setSelectedOrder(o)}>
                 <div className="flex gap-4 items-center flex-1">
                   {/* Product Image */}
@@ -153,9 +167,9 @@ export default function OrdersList({ role, limit, compact }) {
                 </div>
               </div>
             ))}
-            {orders.length === 0 && !loading && (
+            {filteredOrders.length === 0 && !loading && (
               <div className="text-center py-12 text-gray-400 dark:text-gray-500">
-                <p>No orders yet.</p>
+                <p>No orders found.</p>
               </div>
             )}
           </div>

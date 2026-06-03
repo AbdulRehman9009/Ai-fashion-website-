@@ -8,12 +8,15 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "react-toastify";
 import axios from "axios";
+import { useSearchParams } from "next/navigation";
 
 export default function TailorOrdersPage() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(null);
     const [deliveryDialogOrder, setDeliveryDialogOrder] = useState(null);
+    const searchParams = useSearchParams();
+    const searchQuery = searchParams.get("search") || "";
 
     const fetchOrders = async () => {
         try {
@@ -50,13 +53,23 @@ export default function TailorOrdersPage() {
         }
     };
 
+    const filteredOrders = orders.filter(o => {
+        const query = searchQuery.toLowerCase();
+        return !searchQuery ||
+            String(o._id).toLowerCase().includes(query) ||
+            o.user?.name?.toLowerCase().includes(query) ||
+            o.user?.email?.toLowerCase().includes(query) ||
+            o.status?.toLowerCase().includes(query) ||
+            o.items?.some(item => item.product?.title?.toLowerCase().includes(query));
+    });
+
     const ACTIVE_STATUSES = ["TailoringPending", "TailoringInProgress", "placed"];
     const READY_STATUSES = ["TailoringCompleted"];
     const HISTORY_STATUSES = ["DeliveryPending", "Completed", "Delivered", "stitched"];
 
-    const activeOrders = orders.filter(o => ACTIVE_STATUSES.includes(o.status));
-    const readyOrders = orders.filter(o => READY_STATUSES.includes(o.status));
-    const historyOrders = orders.filter(o => HISTORY_STATUSES.includes(o.status));
+    const activeOrders = filteredOrders.filter(o => ACTIVE_STATUSES.includes(o.status));
+    const readyOrders = filteredOrders.filter(o => READY_STATUSES.includes(o.status));
+    const historyOrders = filteredOrders.filter(o => HISTORY_STATUSES.includes(o.status));
 
     const EmptyState = ({ icon: Icon, label }) => (
         <div className="text-center py-20 bg-gray-50 dark:bg-gray-900/50 rounded-2xl border-2 border-dashed border-gray-200 dark:border-gray-800">

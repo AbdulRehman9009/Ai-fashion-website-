@@ -11,6 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import axios from "axios";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { getProductImage, useProductImageFallback } from "@/lib/productImages";
 import AssignDeliveryDialog from "@/components/tailor/AssignDeliveryDialog";
 
@@ -23,6 +24,19 @@ export default function OrderListShop() {
     const [selectedTailor, setSelectedTailor] = useState("");
     const [actionLoading, setActionLoading] = useState(false);
     const [deliveryDialogOrder, setDeliveryDialogOrder] = useState(null);
+    const searchParams = useSearchParams();
+    const searchQuery = searchParams.get("search") || "";
+
+    const filteredOrders = orders.filter(o => {
+        const query = searchQuery.toLowerCase();
+        return !searchQuery ||
+            String(o._id).toLowerCase().includes(query) ||
+            o.user?.name?.toLowerCase().includes(query) ||
+            o.user?.email?.toLowerCase().includes(query) ||
+            o.status?.toLowerCase().includes(query) ||
+            o.paymentStatus?.toLowerCase().includes(query) ||
+            o.items?.some(item => item.product?.title?.toLowerCase().includes(query));
+    });
 
     useEffect(() => {
         fetchOrders();
@@ -128,14 +142,14 @@ export default function OrderListShop() {
                 </Link>
             </div>
 
-            {orders.length === 0 ? (
+            {filteredOrders.length === 0 ? (
                 <div className="text-center py-16 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                    <p className="text-gray-500">No orders yet.</p>
+                    <p className="text-gray-500">No orders found.</p>
                 </div>
             ) : null}
 
             <div className="grid gap-4">
-                {orders.map(o => (
+                {filteredOrders.map(o => (
                     <Card key={o._id} className="hover:shadow-md transition-shadow border border-gray-200 dark:border-gray-700">
                         <CardHeader className="pb-2">
                             <div className="flex justify-between items-start">
@@ -204,11 +218,6 @@ export default function OrderListShop() {
                                 </Button>
                             )}
                             {o.status === "PaymentConfirmed" && !requiresTailoring(o) && !o.delivery && (
-                                <Button size="sm" className="bg-blue-600 hover:bg-blue-700 gap-1.5" onClick={() => setDeliveryDialogOrder(o)}>
-                                    <Truck className="h-4 w-4" /> Assign Delivery
-                                </Button>
-                            )}
-                            {o.status === "TailoringCompleted" && !o.delivery && (
                                 <Button size="sm" className="bg-blue-600 hover:bg-blue-700 gap-1.5" onClick={() => setDeliveryDialogOrder(o)}>
                                     <Truck className="h-4 w-4" /> Assign Delivery
                                 </Button>

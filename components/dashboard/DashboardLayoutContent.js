@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import Sidebar from "@/components/dashboard/Sidebar";
 import { Menu, Bell, Search, ChevronDown, LogOut, User } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { signOut } from "next-auth/react";
 import {
@@ -19,11 +19,28 @@ import { Input } from "@/components/ui/input";
 export default function DashboardLayoutContent({ children, session, profileData }) {
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const pathname = usePathname();
-
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const [searchVal, setSearchVal] = useState("");
 
     useEffect(() => {
         setIsSidebarOpen(false);
     }, [pathname]);
+
+    useEffect(() => {
+        setSearchVal(searchParams.get("search") || "");
+    }, [searchParams]);
+
+    const handleSearchSubmit = (e) => {
+        e.preventDefault();
+        const params = new URLSearchParams(window.location.search);
+        if (searchVal) {
+            params.set("search", searchVal);
+        } else {
+            params.delete("search");
+        }
+        router.push(`${pathname}?${params.toString()}`);
+    };
 
     const getPageTitle = () => {
         const segments = pathname.split('/').filter(Boolean);
@@ -85,13 +102,15 @@ export default function DashboardLayoutContent({ children, session, profileData 
                     {/* Right Actions */}
                     <div className="flex items-center gap-2 md:gap-4">
                         {/* Search Bar (Desktop) */}
-                        <div className="hidden md:flex relative w-64">
+                        <form onSubmit={handleSearchSubmit} className="hidden md:flex relative w-64">
                             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
                             <Input
                                 placeholder="Search..."
+                                value={searchVal}
+                                onChange={(e) => setSearchVal(e.target.value)}
                                 className="pl-9 h-9 bg-gray-100/50 dark:bg-gray-800/50 border-transparent focus:bg-white dark:focus:bg-gray-900 transition-all font-normal"
                             />
-                        </div>
+                        </form>
 
                         <button className="relative p-2 text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-full transition-colors">
                             <Bell className="h-5 w-5" />

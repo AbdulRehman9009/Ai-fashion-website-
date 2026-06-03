@@ -84,7 +84,7 @@ export async function PATCH(req, { params }) {
                     return NextResponse.json({ error: "Not assigned to this delivery" }, { status: 403 });
                 }
 
-                newStatus = "Delivered";
+                newStatus = "Completed";
                 order.paymentStatus = "PAID";
                 delivery.status = "Delivered";
                 delivery.confirmedAt = new Date();
